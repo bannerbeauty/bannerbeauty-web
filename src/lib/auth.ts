@@ -5,6 +5,15 @@ const CLIENT_ID = 'c43c292b-1b08-4d2e-9045-b33eb96efc41';
 const b2cBase = `https://login.microsoftonline.com/${TENANT_ID}/oauth2/v2.0`;
 
 export const { auth, signIn, signOut, handlers } = NextAuth({
+  debug: true,
+  logger: {
+    error(code, ...message) {
+      console.error('[NextAuth Error]', code, message);
+    },
+    warn(code) {
+      console.warn('[NextAuth Warning]', code);
+    },
+  },
   providers: [
     {
       id: 'azure-ad-b2c',
