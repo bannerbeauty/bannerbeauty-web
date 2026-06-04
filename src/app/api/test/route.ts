@@ -1,8 +1,9 @@
-import { auth } from '@/lib/auth';
-import { dataverse } from '@/lib/dataverse';
-
 export async function GET() {
-  const session = await auth();
-  const products = await dataverse.get('bb_products?$top=3&$select=bb_productname,bb_price');
-  return Response.json({ session, products });
+  return Response.json({
+    dataverseUrl: process.env.DATAVERSE_URL ? 'set' : 'MISSING',
+    clientId: process.env.DATAVERSE_CLIENT_ID ? 'set' : 'MISSING',
+    clientSecret: process.env.DATAVERSE_CLIENT_SECRET ? 'set' : 'MISSING',
+    tenantId: process.env.DATAVERSE_TENANT_ID ? 'set' : 'MISSING',
+    bbSecret: process.env.BB_API_SECRET ? 'set' : 'MISSING',
+  });
 }
