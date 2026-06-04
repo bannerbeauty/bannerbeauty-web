@@ -5,11 +5,16 @@ let tokenCache: { token: string; expiresAt: number } | null = null;
 let tokenPromise: Promise<string> | null = null;
 
 async function fetchNewToken(): Promise<string> {
+  const dataverseUrl = process.env.DATAVERSE_URL;
+  console.log('dataverseUrl in fetchNewToken:', dataverseUrl);
+  if (!dataverseUrl) throw new Error('DATAVERSE_URL environment variable is not set');
+  const scope = `${dataverseUrl}/.default`;
+
   const body = new URLSearchParams({
     grant_type: 'client_credentials',
     client_id: process.env.DATAVERSE_CLIENT_ID!,
     client_secret: process.env.DATAVERSE_CLIENT_SECRET!,
-    scope: `${DATAVERSE_URL}/.default`,
+    scope,
   });
 
   const res = await fetch(TOKEN_URL, {
