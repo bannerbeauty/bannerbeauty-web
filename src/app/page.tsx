@@ -1,20 +1,62 @@
-import { Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { dataverse } from '@/lib/dataverse';
-async function getBannerCount(): Promise<number> {
-  try {
-    const result = await dataverse.get<{ '@odata.count': number }>(
-      'bb_banners?$count=true&$select=bb_bannerid'
-    );
-    return result['@odata.count'] ?? 0;
-  } catch {
-    return 0;
-  }
+import HomeClient, { type FeaturedBanner, type Quote } from './HomeClient';
+
+// ── Dataverse types ────────────────────────────────────────────────────────────
+
+interface DvFeaturedBanner {
+  bb_bannerid: string;
+  createdon?: string;
+  bb_attributiontype?: string;
+  bb_attributionname?: string;
+  bb_attributiontext?: string;
+  bb_notein?: string;
+  bb_notern?: string;
+  bb_beforephotourl?: string;
+  bb_afterphotourl?: string;
+  bb_sharename?: boolean;
+  bb_infirstname?: string;
+  bb_rnfirstname?: string;
 }
 
-async function StatsSection() {
-  const count = await getBannerCount();
+interface DvPublicNotesBanner {
+  bb_notein?: string;
+  bb_notern?: string;
+  bb_ispublicnotern?: boolean;
+  bb_sharename?: boolean;
+  bb_infirstname?: string;
+  bb_rnfirstname?: string;
+}
+
+// ── Fetch helpers ──────────────────────────────────────────────────────────────
+
+async function getBannerCount(): Promise<number> {
+  const result = await dataverse.get<{ '@odata.count': number }>(
+    'bb_banners?$count=true&$select=bb_bannerid'
+  );
+  return result['@odata.count'] ?? 0;
+}
+
+async function getFeaturedBanners(): Promise<DvFeaturedBanner[]> {
+  const result = await dataverse.get<{ value: DvFeaturedBanner[] }>(
+    'bb_banners?$filter=bb_isfeatureable eq true and statecode eq 0' +
+    '&$select=bb_bannerid,createdon,bb_attributiontype,bb_attributionname,bb_attributiontext,bb_notein,bb_notern,bb_beforephotourl,bb_afterphotourl,bb_sharename,bb_infirstname,bb_rnfirstname'
+  );
+  return result.value ?? [];
+}
+
+async function getPublicNotesBanners(): Promise<DvPublicNotesBanner[]> {
+  const result = await dataverse.get<{ value: DvPublicNotesBanner[] }>(
+    'bb_banners?$filter=(bb_ispublicnotern eq true or bb_notein ne null) and statecode eq 0' +
+    '&$select=bb_notein,bb_notern,bb_ispublicnotern,bb_sharename,bb_infirstname,bb_rnfirstname'
+  );
+  return result.value ?? [];
+}
+
+// ── Sub-components ─────────────────────────────────────────────────────────────
+
+function StatsSection({ count }: { count: number }) {
   return (
     <section style={{ background: '#1B2A4A', padding: '72px 24px', textAlign: 'center' }}>
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
@@ -51,16 +93,6 @@ async function StatsSection() {
   );
 }
 
-function StatsFallback() {
-  return (
-    <section style={{ background: '#1B2A4A', padding: '72px 24px', textAlign: 'center' }}>
-      <div style={{ color: '#C5A028', fontFamily: 'Georgia, serif', fontSize: '2rem' }}>
-        ★ &nbsp; &nbsp; ★
-      </div>
-    </section>
-  );
-}
-
 const OPTION_CARDS = [
   {
     emoji: '✉️',
@@ -82,7 +114,75 @@ const OPTION_CARDS = [
   },
 ];
 
-export default function HomePage() {
+// ── Page ───────────────────────────────────────────────────────────────────────
+
+export default async function HomePage() {
+  const [countRes, featuredRes, notesRes] = await Promise.allSettled([
+    getBannerCount(),
+    getFeaturedBanners(),
+    getPublicNotesBanners(),
+  ]);
+
+  if (countRes.status === 'rejected') console.error('Banner count fetch failed:', countRes.reason);
+  if (featuredRes.status === 'rejected') console.error('Featured banners fetch failed:', featuredRes.reason);
+  if (notesRes.status === 'rejected') console.error('Public notes fetch failed:', notesRes.reason);
+
+  const count = countRes.status === 'fulfilled' ? countRes.value : 0;
+  const featuredBanners = featuredRes.status === 'fulfilled' ? featuredRes.value : [];
+  const notesBanners = notesRes.status === 'fulfilled' ? notesRes.value : [];
+
+  // Day-indexed featured banner (Pacific time)
+  const pacificOffsetMs = (() => {
+    const fmt = new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Los_Angeles',
+      timeZoneName: 'shortOffset',
+    });
+    const parts = fmt.formatToParts(new Date());
+    const tzName = parts.find(p => p.type === 'timeZoneName')?.value ?? 'GMT-8';
+    const hoursFromUtc = parseInt(tzName.replace('GMT', '')) || -8;
+    return -hoursFromUtc * 3600 * 1000;
+  })();
+  const dayIndex = Math.floor((Date.now() - pacificOffsetMs) / 86400000);
+
+  const dvFeatured = featuredBanners.length > 0
+    ? featuredBanners[dayIndex % featuredBanners.length]
+    : null;
+
+  const featuredBanner: FeaturedBanner | null = dvFeatured
+    ? {
+        bannerId: dvFeatured.bb_bannerid,
+        attributionType: dvFeatured.bb_attributiontype ?? '',
+        attributionName: dvFeatured.bb_attributionname ?? '',
+        attributionText: dvFeatured.bb_attributiontext ?? '',
+        noteIn: dvFeatured.bb_notein ?? '',
+        noteRn: dvFeatured.bb_notern ?? '',
+        beforePhotoUrl: dvFeatured.bb_beforephotourl ?? null,
+        afterPhotoUrl: dvFeatured.bb_afterphotourl ?? null,
+        initiatingFirstName: dvFeatured.bb_infirstname ?? '',
+        recipientFirstName: dvFeatured.bb_rnfirstname ?? '',
+        shareName: dvFeatured.bb_sharename ?? false,
+      }
+    : null;
+
+  // Build quotes using denormalized name fields
+  const quotes: Quote[] = [];
+  for (const b of notesBanners) {
+    if (b.bb_notein) {
+      quotes.push({
+        quote: b.bb_notein,
+        name: b.bb_sharename ? (b.bb_infirstname || 'A Fellow Patriot') : 'A Fellow Patriot',
+        type: 'in',
+      });
+    }
+    if (b.bb_notern && b.bb_ispublicnotern) {
+      quotes.push({
+        quote: b.bb_notern,
+        name: b.bb_rnfirstname || 'A Grateful Patriot',
+        type: 'rn',
+      });
+    }
+  }
+
   return (
     <>
       {/* Hero */}
@@ -253,10 +353,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats — streamed */}
-      <Suspense fallback={<StatsFallback />}>
-        <StatsSection />
-      </Suspense>
+      {/* Stats */}
+      <StatsSection count={count} />
 
       {/* Video */}
       <section style={{ background: '#FAF7F2', padding: '80px 24px' }}>
@@ -304,6 +402,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Featured Banner + Quotes — client-rendered */}
+      <HomeClient featuredBanner={featuredBanner} quotes={quotes} />
     </>
   );
 }
