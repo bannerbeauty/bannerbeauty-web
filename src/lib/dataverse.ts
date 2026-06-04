@@ -21,7 +21,7 @@ async function fetchNewToken(): Promise<string> {
   if (!res.ok) {
     const errorText = await res.text();
     console.error('Token fetch failed:', res.status, errorText);
-    throw new Error(`Token fetch failed: ${res.status}`);
+    throw new Error(`Token fetch failed: ${res.status} ${errorText}`);
   }
 
   const data = await res.json();
