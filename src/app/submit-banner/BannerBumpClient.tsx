@@ -390,38 +390,53 @@ export default function BannerBumpClient({
 
   // ── Submission ───────────────────────────────────────────────────────────────
   async function submitBannerBump() {
+    console.log('[BannerBump] submitBannerBump called');
     if (!validateStep()) return;
     if (amountDue > 0 && !stripeRef.current) { setOrderError('Payment form not ready. Please wait.'); return; }
     setPlacing(true); setOrderError('');
 
     let orderData: { orderId?: string; qrToken?: string; bannerId?: string } = {};
     try {
+      console.log('[BannerBump] Calling create-banner-order...');
       const res = await fetch('/api/flows/create-banner-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          inFirstName, inLastName, inEmail,
-          recipientFirstName, recipientLastName,
-          recipientAddress1, recipientAddress2,
-          recipientCity, recipientState, recipientZipcode,
-          attribution,
-          attributionName: attribution === 'in_honor' || attribution === 'in_memoriam' ? attributionName : '',
-          attributionText: attribution === 'in_honor' || attribution === 'in_memoriam' ? attributionText : '',
-          shareName, sharePhone, shareEmail, shareAddress,
-          bannerOption, bannerOptionName: bannerOptionLabel,
-          flagProductId: selectedFlagId, flagProductName: selectedFlag?.name ?? '',
-          gcProductId, gcAmount,
-          letterTemplateId: selectedTemplateId, letterTemplateName: selectedTemplate?.name ?? '',
-          personalNote: !isAnon ? personalNote : '',
-          subtotal, shipping, total: amountDue, gcTotal, appliedGCs,
+          bannerOption: parseInt(bannerOption),
+          attributionType: attribution === 'from_me' ? 121120000 : attribution === 'in_memoriam' ? 121120001 : attribution === 'in_honor' ? 121120002 : 121120003,
+          attributionName: attributionName,
+          attributionText: attributionText,
+          inNeighborId: neighbor?.neighborId || '',
+          rnFirstName: recipientFirstName,
+          rnLastName: recipientLastName,
+          shipAddress1: recipientAddress1,
+          shipAddress2: recipientAddress2,
+          shipCity: recipientCity,
+          shipState: recipientState,
+          shipZip: recipientZipcode,
+          letterTemplateId: selectedTemplateId,
+          customNote: !isAnon ? personalNote : '',
+          shareName,
+          sharePhone,
+          shareEmail,
+          shareAddress,
+          gcAmount: gcAmount || 0,
+          selectedProductSku: selectedFlag?.productnumber ?? '',
+          stripeClientSecret: clientSecret || '',
+          subtotal,
+          shippingAmount: shipping,
+          grandTotal: amountDue,
+          gcTotal,
+          appliedGCs,
         }),
       });
       orderData = await res.json();
+      console.log('[BannerBump] Order created:', orderData);
     } catch (err) {
-      console.error('create-banner-order error:', err);
-      setOrderError('Failed to create your order. Please try again.');
+      console.error('[BannerBump] create-banner-order error:', err);
+      setOrderError('Order creation failed: ' + String(err));
       setPlacing(false);
-      return;
+      return; // Stop here — don't proceed to Stripe
     }
 
     const bannerOrder = {
@@ -441,6 +456,7 @@ export default function BannerBumpClient({
 
     if (amountDue === 0) { router.push('/banner-bump-confirmation?redirect_status=succeeded'); return; }
 
+    console.log('[BannerBump] About to call stripe.confirmPayment');
     const { stripe, elements } = stripeRef.current!;
     const { error } = await stripe.confirmPayment({
       elements,

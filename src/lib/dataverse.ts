@@ -33,7 +33,7 @@ async function fetchNewToken(): Promise<string> {
 async function getAccessToken(): Promise<string> {
   if (tokenPromise) return tokenPromise;
 
-  if (tokenCache && Date.now() < tokenCache.expiresAt - 60_000) {
+  if (tokenCache && Date.now() < tokenCache.expiresAt - 300_000) {
     return tokenCache.token;
   }
 
@@ -61,6 +61,14 @@ export const dataverse = {
   async get<T = unknown>(path: string, select?: string): Promise<T> {
     const url = select ? `${apiUrl(path)}?$select=${select}` : apiUrl(path);
     const res = await fetch(url, { headers: await authHeaders() });
+    if (res.status === 401) {
+      tokenCache = null;
+      const retryRes = await fetch(url, { headers: await authHeaders() });
+      if (!retryRes.ok) {
+        throw new Error(`Dataverse GET ${path} failed: ${retryRes.status} ${await retryRes.text()}`);
+      }
+      return retryRes.json();
+    }
     if (!res.ok) {
       throw new Error(`Dataverse GET ${path} failed: ${res.status} ${await res.text()}`);
     }
