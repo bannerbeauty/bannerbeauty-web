@@ -29,7 +29,6 @@ export default function StripePaymentElement({ clientSecret, onReady, onInit }: 
       const stripe = window.Stripe(STRIPE_PK) as StripeInstance;
       // @ts-expect-error Stripe global
       const elements = stripe.elements({ clientSecret, appearance: { theme: 'stripe' } });
-      // @ts-expect-error Stripe elements
       const paymentElement = elements.create('payment', {
         layout: 'tabs',
         wallets: { applePay: 'never', googlePay: 'never' },
