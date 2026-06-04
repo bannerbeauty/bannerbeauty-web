@@ -1,0 +1,48 @@
+import type { NextRequest } from 'next/server';
+
+const FLOW_URL =
+  'https://2e1e3024670eed439dc2d049ff5827.18.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/2d9d7c1a97244998b9784ba030d2fd44/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=_Zv2cw6EEbaHUiaeh8Ztj7tVgFweQ6lw7wUQJuaRmfU';
+
+export async function POST(req: NextRequest) {
+  let body: unknown;
+  try {
+    body = await req.json();
+  } catch {
+    return Response.json({ error: 'Invalid request body' }, { status: 400 });
+  }
+
+  console.log('Stripe PI request body:', body);
+
+  let flowRes: Response;
+  try {
+    flowRes = await fetch(FLOW_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-bb-secret': process.env.BB_API_SECRET ?? '',
+      },
+      body: JSON.stringify(body),
+    });
+  } catch (err) {
+    console.error('Stripe PI flow error:', err);
+    return Response.json({ error: 'Flow request failed' }, { status: 502 });
+  }
+
+  console.log('Stripe PI flow response status:', flowRes.status);
+
+  const responseText = await flowRes.text();
+  console.log('Stripe PI flow response:', responseText);
+
+  let data: unknown;
+  try {
+    data = JSON.parse(responseText);
+  } catch {
+    return Response.json({ error: 'Invalid flow response' }, { status: 502 });
+  }
+
+  if (!flowRes.ok) {
+    return Response.json({ error: 'Flow returned an error', detail: data }, { status: flowRes.status });
+  }
+
+  return Response.json(data);
+}
