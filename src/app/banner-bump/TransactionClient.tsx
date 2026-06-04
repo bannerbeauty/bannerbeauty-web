@@ -121,12 +121,15 @@ export default function TransactionClient({
   userEmail,
 }: TransactionClientProps) {
   const [noteText, setNoteText] = useState(noteRn);
+  const [savedNote, setSavedNote] = useState(noteRn);
+  const [isPublicNote, setIsPublicNote] = useState(false);
   const [noteSaving, setNoteSaving] = useState(false);
   const [noteSaved, setNoteSaved] = useState(false);
   const [noteError, setNoteError] = useState('');
 
   const [photoUploading, setPhotoUploading] = useState(false);
   const [photoUploaded, setPhotoUploaded] = useState(false);
+  const [isPublicPhoto, setIsPublicPhoto] = useState(false);
   const [photoError, setPhotoError] = useState('');
   const [previewUrl, setPreviewUrl] = useState<string | null>(afterPhotoUrl);
 
@@ -170,9 +173,10 @@ export default function TransactionClient({
       const res = await fetch('/api/banner/note', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ bannerId, note: noteText }),
+        body: JSON.stringify({ bannerId, note: noteText, isPublicNote, isPublicPhoto }),
       });
       if (!res.ok) throw new Error('Save failed');
+      setSavedNote(noteText);
       setNoteSaved(true);
     } catch {
       setNoteError('Could not save your note. Please try again.');
@@ -499,6 +503,39 @@ export default function TransactionClient({
                     {photoError}
                   </p>
                 )}
+                <label style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 10,
+                  marginTop: 16, cursor: 'pointer',
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={isPublicPhoto}
+                    onChange={async (e) => {
+                      setIsPublicPhoto(e.target.checked);
+                      try {
+                        await fetch('/api/banner/note', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            bannerId,
+                            note: savedNote || '',
+                            isPublicNote,
+                            isPublicPhoto: e.target.checked,
+                          }),
+                        });
+                      } catch (err) {
+                        console.error('Failed to save photo preference:', err);
+                      }
+                    }}
+                    style={{ marginTop: 2, accentColor: '#C5A028', flexShrink: 0 }}
+                  />
+                  <span style={{
+                    fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem',
+                    color: '#555', lineHeight: 1.5,
+                  }}>
+                    ✓ Make my photos public — let BannerBeauty use my photos to inspire others 🇺🇸
+                  </span>
+                </label>
               </>
             ) : (
               <div style={{
@@ -535,6 +572,39 @@ export default function TransactionClient({
                     }}
                   />
                 </div>
+                <label style={{
+                  display: 'flex', alignItems: 'flex-start', gap: 10,
+                  marginBottom: 16, cursor: 'pointer',
+                }}>
+                  <input
+                    type="checkbox"
+                    checked={isPublicNote}
+                    onChange={async (e) => {
+                      setIsPublicNote(e.target.checked);
+                      try {
+                        await fetch('/api/banner/note', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            bannerId,
+                            note: savedNote || '',
+                            isPublicNote: e.target.checked,
+                            isPublicPhoto,
+                          }),
+                        });
+                      } catch (err) {
+                        console.error('Failed to save note preference:', err);
+                      }
+                    }}
+                    style={{ marginTop: 2, accentColor: '#C5A028', flexShrink: 0 }}
+                  />
+                  <span style={{
+                    fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem',
+                    color: '#555', lineHeight: 1.5,
+                  }}>
+                    ✓ Make my note public — let BannerBeauty share my response to inspire others 🇺🇸
+                  </span>
+                </label>
                 {noteSaved && (
                   <p style={{
                     fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem',

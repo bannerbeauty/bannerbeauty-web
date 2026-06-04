@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
-  let body: { bannerId?: string; note?: string };
+  let body: { bannerId?: string; note?: string; isPublicNote?: boolean; isPublicPhoto?: boolean };
   try {
     body = await req.json();
   } catch {
@@ -22,6 +22,9 @@ export async function POST(req: NextRequest) {
   try {
     await dataverse.patch('bb_banners', body.bannerId, {
       bb_notern: body.note ?? '',
+      bb_recipientrespondeddatetime: new Date().toISOString(),
+      bb_ispublicnotern: body.isPublicNote ?? false,
+      bb_ispublicphotorn: body.isPublicPhoto ?? false,
     });
     return Response.json({ ok: true });
   } catch (err) {
