@@ -69,7 +69,7 @@ export default function HomeClient({ featuredBanner, quotes }: HomeClientProps) 
 
             {/* Section label */}
             <p style={{
-              fontFamily: 'Trebuchet MS, sans-serif', fontSize: '1.44rem',
+              fontFamily: 'Trebuchet MS, sans-serif', fontSize: '1.08rem',
               letterSpacing: '3px', textTransform: 'uppercase',
               color: '#C5A028', textAlign: 'center', margin: '0 0 10px',
             }}>
@@ -188,7 +188,7 @@ export default function HomeClient({ featuredBanner, quotes }: HomeClientProps) 
                       letterSpacing: '2px', textTransform: 'uppercase',
                       color: '#C5A028', margin: '0 0 8px',
                     }}>
-                      From {senderName}
+                      {senderName}
                     </p>
                     <p style={{
                       fontFamily: 'Georgia, serif', fontSize: '1rem',
@@ -211,7 +211,7 @@ export default function HomeClient({ featuredBanner, quotes }: HomeClientProps) 
                       letterSpacing: '2px', textTransform: 'uppercase',
                       color: '#B22234', margin: '0 0 8px',
                     }}>
-                      RN Response: {featuredBanner.recipientFirstName || 'Recipient'}
+                      {featuredBanner.recipientFirstName || 'Recipient'}
                     </p>
                     <p style={{
                       fontFamily: 'Georgia, serif', fontSize: '1rem',
@@ -235,7 +235,7 @@ export default function HomeClient({ featuredBanner, quotes }: HomeClientProps) 
           <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
 
             <p style={{
-              fontFamily: 'Trebuchet MS, sans-serif', fontSize: '1.44rem',
+              fontFamily: 'Trebuchet MS, sans-serif', fontSize: '1.08rem',
               letterSpacing: '3px', textTransform: 'uppercase',
               color: '#C5A028', margin: '0 0 48px',
             }}>

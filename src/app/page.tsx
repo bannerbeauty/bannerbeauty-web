@@ -64,7 +64,7 @@ function StatsSection({ count }: { count: number }) {
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
         <p style={{
           fontFamily: 'Trebuchet MS, sans-serif',
-          fontSize: '1.5rem',
+          fontSize: '1.125rem',
           letterSpacing: '3px',
           textTransform: 'uppercase',
           color: '#C5A028',
@@ -79,7 +79,7 @@ function StatsSection({ count }: { count: number }) {
           fontWeight: 700,
           lineHeight: 1.2,
         }}>
-          ★ {count.toLocaleString()} Banner Bumps Delivered ★
+          ★ Bump Count: {count.toLocaleString()} ★
         </div>
         <p style={{
           color: 'rgba(255,255,255,0.6)',
@@ -89,7 +89,7 @@ function StatsSection({ count }: { count: number }) {
           marginBottom: 0,
           lineHeight: 1.5,
         }}>
-          ... and counting!<br />Let&apos;s build patriotic communities!
+          ... nationwide!<br />Let&apos;s build patriotic communities!
         </p>
       </div>
     </section>
@@ -263,7 +263,7 @@ export default async function HomePage() {
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <p style={{
             fontFamily: 'Trebuchet MS, sans-serif',
-            fontSize: '1.5rem',
+            fontSize: '1.125rem',
             letterSpacing: '3px',
             textTransform: 'uppercase',
             color: '#C5A028',
@@ -280,7 +280,7 @@ export default async function HomePage() {
             textAlign: 'center',
             margin: '0 0 48px 0',
           }}>
-            Three Ways to Banner Bump
+            3 Ways to Banner Bump
           </h2>
 
           <div style={{
@@ -366,7 +366,7 @@ export default async function HomePage() {
         <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
           <p style={{
             fontFamily: 'Trebuchet MS, sans-serif',
-            fontSize: '1.5rem',
+            fontSize: '1.125rem',
             letterSpacing: '3px',
             textTransform: 'uppercase',
             color: '#C5A028',
