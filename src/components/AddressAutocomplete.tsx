@@ -59,7 +59,7 @@ export default function AddressAutocomplete({ onAddressSelect, placeholder = 'St
     );
   }, [inputValue]);
 
-  function selectSuggestion(prediction: google.maps.places.AutocompletePrediction) {
+  function handleSelect(prediction: google.maps.places.AutocompletePrediction) {
     if (!placesService.current) return;
     setInputValue(prediction.description);
     setSuggestions([]);
@@ -102,7 +102,7 @@ export default function AddressAutocomplete({ onAddressSelect, placeholder = 'St
       setActiveIndex(i => Math.max(i - 1, 0));
     } else if (e.key === 'Enter' && activeIndex >= 0) {
       e.preventDefault();
-      selectSuggestion(suggestions[activeIndex]);
+      handleSelect(suggestions[activeIndex]);
     } else if (e.key === 'Escape') {
       setSuggestions([]);
     }
@@ -120,6 +120,10 @@ export default function AddressAutocomplete({ onAddressSelect, placeholder = 'St
         onBlur={() => setTimeout(() => setFocused(false), 150)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
+        autoComplete="off"
+        autoCorrect="off"
+        autoCapitalize="off"
+        spellCheck={false}
         style={{
           width: '100%',
           padding: '10px 14px',
@@ -141,21 +145,25 @@ export default function AddressAutocomplete({ onAddressSelect, placeholder = 'St
           top: 'calc(100% + 4px)',
           left: 0,
           right: 0,
+          width: '100%',
           background: '#1B2A4A',
           borderRadius: 4,
           boxShadow: '0 6px 24px rgba(27,42,74,0.22)',
           listStyle: 'none',
           margin: 0,
           padding: '4px 0',
-          zIndex: 1000,
+          zIndex: 9999,
           maxHeight: 260,
           overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
         }}>
           {suggestions.map((s, i) => (
             <li
               key={s.place_id}
-              onMouseDown={() => selectSuggestion(s)}
+              onMouseDown={() => handleSelect(s)}
               onMouseEnter={() => setActiveIndex(i)}
+              onTouchStart={(e) => e.preventDefault()}
+              onTouchEnd={() => handleSelect(s)}
               style={{
                 padding: '10px 14px',
                 cursor: 'pointer',
