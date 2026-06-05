@@ -13,6 +13,8 @@ export interface FeaturedBanner {
   afterPhotoUrl: string | null;
   initiatingFirstName: string;
   recipientFirstName: string;
+  recipientCity: string;
+  recipientState: string;
   shareName: boolean;
 }
 
@@ -67,18 +69,26 @@ export default function HomeClient({ featuredBanner, quotes }: HomeClientProps) 
 
             {/* Section label */}
             <p style={{
-              fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem',
+              fontFamily: 'Trebuchet MS, sans-serif', fontSize: '1.44rem',
               letterSpacing: '3px', textTransform: 'uppercase',
               color: '#C5A028', textAlign: 'center', margin: '0 0 10px',
             }}>
               ★ Today&apos;s Featured Banner Bump ★
             </p>
             <p style={{
-              fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.8rem',
-              color: '#999', textAlign: 'center', margin: '0 0 36px', letterSpacing: '0.5px',
+              fontFamily: 'Trebuchet MS, sans-serif', fontSize: '1.6rem',
+              color: '#999', textAlign: 'center', margin: '0 0 4px', letterSpacing: '0.5px',
             }}>
               {today}
             </p>
+            {(featuredBanner.recipientCity || featuredBanner.recipientState) && (
+              <p style={{
+                fontFamily: 'Trebuchet MS, sans-serif', fontSize: '1.6rem',
+                color: '#999', textAlign: 'center', margin: '0 0 36px', letterSpacing: '0.5px',
+              }}>
+                {[featuredBanner.recipientCity, featuredBanner.recipientState].filter(Boolean).join(', ')}
+              </p>
+            )}
 
             {/* Card */}
             <div style={{
@@ -225,7 +235,7 @@ export default function HomeClient({ featuredBanner, quotes }: HomeClientProps) 
           <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
 
             <p style={{
-              fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem',
+              fontFamily: 'Trebuchet MS, sans-serif', fontSize: '1.44rem',
               letterSpacing: '3px', textTransform: 'uppercase',
               color: '#C5A028', margin: '0 0 48px',
             }}>

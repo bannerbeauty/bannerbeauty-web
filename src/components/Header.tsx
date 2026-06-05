@@ -45,8 +45,8 @@ export default function Header() {
               src="https://bannerbeautystorage.blob.core.windows.net/logos/bannerbeauty-wordmark-logo-horizontal-white-banner.png"
               alt="BannerBeauty"
               width={200}
-              height={64}
-              style={{ height: 64, width: 'auto', objectFit: 'contain' }}
+              height={54}
+              style={{ height: 54, width: 'auto', objectFit: 'contain' }}
               className="bb-logo-desktop"
               priority
               unoptimized
@@ -55,8 +55,8 @@ export default function Header() {
               src="https://bannerbeautystorage.blob.core.windows.net/logos/bannerbeauty-wordmark-logo-horizontal-white-banner.png"
               alt="BannerBeauty"
               width={125}
-              height={40}
-              style={{ height: 40, width: 'auto', objectFit: 'contain' }}
+              height={34}
+              style={{ height: 34, width: 'auto', objectFit: 'contain' }}
               className="bb-logo-mobile"
               priority
               unoptimized

@@ -18,6 +18,8 @@ interface DvFeaturedBanner {
   bb_sharename?: boolean;
   bb_infirstname?: string;
   bb_rnfirstname?: string;
+  bb_recipientcity?: string;
+  bb_recipientstate?: string;
 }
 
 interface DvPublicNotesBanner {
@@ -41,7 +43,7 @@ async function getBannerCount(): Promise<number> {
 async function getFeaturedBanners(): Promise<DvFeaturedBanner[]> {
   const result = await dataverse.get<{ value: DvFeaturedBanner[] }>(
     'bb_banners?$filter=bb_isfeatureable eq true and statecode eq 0' +
-    '&$select=bb_bannerid,createdon,bb_attributiontype,bb_attributionname,bb_attributiontext,bb_notein,bb_notern,bb_beforephotourl,bb_afterphotourl,bb_sharename,bb_infirstname,bb_rnfirstname'
+    '&$select=bb_bannerid,createdon,bb_attributiontype,bb_attributionname,bb_attributiontext,bb_notein,bb_notern,bb_beforephotourl,bb_afterphotourl,bb_sharename,bb_infirstname,bb_rnfirstname,bb_recipientcity,bb_recipientstate'
   );
   return result.value ?? [];
 }
@@ -62,7 +64,7 @@ function StatsSection({ count }: { count: number }) {
       <div style={{ maxWidth: 800, margin: '0 auto' }}>
         <p style={{
           fontFamily: 'Trebuchet MS, sans-serif',
-          fontSize: '0.75rem',
+          fontSize: '1.5rem',
           letterSpacing: '3px',
           textTransform: 'uppercase',
           color: '#C5A028',
@@ -73,7 +75,7 @@ function StatsSection({ count }: { count: number }) {
         <div style={{
           color: '#C5A028',
           fontFamily: 'Georgia, serif',
-          fontSize: 'clamp(1.4rem, 4vw, 2.4rem)',
+          fontSize: 'clamp(2.8rem, 8vw, 4.8rem)',
           fontWeight: 700,
           lineHeight: 1.2,
         }}>
@@ -82,11 +84,12 @@ function StatsSection({ count }: { count: number }) {
         <p style={{
           color: 'rgba(255,255,255,0.6)',
           fontFamily: 'Trebuchet MS, sans-serif',
-          fontSize: '0.88rem',
+          fontSize: '1.76rem',
           marginTop: 16,
           marginBottom: 0,
+          lineHeight: 1.5,
         }}>
-          and counting — join your neighbors in building patriotic communities
+          ... and counting!<br />Let&apos;s build patriotic communities!
         </p>
       </div>
     </section>
@@ -160,6 +163,8 @@ export default async function HomePage() {
         afterPhotoUrl: dvFeatured.bb_afterphotourl ?? null,
         initiatingFirstName: dvFeatured.bb_infirstname ?? '',
         recipientFirstName: dvFeatured.bb_rnfirstname ?? '',
+        recipientCity: dvFeatured.bb_recipientcity ?? '',
+        recipientState: dvFeatured.bb_recipientstate ?? '',
         shareName: dvFeatured.bb_sharename ?? false,
       }
     : null;
@@ -258,7 +263,7 @@ export default async function HomePage() {
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <p style={{
             fontFamily: 'Trebuchet MS, sans-serif',
-            fontSize: '0.75rem',
+            fontSize: '1.5rem',
             letterSpacing: '3px',
             textTransform: 'uppercase',
             color: '#C5A028',
@@ -361,7 +366,7 @@ export default async function HomePage() {
         <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
           <p style={{
             fontFamily: 'Trebuchet MS, sans-serif',
-            fontSize: '0.75rem',
+            fontSize: '1.5rem',
             letterSpacing: '3px',
             textTransform: 'uppercase',
             color: '#C5A028',
@@ -371,12 +376,12 @@ export default async function HomePage() {
           </p>
           <h2 style={{
             fontFamily: 'Georgia, serif',
-            fontSize: 'clamp(1.4rem, 3vw, 2rem)',
+            fontSize: 'clamp(2.8rem, 6vw, 4rem)',
             fontWeight: 700,
             color: '#1B2A4A',
             margin: '0 0 32px 0',
           }}>
-            Watch how Banner Bumping works
+            What is a Banner Bump?
           </h2>
           <div style={{
             background: '#1B2A4A',
