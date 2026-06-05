@@ -1,0 +1,85 @@
+/* BannerBeauty Sign-In Page Branding */
+
+body {
+  background-color: #1B2A4A;
+  font-family: 'Trebuchet MS', sans-serif;
+}
+
+.ext-background-image {
+  background-color: #1B2A4A;
+}
+
+.ext-middle {
+  background-color: #1B2A4A;
+}
+
+.ext-header {
+  background-color: #1B2A4A;
+  border-bottom: 1px solid rgba(197,160,40,0.3);
+}
+
+.ext-header-logo img {
+  max-height: 48px;
+}
+
+.ext-sign-in-box {
+  background-color: #FAF7F2;
+  border-radius: 8px;
+  border: 1px solid rgba(197,160,40,0.4);
+}
+
+.ext-title {
+  font-family: Georgia, serif;
+  color: #1B2A4A;
+  font-weight: 700;
+}
+
+.ext-subtitle {
+  font-family: 'Trebuchet MS', sans-serif;
+  color: #555555;
+}
+
+.ext-button.ext-primary {
+  background-color: #B22234;
+  border-color: #B22234;
+  border-radius: 4px;
+  font-family: Georgia, serif;
+  font-weight: 700;
+}
+
+.ext-button.ext-primary:hover {
+  background-color: #8B1A27;
+  border-color: #8B1A27;
+}
+
+.ext-button.ext-secondary {
+  border-color: #1B2A4A;
+  color: #1B2A4A;
+  border-radius: 4px;
+}
+
+.ext-input.ext-text-box {
+  border-color: #DDDDDD;
+  border-radius: 4px;
+  font-family: Georgia, serif;
+}
+
+.ext-input.ext-text-box:focus {
+  border-color: #1B2A4A;
+}
+
+.ext-link {
+  color: #C5A028;
+}
+
+.ext-link:hover {
+  color: #B22234;
+}
+
+.ext-footer {
+  background-color: #1B2A4A;
+}
+
+.ext-footer-item {
+  color: rgba(255,255,255,0.6);
+}
