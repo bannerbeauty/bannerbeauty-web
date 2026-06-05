@@ -48,6 +48,17 @@ async function getFeaturedBanners(): Promise<DvFeaturedBanner[]> {
   return result.value ?? [];
 }
 
+async function getBannerLocations() {
+  try {
+    const result = await dataverse.get<{ value: { bb_latitude: number; bb_longitude: number }[] }>(
+      'bb_banners?$filter=statecode eq 0 and bb_latitude ne null and bb_longitude ne null&$select=bb_latitude,bb_longitude'
+    );
+    return result.value ?? [];
+  } catch {
+    return [];
+  }
+}
+
 async function getPublicNotesBanners(): Promise<DvPublicNotesBanner[]> {
   const result = await dataverse.get<{ value: DvPublicNotesBanner[] }>(
     'bb_banners?$filter=(bb_ispublicnotern eq true or bb_notein ne null) and statecode eq 0' +
@@ -120,19 +131,22 @@ const OPTION_CARDS = [
 // ── Page ───────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-  const [countRes, featuredRes, notesRes] = await Promise.allSettled([
+  const [countRes, featuredRes, notesRes, locationsRes] = await Promise.allSettled([
     getBannerCount(),
     getFeaturedBanners(),
     getPublicNotesBanners(),
+    getBannerLocations(),
   ]);
 
   if (countRes.status === 'rejected') console.error('Banner count fetch failed:', countRes.reason);
   if (featuredRes.status === 'rejected') console.error('Featured banners fetch failed:', featuredRes.reason);
   if (notesRes.status === 'rejected') console.error('Public notes fetch failed:', notesRes.reason);
+  if (locationsRes.status === 'rejected') console.error('Banner locations fetch failed:', locationsRes.reason);
 
   const count = countRes.status === 'fulfilled' ? countRes.value : 0;
   const featuredBanners = featuredRes.status === 'fulfilled' ? featuredRes.value : [];
   const notesBanners = notesRes.status === 'fulfilled' ? notesRes.value : [];
+  const locations = locationsRes.status === 'fulfilled' ? locationsRes.value : [];
 
   // Day-indexed featured banner (Pacific time)
   const pacificOffsetMs = (() => {
@@ -409,7 +423,7 @@ export default async function HomePage() {
       </section>
 
       {/* Featured Banner + Quotes — client-rendered */}
-      <HomeClient featuredBanner={featuredBanner} quotes={quotes} />
+      <HomeClient featuredBanner={featuredBanner} quotes={quotes} locations={locations} />
     </>
   );
 }

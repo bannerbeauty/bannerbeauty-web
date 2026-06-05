@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import BannerBumpMap from '@/components/BannerBumpMap';
 
 export interface FeaturedBanner {
   bannerId: string;
@@ -24,16 +25,22 @@ export interface Quote {
   type: 'in' | 'rn';
 }
 
+export interface BannerLocation {
+  lat: number;
+  lng: number;
+}
+
 interface HomeClientProps {
   featuredBanner: FeaturedBanner | null;
   quotes: Quote[];
+  locations: BannerLocation[];
 }
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
-export default function HomeClient({ featuredBanner, quotes }: HomeClientProps) {
+export default function HomeClient({ featuredBanner, quotes, locations }: HomeClientProps) {
   const [quoteIndex, setQuoteIndex] = useState(0);
   const [visible, setVisible] = useState(true);
 
@@ -62,6 +69,9 @@ export default function HomeClient({ featuredBanner, quotes }: HomeClientProps) 
 
   return (
     <>
+      {/* ── Banner Bump Map ─────────────────────────────────────────────────── */}
+      <BannerBumpMap locations={locations} />
+
       {/* ── Featured Banner ─────────────────────────────────────────────────── */}
       {featuredBanner && (
         <section style={{ background: '#F4F1EC', padding: '72px 24px' }}>
