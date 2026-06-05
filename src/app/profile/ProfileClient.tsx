@@ -161,31 +161,8 @@ export default function ProfileClient({
 
   return (
     <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!} libraries={['places']}>
-    <div style={{ minHeight: '100vh', background: '#F9F6F0', display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
-      <header style={{
-        background: '#1A1A2E', padding: '16px 24px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      }}>
-        <a href="/" style={{ textDecoration: 'none' }}>
-          <span style={{
-            fontFamily: 'Georgia, serif', fontSize: '1.4rem', fontWeight: 'bold',
-            color: '#C5A028', letterSpacing: '2px',
-          }}>
-            BANNER BEAUTY
-          </span>
-        </a>
-        <a href="/store" style={{
-          fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.8rem',
-          letterSpacing: '1px', textTransform: 'uppercase', color: '#C5A028',
-          textDecoration: 'none',
-        }}>
-          Store
-        </a>
-      </header>
-
-      {/* Body */}
-      <main style={{ flex: 1, display: 'flex', justifyContent: 'center', padding: '40px 16px 60px' }}>
+    <div style={{ background: '#F9F6F0' }}>
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '40px 16px 60px' }}>
         <div style={{ width: '100%', maxWidth: 640 }}>
           {/* Page title */}
           <div style={{ textAlign: 'center', marginBottom: 32 }}>
@@ -475,19 +452,7 @@ export default function ProfileClient({
             {saving ? 'Saving…' : 'Save Profile'}
           </button>
         </div>
-      </main>
-
-      {/* Footer */}
-      <footer style={{
-        background: '#1A1A2E', padding: '16px 24px', textAlign: 'center',
-      }}>
-        <p style={{
-          fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem',
-          color: '#888888', margin: 0, letterSpacing: '0.5px',
-        }}>
-          © {new Date().getFullYear()} Banner Beauty · All rights reserved
-        </p>
-      </footer>
+      </div>
     </div>
     </APIProvider>
   );
