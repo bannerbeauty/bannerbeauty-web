@@ -28,7 +28,7 @@ export default function BannerBumpMap({ locations }: Props) {
           style={{ width: '100%', height: 'auto' }}
         >
           <Geographies geography={GEO_URL}>
-            {({ geographies }) =>
+            {({ geographies }: { geographies: any[] }) =>
               geographies.map(geo => (
                 <Geography
                   key={geo.rsmKey}
