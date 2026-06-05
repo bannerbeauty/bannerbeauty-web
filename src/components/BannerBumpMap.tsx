@@ -41,16 +41,12 @@ export default function BannerBumpMap({ locations }: Props) {
     svg.selectAll('*').remove();
     svg.attr('width', width).attr('height', height).attr('viewBox', `0 0 ${width} ${height}`);
 
-    // AlbersUSA is pre-projected at 960×600; scale to our container
     const scale = width / 960;
-    const projection = d3.geoAlbersUsa()
-      .scale(1070 * scale)
-      .translate([width / 2, height / 2]);
-
-    const path = d3.geoPath().projection(projection);
+    const projection = d3.geoAlbersUsa().fitSize([width, height], { type: 'Sphere' });
+    const pathGenerator = d3.geoPath().projection(projection);
 
     const states = topojson.feature(topoData, topoData.objects.states) as GeoJSON.FeatureCollection;
-    const nation = topojson.feature(topoData, topoData.objects.nation) as GeoJSON.FeatureCollection;
+    const nation = topojson.mesh(topoData, topoData.objects.nation);
     const stateBorders = topojson.mesh(topoData, topoData.objects.states, (a, b) => a !== b);
 
     // State fills
@@ -59,15 +55,15 @@ export default function BannerBumpMap({ locations }: Props) {
       .data(states.features)
       .join('path')
       .attr('fill', '#1B2A4A')
-      .attr('d', path);
+      .attr('d', pathGenerator);
 
     // Nation outline
     svg.append('path')
-      .datum(nation.features[0])
+      .datum(nation)
       .attr('fill', 'none')
       .attr('stroke', '#C5A028')
       .attr('stroke-width', 1 * scale)
-      .attr('d', path);
+      .attr('d', pathGenerator);
 
     // State borders
     svg.append('path')
@@ -75,7 +71,7 @@ export default function BannerBumpMap({ locations }: Props) {
       .attr('fill', 'none')
       .attr('stroke', '#C5A028')
       .attr('stroke-width', 0.5 * scale)
-      .attr('d', path);
+      .attr('d', pathGenerator);
 
     // Dots
     const dotGroup = svg.append('g');
