@@ -104,6 +104,8 @@ export default function ProfileClient({
   const [city, setCity] = useState(initialCity);
   const [state, setState] = useState(initialState);
   const [zipcode, setZipcode] = useState(initialZipcode);
+  const [lat, setLat] = useState(0);
+  const [lng, setLng] = useState(0);
   const [preferredAuth, setPreferredAuth] = useState(initialPreferredAuth);
   const [emailOptin, setEmailOptin] = useState(initialEmailOptin);
   const [smsOptin, setSmsOptin] = useState(initialSmsOptin);
@@ -135,6 +137,8 @@ export default function ProfileClient({
           preferredAuth: Number(preferredAuth),
           emailOptin,
           smsOptin,
+          lat,
+          lng,
         }),
       });
 
@@ -267,6 +271,8 @@ export default function ProfileClient({
                   setCity(addr.city);
                   setState(addr.state);
                   setZipcode(addr.zipcode);
+                  setLat(addr.lat);
+                  setLng(addr.lng);
                 }}
               />
             </div>
