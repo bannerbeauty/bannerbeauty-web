@@ -423,7 +423,7 @@ export default async function HomePage() {
       </section>
 
       {/* Featured Banner + Quotes — client-rendered */}
-      <HomeClient featuredBanner={featuredBanner} quotes={quotes} locations={locations} />
+      <HomeClient featuredBanner={featuredBanner} quotes={quotes} locations={locations.map(l => ({ lat: l.bb_latitude, lng: l.bb_longitude }))} />
     </>
   );
 }
