@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import { APIProvider } from '@vis.gl/react-google-maps';
+import AddressAutocomplete from '@/components/AddressAutocomplete';
 
 interface ProfileClientProps {
   neighborId: string | null;
@@ -152,6 +154,7 @@ export default function ProfileClient({
   }
 
   return (
+    <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!} libraries={['places']}>
     <div style={{ minHeight: '100vh', background: '#F9F6F0', display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <header style={{
@@ -256,12 +259,15 @@ export default function ProfileClient({
             <div style={sectionTitleStyle}>Mailing Address</div>
             <div style={{ marginBottom: 16 }}>
               <label style={labelStyle}>Address Line 1</label>
-              <input
-                type="text"
-                value={address1}
-                onChange={e => setAddress1(e.target.value)}
-                style={inputStyle}
-                placeholder="Street address"
+              <AddressAutocomplete
+                placeholder="Start typing your address..."
+                defaultValue={address1}
+                onAddressSelect={(addr) => {
+                  setAddress1(addr.address1);
+                  setCity(addr.city);
+                  setState(addr.state);
+                  setZipcode(addr.zipcode);
+                }}
               />
             </div>
             <div style={{ marginBottom: 16 }}>
@@ -475,5 +481,6 @@ export default function ProfileClient({
         </p>
       </footer>
     </div>
+    </APIProvider>
   );
 }

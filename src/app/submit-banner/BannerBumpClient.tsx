@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { APIProvider } from '@vis.gl/react-google-maps';
 import StripePaymentElement from '@/components/StripePaymentElement';
+import AddressAutocomplete from '@/components/AddressAutocomplete';
 
 // ── Exported types (consumed by page.tsx) ────────────────────────────────────
 
@@ -227,6 +229,8 @@ export default function BannerBumpClient({
   const [recipientCity,      setRecipientCity]      = useState('');
   const [recipientState,     setRecipientState]     = useState('');
   const [recipientZipcode,   setRecipientZipcode]   = useState('');
+  const [recipientLat,       setRecipientLat]       = useState(0);
+  const [recipientLng,       setRecipientLng]       = useState(0);
 
   // Step 3: Recognition / Attribution
   const [attribution,     setAttribution]     = useState<'from_me' | 'in_honor' | 'in_memoriam' | 'anonymous'>('from_me');
@@ -428,6 +432,8 @@ export default function BannerBumpClient({
           grandTotal: amountDue,
           gcTotal,
           appliedGCs,
+          recipientLat,
+          recipientLng,
         }),
       });
       orderData = await res.json();
@@ -472,6 +478,7 @@ export default function BannerBumpClient({
 
   // ── Render ───────────────────────────────────────────────────────────────────
   return (
+    <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!} libraries={['places']}>
     <div style={{ background: '#FAF7F2', minHeight: '80vh', padding: '40px 24px 80px' }}>
       <div style={{ maxWidth: 680, margin: '0 auto' }}>
 
@@ -529,7 +536,18 @@ export default function BannerBumpClient({
             </div>
             <div style={{ marginBottom: 16 }}>
               <label style={labelStyle}>Address Line 1 *</label>
-              <input style={inputStyle} value={recipientAddress1} onChange={(e) => setRecipientAddress1(e.target.value)} placeholder="123 Main Street" />
+              <AddressAutocomplete
+                placeholder="Start typing the address..."
+                defaultValue={recipientAddress1}
+                onAddressSelect={(addr) => {
+                  setRecipientAddress1(addr.address1);
+                  setRecipientCity(addr.city);
+                  setRecipientState(addr.state);
+                  setRecipientZipcode(addr.zipcode);
+                  setRecipientLat(addr.lat);
+                  setRecipientLng(addr.lng);
+                }}
+              />
             </div>
             <div style={{ marginBottom: 16 }}>
               <label style={labelStyle}>Address Line 2</label>
@@ -995,5 +1013,6 @@ export default function BannerBumpClient({
         }
       `}</style>
     </div>
+    </APIProvider>
   );
 }

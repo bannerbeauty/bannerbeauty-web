@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { APIProvider } from '@vis.gl/react-google-maps';
 import StripePaymentElement from '@/components/StripePaymentElement';
+import AddressAutocomplete from '@/components/AddressAutocomplete';
 
 export interface NeighborData {
   neighborId: string;
@@ -292,6 +294,7 @@ export default function CheckoutClient({ userEmail, userFirstName, userLastName,
   if (!ready) return null;
 
   try { return (
+    <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!} libraries={['places']}>
     <div style={{ background: '#FAF7F2', minHeight: '80vh', padding: '40px 24px 80px' }}>
       <div style={{
         maxWidth: 1100,
@@ -350,7 +353,16 @@ export default function CheckoutClient({ userEmail, userFirstName, userLastName,
               <div style={sectionTitleStyle}>★ Shipping Address</div>
               <div style={{ marginBottom: 16 }}>
                 <label style={labelStyle}>Address Line 1 *</label>
-                <input style={inputStyle} value={address1} placeholder="123 Main Street" onChange={(e) => setAddress1(e.target.value)} />
+                <AddressAutocomplete
+                  placeholder="Start typing the address..."
+                  defaultValue={address1}
+                  onAddressSelect={(addr) => {
+                    setAddress1(addr.address1);
+                    setCity(addr.city);
+                    setState(addr.state);
+                    setZipcode(addr.zipcode);
+                  }}
+                />
               </div>
               <div style={{ marginBottom: 16 }}>
                 <label style={labelStyle}>Address Line 2</label>
@@ -512,6 +524,7 @@ export default function CheckoutClient({ userEmail, userFirstName, userLastName,
         }
       `}</style>
     </div>
+    </APIProvider>
   ); } catch (err) {
     console.error('CheckoutClient render error:', err);
     return (
