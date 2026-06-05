@@ -61,7 +61,6 @@ export default function AddressAutocomplete({ onAddressSelect, placeholder = 'St
 
   function handleSelect(prediction: google.maps.places.AutocompletePrediction) {
     if (!placesService.current) return;
-    setInputValue(prediction.description);
     setSuggestions([]);
 
     placesService.current.getDetails(
@@ -81,6 +80,7 @@ export default function AddressAutocomplete({ onAddressSelect, placeholder = 'St
         const streetNumber = get('street_number');
         const route = get('route');
         const address1 = [streetNumber, route].filter(Boolean).join(' ');
+        setInputValue(address1);
         const city = get('locality') || get('sublocality_level_1');
         const state = get('administrative_area_level_1', true);
         const zipcode = get('postal_code');
