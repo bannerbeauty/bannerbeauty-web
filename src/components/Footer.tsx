@@ -1,110 +1,138 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
-const COL_ONE = [
-  { label: 'Home', href: '/' },
-  { label: 'Banner Bump', href: '/submit-banner' },
-  { label: 'Store', href: '/store' },
-  { label: 'Profile', href: '/profile' },
-];
+const colHeaderStyle: React.CSSProperties = {
+  fontFamily: 'Trebuchet MS, sans-serif',
+  fontSize: '0.72rem',
+  letterSpacing: '2px',
+  textTransform: 'uppercase',
+  color: '#C5A028',
+  marginBottom: 16,
+  fontWeight: 700,
+};
 
-const COL_TWO = [
-  { label: 'Terms of Service', href: '/terms' },
-  { label: 'Privacy Policy', href: '/privacy' },
-  { label: 'Contact', href: '/contact' },
-];
+const linkStyle: React.CSSProperties = {
+  display: 'block',
+  fontFamily: 'Trebuchet MS, sans-serif',
+  fontSize: '0.85rem',
+  color: 'rgba(255,255,255,0.65)',
+  textDecoration: 'none',
+  marginBottom: 10,
+  lineHeight: 1.4,
+};
 
 export default function Footer() {
   return (
-    <footer style={{ background: '#1B2A4A', marginTop: 'auto' }}>
+    <footer style={{ background: '#1B2A4A' }}>
+      {/* Main columns */}
       <div style={{
         maxWidth: 1200,
         margin: '0 auto',
-        padding: '48px 24px 32px',
-        textAlign: 'center',
+        padding: '56px 24px 40px',
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
+        gap: '40px 32px',
+        alignItems: 'start',
       }}>
-        {/* Tagline */}
-        <p style={{
-          color: '#C5A028',
-          fontFamily: 'Trebuchet MS, sans-serif',
-          fontSize: '0.75rem',
-          letterSpacing: '3px',
-          textTransform: 'uppercase',
-          margin: '0 0 20px 0',
-        }}>
-          Building Patriotic Neighborhoods
-        </p>
 
-        {/* Gold star separator */}
-        <div style={{
-          color: '#C5A028',
-          fontSize: '0.9rem',
-          letterSpacing: '12px',
-          margin: '0 0 28px 0',
-        }}>
-          ★ ★ ★
-        </div>
-
-        {/* Nav links — two columns desktop, stacked mobile */}
-        <nav style={{
-          display: 'flex',
-          justifyContent: 'center',
-          gap: '8px 64px',
-          flexWrap: 'wrap',
-          margin: '0 0 32px 0',
-        }}>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
-            {COL_ONE.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                style={{
-                  color: 'rgba(255,255,255,0.7)',
-                  textDecoration: 'none',
-                  fontFamily: 'Trebuchet MS, sans-serif',
-                  fontSize: '0.82rem',
-                  letterSpacing: '1px',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
-            {COL_TWO.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                style={{
-                  color: 'rgba(255,255,255,0.7)',
-                  textDecoration: 'none',
-                  fontFamily: 'Trebuchet MS, sans-serif',
-                  fontSize: '0.82rem',
-                  letterSpacing: '1px',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        </nav>
-
-        {/* Divider */}
-        <div style={{
-          borderTop: '1px solid rgba(255,255,255,0.1)',
-          paddingTop: 24,
-        }}>
+        {/* Col 1: Logo + tagline */}
+        <div>
+          <Image
+            src="https://bannerbeautystorage.blob.core.windows.net/logos/bannerbeauty-wordmark-logo-horizontal-white-banner.png"
+            alt="BannerBeauty"
+            width={240}
+            height={80}
+            style={{ height: 80, width: 'auto', objectFit: 'contain', display: 'block', marginBottom: 16 }}
+            unoptimized
+          />
           <p style={{
-            color: 'rgba(255,255,255,0.35)',
-            fontFamily: 'Trebuchet MS, sans-serif',
-            fontSize: '0.75rem',
+            fontFamily: 'Georgia, serif',
+            fontSize: '0.88rem',
+            color: 'rgba(255,255,255,0.55)',
+            lineHeight: 1.7,
             margin: 0,
           }}>
-            © 2026 BannerBeauty LLC · All rights reserved
+            Honoring neighbors who fly the American flag with pride — one banner at a time.
+          </p>
+        </div>
+
+        {/* Col 2: Quick Links */}
+        <div>
+          <p style={colHeaderStyle}>Quick Links</p>
+          <Link href="/" style={linkStyle}>Home</Link>
+          <Link href="/submit-banner" style={linkStyle}>Banner Bump</Link>
+          <Link href="/store" style={linkStyle}>Shop Our Store</Link>
+          <Link href="/about" style={linkStyle}>About Us</Link>
+        </div>
+
+        {/* Col 3: Support */}
+        <div>
+          <p style={colHeaderStyle}>Support</p>
+          <Link href="/faq" style={linkStyle}>FAQ</Link>
+          <Link href="/contact" style={linkStyle}>Contact Us</Link>
+          <Link href="/track" style={linkStyle}>Track My Order</Link>
+        </div>
+
+        {/* Col 4: Legal */}
+        <div>
+          <p style={colHeaderStyle}>Legal</p>
+          <Link href="/privacy" style={linkStyle}>Privacy Policy</Link>
+          <Link href="/terms" style={linkStyle}>Terms of Use</Link>
+          <Link href="/copyright" style={linkStyle}>Copyright</Link>
+        </div>
+
+        {/* Col 5: Contact */}
+        <div>
+          <p style={colHeaderStyle}>Contact</p>
+          <a href="mailto:hello@bannerbeauty.com" style={linkStyle}>
+            hello@bannerbeauty.com
+          </a>
+        </div>
+
+      </div>
+
+      {/* Bottom bar */}
+      <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+        <div style={{
+          maxWidth: 1200,
+          margin: '0 auto',
+          padding: '20px 24px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          flexWrap: 'wrap',
+          gap: 12,
+        }}>
+          <p style={{
+            fontFamily: 'Trebuchet MS, sans-serif',
+            fontSize: '0.75rem',
+            color: 'rgba(255,255,255,0.35)',
+            margin: 0,
+          }}>
+            © 2026 BannerBeauty. All rights reserved.
+          </p>
+          <p style={{
+            fontFamily: 'Trebuchet MS, sans-serif',
+            fontSize: '0.75rem',
+            color: 'rgba(255,255,255,0.35)',
+            margin: 0,
+            letterSpacing: '0.5px',
+          }}>
+            Building Patriotic Neighborhoods — One Banner at a Time ★
           </p>
         </div>
       </div>
+
+      <style>{`
+        @media (max-width: 640px) {
+          footer > div:first-child {
+            grid-template-columns: 1fr 1fr !important;
+          }
+          footer > div:first-child > div:first-child {
+            grid-column: 1 / -1;
+          }
+        }
+      `}</style>
     </footer>
   );
 }
