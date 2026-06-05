@@ -26,10 +26,16 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: 'Flow request failed' }, { status: 502 });
   }
 
+  if (flowRes.status === 204 || flowRes.headers.get('content-length') === '0') {
+    return Response.json({ success: true });
+  }
+
   let data: unknown;
   try {
     data = await flowRes.json();
   } catch {
+    // Empty body but non-204 — treat as success if status is ok
+    if (flowRes.ok) return Response.json({ success: true });
     return Response.json({ error: 'Invalid flow response' }, { status: 502 });
   }
 
