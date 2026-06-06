@@ -76,7 +76,7 @@ export default function Footer() {
         {/* Col 4: Legal */}
         <div>
           <p style={colHeaderStyle}>Legal</p>
-          <Link href="/privacy" style={linkStyle}>Privacy Policy</Link>
+          <Link href="/privacy-policy" style={linkStyle}>Privacy Policy</Link>
           <Link href="/terms" style={linkStyle}>Terms of Use</Link>
           <Link href="/copyright" style={linkStyle}>Copyright</Link>
         </div>
