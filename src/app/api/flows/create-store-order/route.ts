@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
         'Content-Type': 'application/json',
         'x-bb-secret': process.env.BB_API_SECRET ?? '',
       },
-      body: JSON.stringify(body),
+      body: JSON.stringify({ payload: JSON.stringify(body) }),
     });
   } catch (err) {
     console.error('create-store-order flow error:', err);
