@@ -409,7 +409,7 @@ export default function ProfileClient({
                 margin: 0, lineHeight: 1.6, letterSpacing: '0.2px',
               }}>
                 By enabling SMS, you consent to receive automated text messages from Banner Beauty.
-                Message and data rates may apply. Reply STOP at any time to opt out.
+                Message frequency may vary. Message and data rates may apply. Reply STOP at any time to opt out or HELP for assistance.
               </p>
             )}
           </section>
