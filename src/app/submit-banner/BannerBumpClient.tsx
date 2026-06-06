@@ -271,6 +271,8 @@ export default function BannerBumpClient({
   const selectedFlag = flagProducts.find((p) => p.productid === selectedFlagId);
   const flagPrice    = selectedFlag?.price ?? 0;
   const subtotal     = letterPrice + (includesFlag ? flagPrice : 0) + (includesGC ? gcAmount : 0);
+  const cheapestFlag = flagProducts.length > 0 ? Math.min(...flagProducts.map(p => p.price)) : 0;
+  const cheapestGC   = gcProducts.length > 0   ? Math.min(...gcProducts.map(p => p.price))   : 0;
   const shipping     = includesFlag ? 5.0 : 0;
   const amountDue    = Math.max(0, subtotal + shipping - gcTotal);
 
@@ -669,8 +671,8 @@ export default function BannerBumpClient({
                   </div>
                   <div style={{ fontFamily: 'Georgia, serif', fontWeight: 700, color: '#B22234', fontSize: '0.95rem', flexShrink: 0, marginLeft: 16 }}>
                     {opt.value === '121120000' && `$${letterPrice.toFixed(2)}`}
-                    {opt.value === '121120001' && `from $${letterPrice.toFixed(2)}`}
-                    {opt.value === '121120002' && selectedFlag ? `$${(letterPrice + flagPrice).toFixed(2)}` : opt.value === '121120002' ? `from $${letterPrice.toFixed(2)}` : ''}
+                    {opt.value === '121120001' && `from $${(letterPrice + cheapestGC).toFixed(2)}`}
+                    {opt.value === '121120002' && (selectedFlag ? `$${(letterPrice + flagPrice).toFixed(2)}` : `from $${(letterPrice + cheapestFlag).toFixed(2)}`)}
                   </div>
                 </button>
               ))}
@@ -980,7 +982,7 @@ export default function BannerBumpClient({
             <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginBottom: 20 }}>
               <input type="checkbox" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} style={{ marginTop: 3, flexShrink: 0 }} />
               <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', color: '#666666', lineHeight: 1.5 }}>
-                I agree to the <a href="/terms" style={{ color: '#1B2A4A' }}>Terms of Service</a> and <a href="/privacy" style={{ color: '#1B2A4A' }}>Privacy Policy</a>.
+                I agree to the <a href="/terms-of-service" style={{ color: '#1B2A4A' }}>Terms of Service</a> and <a href="/privacy-policy" style={{ color: '#1B2A4A' }}>Privacy Policy</a>.
               </span>
             </label>
 

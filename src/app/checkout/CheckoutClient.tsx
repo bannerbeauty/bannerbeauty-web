@@ -455,7 +455,7 @@ export default function CheckoutClient({ userEmail, userFirstName, userLastName,
           <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, cursor: 'pointer', marginBottom: 20 }}>
             <input type="checkbox" checked={termsAccepted} onChange={(e) => setTermsAccepted(e.target.checked)} style={{ marginTop: 3, flexShrink: 0 }} />
             <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', color: '#666666', lineHeight: 1.5 }}>
-              I agree to the <a href="/terms" style={{ color: '#1B2A4A' }}>Terms of Service</a> and <a href="/privacy" style={{ color: '#1B2A4A' }}>Privacy Policy</a>.
+              I agree to the <a href="/terms-of-service" style={{ color: '#1B2A4A' }}>Terms of Service</a> and <a href="/privacy-policy" style={{ color: '#1B2A4A' }}>Privacy Policy</a>.
             </span>
           </label>
 
