@@ -117,7 +117,7 @@ export default function StoreClient({ products }: { products: Product[] }) {
   function proceedToCheckout() {
     if (cart.length === 0) return;
     setCartOpen(false);
-    router.push('/store/checkout');
+    router.push('/checkout');
   }
 
   const filtered = activeCategory === null
