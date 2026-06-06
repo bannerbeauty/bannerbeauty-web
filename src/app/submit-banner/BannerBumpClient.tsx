@@ -251,7 +251,6 @@ export default function BannerBumpClient({
 
   // Step 6: Letter + P.S.
   const [selectedTemplateId,  setSelectedTemplateId]  = useState('');
-  const [expandedTemplateId,  setExpandedTemplateId]  = useState('');
   const [personalNote,        setPersonalNote]        = useState('');
 
   // Step 7: GC + Payment
@@ -825,21 +824,11 @@ export default function BannerBumpClient({
                       <div style={{ width: 20, height: 20, borderRadius: '50%', border: '2px solid', borderColor: selectedTemplateId === tmpl.id ? '#B22234' : '#DDDDDD', background: selectedTemplateId === tmpl.id ? '#B22234' : 'transparent', flexShrink: 0, marginTop: 2 }} />
                     </button>
 
-                    {tmpl.bodyHtml && (
-                      <div style={{ borderTop: '1px solid #EEEEEE' }}>
-                        <button
-                          onClick={() => setExpandedTemplateId(expandedTemplateId === tmpl.id ? '' : tmpl.id)}
-                          style={{ background: 'none', border: 'none', padding: '8px 20px', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#888888', cursor: 'pointer', textDecoration: 'underline' }}
-                        >
-                          {expandedTemplateId === tmpl.id ? 'Hide preview' : 'Preview letter'}
-                        </button>
-                        {expandedTemplateId === tmpl.id && (
-                          <div
-                            dangerouslySetInnerHTML={{ __html: tmpl.bodyHtml }}
-                            style={{ padding: '12px 20px 20px', fontFamily: 'Georgia, serif', fontSize: '0.88rem', color: '#444444', lineHeight: 1.7, borderTop: '1px solid #F5F5F5' }}
-                          />
-                        )}
-                      </div>
+                    {tmpl.bodyHtml && selectedTemplateId === tmpl.id && (
+                      <div
+                        dangerouslySetInnerHTML={{ __html: tmpl.bodyHtml }}
+                        style={{ padding: '12px 20px 20px', fontFamily: 'Georgia, serif', fontSize: '0.88rem', color: '#444444', lineHeight: 1.7, borderTop: '1px solid #EEEEEE' }}
+                      />
                     )}
                   </div>
                 ))}
