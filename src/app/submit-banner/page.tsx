@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { dataverse } from '@/lib/dataverse';
@@ -139,15 +140,17 @@ export default async function SubmitBannerPage() {
   console.log('letterPrice:', letterPrice);
 
   return (
-    <BannerBumpClient
-      userEmail={userEmail}
-      userFirstName={userFirstName}
-      userLastName={userLastName}
-      neighbor={neighbor}
-      letterTemplates={letterTemplates}
-      flagProducts={flagProducts}
-      gcProducts={gcProducts}
-      letterPrice={letterPrice}
-    />
+    <Suspense fallback={<div style={{ minHeight: '60vh', background: '#FAF7F2' }} />}>
+      <BannerBumpClient
+        userEmail={userEmail}
+        userFirstName={userFirstName}
+        userLastName={userLastName}
+        neighbor={neighbor}
+        letterTemplates={letterTemplates}
+        flagProducts={flagProducts}
+        gcProducts={gcProducts}
+        letterPrice={letterPrice}
+      />
+    </Suspense>
   );
 }

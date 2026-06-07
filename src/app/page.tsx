@@ -74,6 +74,25 @@ async function getBannerTotals(): Promise<Record<string, number>> {
   }
 }
 
+async function getProductPrices(): Promise<{ letterPrice: number; cheapestFlag: number; cheapestGC: number }> {
+  try {
+    const result = await dataverse.get<{ value: { bb_price: number; bb_producttype: number }[] }>(
+      'bb_products?$filter=statecode eq 0 and bb_displayinstore eq true and (bb_producttype eq 121120000 or bb_producttype eq 121120004 or bb_producttype eq 121120005)&$select=bb_price,bb_producttype'
+    );
+    const products = result.value ?? [];
+    const flags = products.filter(p => p.bb_producttype === 121120000).map(p => p.bb_price);
+    const gcs = products.filter(p => p.bb_producttype === 121120004).map(p => p.bb_price);
+    const letters = products.filter(p => p.bb_producttype === 121120005).map(p => p.bb_price);
+    return {
+      letterPrice: letters.length > 0 ? Math.min(...letters) : 5.99,
+      cheapestFlag: flags.length > 0 ? Math.min(...flags) : 30,
+      cheapestGC: gcs.length > 0 ? Math.min(...gcs) : 25,
+    };
+  } catch {
+    return { letterPrice: 5.99, cheapestFlag: 30, cheapestGC: 25 };
+  }
+}
+
 async function getPublicNotesBanners(): Promise<DvPublicNotesBanner[]> {
   const result = await dataverse.get<{ value: DvPublicNotesBanner[] }>(
     'bb_banners?$filter=(bb_ispublicnotern eq true or bb_notein ne null) and statecode eq 0' +
@@ -85,36 +104,16 @@ async function getPublicNotesBanners(): Promise<DvPublicNotesBanner[]> {
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
 
-const OPTION_CARDS = [
-  {
-    emoji: '✉️',
-    title: 'Send a Letter',
-    description: 'A heartfelt letter delivered by mail to honor a fellow patriot.',
-    price: '$5.99',
-  },
-  {
-    emoji: '🎁',
-    title: 'Send a Gift Certificate',
-    description: 'Let them choose their own flag from the BannerBeauty store.',
-    price: 'From $25',
-  },
-  {
-    emoji: '🇺🇸',
-    title: 'Send a Flag',
-    description: 'A brand new American flag delivered straight to their door.',
-    price: 'From $30',
-  },
-];
-
 // ── Page ───────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-  const [countRes, featuredRes, notesRes, locationsRes, totalsRes] = await Promise.allSettled([
+  const [countRes, featuredRes, notesRes, locationsRes, totalsRes, pricesRes] = await Promise.allSettled([
     getBannerCount(),
     getFeaturedBanners(),
     getPublicNotesBanners(),
     getBannerLocations(),
     getBannerTotals(),
+    getProductPrices(),
   ]);
 
   if (countRes.status === 'rejected') console.error('Banner count fetch failed:', countRes.reason);
@@ -122,12 +121,38 @@ export default async function HomePage() {
   if (notesRes.status === 'rejected') console.error('Public notes fetch failed:', notesRes.reason);
   if (locationsRes.status === 'rejected') console.error('Banner locations fetch failed:', locationsRes.reason);
   if (totalsRes.status === 'rejected') console.error('Banner totals fetch failed:', totalsRes.reason);
+  if (pricesRes.status === 'rejected') console.error('Product prices fetch failed:', pricesRes.reason);
 
   const count = countRes.status === 'fulfilled' ? countRes.value : 0;
   const featuredBanners = featuredRes.status === 'fulfilled' ? featuredRes.value : [];
   const notesBanners = notesRes.status === 'fulfilled' ? notesRes.value : [];
   const locations = locationsRes.status === 'fulfilled' ? locationsRes.value : [];
   const stateTotals = totalsRes.status === 'fulfilled' ? totalsRes.value : {};
+  const { letterPrice, cheapestFlag, cheapestGC } = pricesRes.status === 'fulfilled' ? pricesRes.value : { letterPrice: 5.99, cheapestFlag: 30, cheapestGC: 25 };
+
+  const OPTION_CARDS = [
+    {
+      emoji: '✉️',
+      title: 'Send a Letter',
+      description: 'A heartfelt patriotic letter delivered by mail to honor a fellow patriot.',
+      price: `$${letterPrice.toFixed(2)}`,
+      option: '121120000',
+    },
+    {
+      emoji: '🎁',
+      title: 'Letter + Gift Certificate',
+      description: 'A letter plus a gift certificate so they can pick their own flag.',
+      price: `From $${(letterPrice + cheapestGC).toFixed(2)}`,
+      option: '121120001',
+    },
+    {
+      emoji: '🇺🇸',
+      title: 'Letter + Flag',
+      description: 'A brand new flag delivered straight to their door, with a letter.',
+      price: `From $${(letterPrice + cheapestFlag).toFixed(2)}`,
+      option: '121120002',
+    },
+  ];
 
   // Day-indexed featured banner (Pacific time)
   const pacificOffsetMs = (() => {
@@ -284,54 +309,60 @@ export default async function HomePage() {
             gap: 24,
           }}>
             {OPTION_CARDS.map((card) => (
-              <div key={card.title} style={{
-                border: '2px solid #1B2A4A',
-                borderRadius: 8,
-                padding: '36px 28px',
-                textAlign: 'center',
-                background: '#FAF7F2',
-                position: 'relative',
-              }}>
+              <Link
+                key={card.title}
+                href={`/submit-banner?option=${card.option}`}
+                style={{ textDecoration: 'none', display: 'block' }}
+              >
                 <div style={{
-                  position: 'absolute',
-                  top: -14,
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  background: '#FFFFFF',
-                  padding: '0 12px',
-                  color: '#C5A028',
-                  fontSize: '1.1rem',
+                  border: '2px solid #1B2A4A',
+                  borderRadius: 8,
+                  padding: '36px 28px',
+                  textAlign: 'center',
+                  background: '#FAF7F2',
+                  position: 'relative',
                 }}>
-                  ★
+                  <div style={{
+                    position: 'absolute',
+                    top: -14,
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    background: '#FFFFFF',
+                    padding: '0 12px',
+                    color: '#C5A028',
+                    fontSize: '1.1rem',
+                  }}>
+                    ★
+                  </div>
+                  <div style={{ fontSize: '3rem', marginBottom: 16 }}>{card.emoji}</div>
+                  <h3 style={{
+                    fontFamily: 'Georgia, serif',
+                    fontSize: '1.2rem',
+                    fontWeight: 700,
+                    color: '#1B2A4A',
+                    margin: '0 0 12px 0',
+                  }}>
+                    {card.title}
+                  </h3>
+                  <p style={{
+                    fontFamily: 'Trebuchet MS, sans-serif',
+                    fontSize: '0.9rem',
+                    color: '#666666',
+                    lineHeight: 1.6,
+                    margin: '0 0 20px 0',
+                  }}>
+                    {card.description}
+                  </p>
+                  <div style={{
+                    fontFamily: 'Georgia, serif',
+                    fontSize: '1.1rem',
+                    fontWeight: 700,
+                    color: '#B22234',
+                  }}>
+                    {card.price}
+                  </div>
                 </div>
-                <div style={{ fontSize: '3rem', marginBottom: 16 }}>{card.emoji}</div>
-                <h3 style={{
-                  fontFamily: 'Georgia, serif',
-                  fontSize: '1.2rem',
-                  fontWeight: 700,
-                  color: '#1B2A4A',
-                  margin: '0 0 12px 0',
-                }}>
-                  {card.title}
-                </h3>
-                <p style={{
-                  fontFamily: 'Trebuchet MS, sans-serif',
-                  fontSize: '0.9rem',
-                  color: '#666666',
-                  lineHeight: 1.6,
-                  margin: '0 0 20px 0',
-                }}>
-                  {card.description}
-                </p>
-                <div style={{
-                  fontFamily: 'Georgia, serif',
-                  fontSize: '1.1rem',
-                  fontWeight: 700,
-                  color: '#B22234',
-                }}>
-                  {card.price}
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
 

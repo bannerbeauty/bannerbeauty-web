@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { APIProvider } from '@vis.gl/react-google-maps';
 import StripePaymentElement from '@/components/StripePaymentElement';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
@@ -206,6 +206,7 @@ export default function BannerBumpClient({
   userEmail, userFirstName, userLastName, neighbor, letterTemplates, flagProducts, gcProducts, letterPrice,
 }: BannerBumpClientProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const stripeRef = useRef<{
     stripe: { confirmPayment: (opts: unknown) => Promise<{ error?: { message: string } }> };
     elements: unknown;
@@ -238,7 +239,7 @@ export default function BannerBumpClient({
   const [attributionText, setAttributionText] = useState('');
 
   // Step 4: Banner Option + Flag + GC product
-  const [bannerOption,    setBannerOption]    = useState('');
+  const [bannerOption,    setBannerOption]    = useState(searchParams.get('option') ?? '');
   const [selectedFlagId,  setSelectedFlagId]  = useState('');
   const [gcProductId,     setGcProductId]     = useState('');
   const [gcAmount,        setGcAmount]        = useState(0);
