@@ -407,26 +407,21 @@ export default async function HomePage() {
             What is a Banner Bump?
           </h2>
           <div style={{
-            background: '#1B2A4A',
             borderRadius: 8,
+            overflow: 'hidden',
             aspectRatio: '16 / 9',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexDirection: 'column',
-            gap: 16,
-            color: 'rgba(255,255,255,0.5)',
+            position: 'relative',
           }}>
-            <div style={{ fontSize: '4rem', opacity: 0.4 }}>▶</div>
-            <p style={{
-              fontFamily: 'Trebuchet MS, sans-serif',
-              fontSize: '0.88rem',
-              letterSpacing: '1px',
-              textTransform: 'uppercase',
-              margin: 0,
-            }}>
-              Video coming soon
-            </p>
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/1w3plWa3XaU"
+              title="What is a Banner Bump?"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+            />
           </div>
         </div>
       </section>

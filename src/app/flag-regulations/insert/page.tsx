@@ -9,9 +9,11 @@ export default function FlagRegulationsInsertPage() {
             size: 4in 9in;
             margin: 0;
           }
-          body { margin: 0; }
+          body { margin: 0; background: transparent !important; }
           .no-print { display: none; }
         }
+        body { background: transparent !important; }
+        main { background: transparent !important; }
       `}</style>
 
       {/* Print button — hidden when printing */}
@@ -51,7 +53,7 @@ export default function FlagRegulationsInsertPage() {
         width: '4in',
         minHeight: '9in',
         margin: '32px auto',
-        background: '#FAF7F2',
+        background: 'transparent',
         display: 'flex',
         flexDirection: 'column',
         boxShadow: '0 4px 24px rgba(0,0,0,0.15)',
@@ -66,20 +68,10 @@ export default function FlagRegulationsInsertPage() {
         }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://bannerbeautystorage.blob.core.windows.net/logos/bannerbeauty-wordmark-logo-horizontal.png"
+            src="https://bannerbeautystorage.blob.core.windows.net/logos/bannerbeauty-wordmark-logo-horizontal-white-banner.png"
             alt="Banner Beauty"
-            style={{ width: '180px', height: 'auto' }}
+            style={{ width: '240px', height: 'auto', display: 'block', margin: '0 auto' }}
           />
-          <div style={{
-            fontFamily: 'Trebuchet MS, sans-serif',
-            fontSize: '7px',
-            letterSpacing: '2px',
-            textTransform: 'uppercase',
-            color: '#C5A028',
-            marginTop: 6,
-          }}>
-            ★ Building Patriotic Neighborhoods ★
-          </div>
         </div>
 
         {/* Title */}
@@ -101,12 +93,12 @@ export default function FlagRegulationsInsertPage() {
         </div>
 
         {/* Content */}
-        <div style={{ flex: 1, padding: '16px 18px', fontSize: '8px', lineHeight: 1.6, color: '#333333' }}>
+        <div style={{ flex: 1, padding: '16px 18px', fontSize: '8.5px', lineHeight: 1.6, color: '#333333' }}>
 
           {/* Section 1 */}
           <div style={{
             fontFamily: 'Trebuchet MS, sans-serif',
-            fontSize: '7.5px',
+            fontSize: '8px',
             fontWeight: 700,
             letterSpacing: '1.5px',
             textTransform: 'uppercase',
@@ -124,10 +116,32 @@ export default function FlagRegulationsInsertPage() {
             <li>The flag must never touch the ground, floor, or water.</li>
           </ul>
 
+          {/* Section: Flag Size & Proportion */}
+          <div style={{
+            fontFamily: 'Trebuchet MS, sans-serif',
+            fontSize: '8px',
+            fontWeight: 700,
+            letterSpacing: '1.5px',
+            textTransform: 'uppercase',
+            color: '#C5A028',
+            marginBottom: 6,
+            borderBottom: '1px solid #C5A028',
+            paddingBottom: 3,
+          }}>
+            📐 Flag Size &amp; Proportion
+          </div>
+          <ul style={{ margin: '0 0 12px 0', paddingLeft: 14 }}>
+            <li style={{ marginBottom: 4 }}>The flag&apos;s fly (length) should be 1.9× its hoist (width) — e.g. a 3&apos;×5&apos; flag on a standard residential pole.</li>
+            <li style={{ marginBottom: 4 }}>For a vertical flagpole, the flag length should be approximately one-quarter to one-third the pole height.</li>
+            <li style={{ marginBottom: 4 }}>A 20-foot residential pole typically flies a 3&apos;×5&apos; or 4&apos;×6&apos; flag.</li>
+            <li style={{ marginBottom: 4 }}>A 25-foot pole is suited for a 4&apos;×6&apos; flag.</li>
+            <li>Flags that are too large for the pole will wear faster and look disproportionate.</li>
+          </ul>
+
           {/* Section 2 */}
           <div style={{
             fontFamily: 'Trebuchet MS, sans-serif',
-            fontSize: '7.5px',
+            fontSize: '8px',
             fontWeight: 700,
             letterSpacing: '1.5px',
             textTransform: 'uppercase',
@@ -148,7 +162,7 @@ export default function FlagRegulationsInsertPage() {
           {/* Section 3 */}
           <div style={{
             fontFamily: 'Trebuchet MS, sans-serif',
-            fontSize: '7.5px',
+            fontSize: '8px',
             fontWeight: 700,
             letterSpacing: '1.5px',
             textTransform: 'uppercase',
@@ -159,16 +173,38 @@ export default function FlagRegulationsInsertPage() {
           }}>
             🔥 Retiring a Worn Flag
           </div>
-          <ul style={{ margin: '0 0 16px 0', paddingLeft: 14 }}>
+          <ul style={{ margin: '0 0 12px 0', paddingLeft: 14 }}>
             <li style={{ marginBottom: 4 }}>A worn or tattered flag should be retired with dignity — never thrown in the trash.</li>
             <li style={{ marginBottom: 4 }}>The preferred method is burning in a dignified ceremony.</li>
             <li>Contact your local American Legion or VFW post for free flag retirement.</li>
           </ul>
 
+          {/* Section: Half-Staff Rules */}
+          <div style={{
+            fontFamily: 'Trebuchet MS, sans-serif',
+            fontSize: '8px',
+            fontWeight: 700,
+            letterSpacing: '1.5px',
+            textTransform: 'uppercase',
+            color: '#C5A028',
+            marginBottom: 6,
+            borderBottom: '1px solid #C5A028',
+            paddingBottom: 3,
+          }}>
+            🏳️ Half-Staff Rules
+          </div>
+          <ul style={{ margin: '0 0 16px 0', paddingLeft: 14 }}>
+            <li style={{ marginBottom: 4 }}>The flag should be flown at half-staff on Memorial Day until noon, then raised to full staff.</li>
+            <li style={{ marginBottom: 4 }}>The President may order half-staff to honor the death of a government official or national tragedy.</li>
+            <li style={{ marginBottom: 4 }}>Governors may order half-staff within their state for state officials or local tragedies.</li>
+            <li style={{ marginBottom: 4 }}>To fly at half-staff, first raise the flag to full staff, then lower it to the midpoint of the pole.</li>
+            <li>When retiring the flag from half-staff, raise it to full staff briefly before bringing it down.</li>
+          </ul>
+
           {/* Source note */}
           <div style={{
             fontFamily: 'Trebuchet MS, sans-serif',
-            fontSize: '6.5px',
+            fontSize: '7.5px',
             color: '#AAAAAA',
             textAlign: 'center',
             borderTop: '1px solid #EEEEEE',
@@ -191,7 +227,7 @@ export default function FlagRegulationsInsertPage() {
         }}>
           <div style={{
             fontFamily: 'Trebuchet MS, sans-serif',
-            fontSize: '7px',
+            fontSize: '7.5px',
             color: 'rgba(255,255,255,0.8)',
             lineHeight: 1.6,
             flex: 1,
