@@ -252,6 +252,7 @@ export default function BannerBumpClient({
   // Step 6: Letter + P.S.
   const [selectedTemplateId,  setSelectedTemplateId]  = useState('');
   const [personalNote,        setPersonalNote]        = useState('');
+  const [isPublicNoteIn,      setIsPublicNoteIn]      = useState(false);
 
   // Step 7: GC + Payment
   const [gcInput,      setGcInput]      = useState('');
@@ -421,6 +422,7 @@ export default function BannerBumpClient({
           shipZip: recipientZipcode,
           letterTemplateId: selectedTemplateId,
           customNote: !isAnon ? personalNote : '',
+          isPublicNoteIn: !isAnon ? isPublicNoteIn : false,
           shareName,
           sharePhone,
           shareEmail,
@@ -848,6 +850,18 @@ export default function BannerBumpClient({
                   onChange={(e) => setPersonalNote(e.target.value)}
                   placeholder="P.S. — I noticed your flag and wanted you to know your service to this neighborhood doesn't go unseen…"
                 />
+                <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 10 }}>
+                  <input
+                    type="checkbox"
+                    id="isPublicNoteIn"
+                    checked={isPublicNoteIn}
+                    onChange={(e) => setIsPublicNoteIn(e.target.checked)}
+                    style={{ width: 16, height: 16, cursor: 'pointer', accentColor: '#1B2A4A' }}
+                  />
+                  <label htmlFor="isPublicNoteIn" style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#555555', cursor: 'pointer' }}>
+                    Share this personal note on the Banner Beauty website.
+                  </label>
+                </div>
               </div>
             )}
 

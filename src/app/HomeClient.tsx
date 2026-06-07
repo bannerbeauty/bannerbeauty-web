@@ -34,13 +34,15 @@ interface HomeClientProps {
   featuredBanner: FeaturedBanner | null;
   quotes: Quote[];
   locations: BannerLocation[];
+  stateTotals: Record<string, number>;
+  totalCount: number;
 }
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
-export default function HomeClient({ featuredBanner, quotes, locations }: HomeClientProps) {
+export default function HomeClient({ featuredBanner, quotes, locations, stateTotals, totalCount }: HomeClientProps) {
   const [quoteIndex, setQuoteIndex] = useState(0);
   const [visible, setVisible] = useState(true);
 
@@ -70,7 +72,7 @@ export default function HomeClient({ featuredBanner, quotes, locations }: HomeCl
   return (
     <>
       {/* ── Banner Bump Map ─────────────────────────────────────────────────── */}
-      <BannerBumpMap locations={locations} />
+      <BannerBumpMap locations={locations} stateTotals={stateTotals} totalCount={totalCount} />
 
       {/* ── Featured Banner ─────────────────────────────────────────────────── */}
       {featuredBanner && (

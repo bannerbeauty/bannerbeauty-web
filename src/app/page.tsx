@@ -59,6 +59,21 @@ async function getBannerLocations() {
   }
 }
 
+async function getBannerTotals(): Promise<Record<string, number>> {
+  try {
+    const result = await dataverse.get<{ value: { bb_statename: string; bb_statenamefull: string; bb_count: number }[] }>(
+      'bb_bannertotals?$select=bb_statename,bb_statenamefull,bb_count&$orderby=bb_statename asc'
+    );
+    const map: Record<string, number> = {};
+    for (const row of result.value ?? []) {
+      map[row.bb_statenamefull] = row.bb_count ?? 0;
+    }
+    return map;
+  } catch {
+    return {};
+  }
+}
+
 async function getPublicNotesBanners(): Promise<DvPublicNotesBanner[]> {
   const result = await dataverse.get<{ value: DvPublicNotesBanner[] }>(
     'bb_banners?$filter=(bb_ispublicnotern eq true or bb_notein ne null) and statecode eq 0' +
@@ -69,43 +84,6 @@ async function getPublicNotesBanners(): Promise<DvPublicNotesBanner[]> {
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
 
-function StatsSection({ count }: { count: number }) {
-  return (
-    <section style={{ background: '#1B2A4A', padding: '72px 24px', textAlign: 'center' }}>
-      <div style={{ maxWidth: 800, margin: '0 auto' }}>
-        <p style={{
-          fontFamily: 'Trebuchet MS, sans-serif',
-          fontSize: '1.125rem',
-          letterSpacing: '3px',
-          textTransform: 'uppercase',
-          color: '#C5A028',
-          margin: '0 0 24px 0',
-        }}>
-          ★ Bumping It Forward ★
-        </p>
-        <div style={{
-          color: '#C5A028',
-          fontFamily: 'Georgia, serif',
-          fontSize: 'clamp(2.8rem, 8vw, 4.8rem)',
-          fontWeight: 700,
-          lineHeight: 1.2,
-        }}>
-          ★ Bump Count: {count.toLocaleString()} ★
-        </div>
-        <p style={{
-          color: 'rgba(255,255,255,0.6)',
-          fontFamily: 'Trebuchet MS, sans-serif',
-          fontSize: '1.76rem',
-          marginTop: 16,
-          marginBottom: 0,
-          lineHeight: 1.5,
-        }}>
-          ... nationwide!<br />Let&apos;s build patriotic communities!
-        </p>
-      </div>
-    </section>
-  );
-}
 
 const OPTION_CARDS = [
   {
@@ -131,22 +109,25 @@ const OPTION_CARDS = [
 // ── Page ───────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-  const [countRes, featuredRes, notesRes, locationsRes] = await Promise.allSettled([
+  const [countRes, featuredRes, notesRes, locationsRes, totalsRes] = await Promise.allSettled([
     getBannerCount(),
     getFeaturedBanners(),
     getPublicNotesBanners(),
     getBannerLocations(),
+    getBannerTotals(),
   ]);
 
   if (countRes.status === 'rejected') console.error('Banner count fetch failed:', countRes.reason);
   if (featuredRes.status === 'rejected') console.error('Featured banners fetch failed:', featuredRes.reason);
   if (notesRes.status === 'rejected') console.error('Public notes fetch failed:', notesRes.reason);
   if (locationsRes.status === 'rejected') console.error('Banner locations fetch failed:', locationsRes.reason);
+  if (totalsRes.status === 'rejected') console.error('Banner totals fetch failed:', totalsRes.reason);
 
   const count = countRes.status === 'fulfilled' ? countRes.value : 0;
   const featuredBanners = featuredRes.status === 'fulfilled' ? featuredRes.value : [];
   const notesBanners = notesRes.status === 'fulfilled' ? notesRes.value : [];
   const locations = locationsRes.status === 'fulfilled' ? locationsRes.value : [];
+  const stateTotals = totalsRes.status === 'fulfilled' ? totalsRes.value : {};
 
   // Day-indexed featured banner (Pacific time)
   const pacificOffsetMs = (() => {
@@ -372,9 +353,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Stats */}
-      <StatsSection count={count} />
-
       {/* Video */}
       <section style={{ background: '#FAF7F2', padding: '80px 24px' }}>
         <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
@@ -423,7 +401,7 @@ export default async function HomePage() {
       </section>
 
       {/* Featured Banner + Quotes — client-rendered */}
-      <HomeClient featuredBanner={featuredBanner} quotes={quotes} locations={locations.map(l => ({ lat: l.bb_latitude, lng: l.bb_longitude }))} />
+      <HomeClient featuredBanner={featuredBanner} quotes={quotes} locations={locations.map(l => ({ lat: l.bb_latitude, lng: l.bb_longitude }))} stateTotals={stateTotals} totalCount={count} />
     </>
   );
 }
