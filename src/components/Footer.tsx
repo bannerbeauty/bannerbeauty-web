@@ -63,6 +63,7 @@ export default function Footer() {
           <Link href="/submit-banner" style={linkStyle}>Banner Bump</Link>
           <Link href="/store" style={linkStyle}>Shop Our Store</Link>
           <Link href="/about" style={linkStyle}>About Us</Link>
+          <Link href="/flag-regulations" style={linkStyle}>Flag Regulations</Link>
         </div>
 
         {/* Col 3: Support */}
