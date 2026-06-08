@@ -65,10 +65,10 @@ async function authHeaders(extra?: Record<string, string>): Promise<Record<strin
 export const dataverse = {
   async get<T = unknown>(path: string, select?: string): Promise<T> {
     const url = select ? `${apiUrl(path)}?$select=${select}` : apiUrl(path);
-    const res = await fetch(url, { headers: await authHeaders() });
+    const res = await fetch(url, { headers: await authHeaders(), cache: 'no-store' });
     if (res.status === 401) {
       tokenCache = null;
-      const retryRes = await fetch(url, { headers: await authHeaders() });
+      const retryRes = await fetch(url, { headers: await authHeaders(), cache: 'no-store' });
       if (!retryRes.ok) {
         throw new Error(`Dataverse GET ${path} failed: ${retryRes.status} ${await retryRes.text()}`);
       }
