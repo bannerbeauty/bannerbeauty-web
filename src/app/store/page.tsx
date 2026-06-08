@@ -8,6 +8,10 @@ interface DvProduct {
   bb_productnumber: string;
   bb_price: number;
   bb_producttype: number;
+  bb_productmaterial?: number;
+  bb_productsize?: number;
+  'bb_productmaterial@OData.Community.Display.V1.FormattedValue'?: string;
+  'bb_productsize@OData.Community.Display.V1.FormattedValue'?: string;
 }
 
 interface DvProductImage {
@@ -20,7 +24,7 @@ async function getProducts(): Promise<Product[]> {
   const [productsRes, imagesRes] = await Promise.all([
     dataverse.get<{ value: DvProduct[] }>(
       'bb_products?$filter=statecode eq 0 and bb_displayinstore eq true' +
-      '&$select=bb_productid,bb_productname,bb_productnumber,bb_price,bb_producttype' +
+      '&$select=bb_productid,bb_productname,bb_productnumber,bb_price,bb_producttype,bb_productmaterial,bb_productsize' +
       '&$orderby=bb_productnumber asc'
     ),
     dataverse.get<{ value: DvProductImage[] }>(
@@ -40,6 +44,8 @@ async function getProducts(): Promise<Product[]> {
       ...p,
       imageUrl: img?.bb_imageurl,
       imageAlt: img?.bb_alttext,
+      materialLabel: p['bb_productmaterial@OData.Community.Display.V1.FormattedValue'] ?? null,
+      sizeLabel: p['bb_productsize@OData.Community.Display.V1.FormattedValue'] ?? null,
     };
   });
 }

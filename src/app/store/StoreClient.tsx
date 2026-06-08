@@ -12,6 +12,8 @@ export interface Product {
   bb_producttype: number;
   imageUrl?: string;
   imageAlt?: string;
+  materialLabel?: string | null;
+  sizeLabel?: string | null;
 }
 
 interface CartItem {
@@ -23,6 +25,9 @@ interface CartItem {
   producttype: number;
   imageUrl?: string;
 }
+
+const SIZE_ALL = 'All';
+const MATERIAL_ALL = 'All';
 
 const CATEGORIES = [
   { label: 'All', value: null },
@@ -51,6 +56,8 @@ function saveCart(cart: CartItem[]) {
 export default function StoreClient({ products }: { products: Product[] }) {
   const router = useRouter();
   const [activeCategory, setActiveCategory] = useState<number | null>(null);
+  const [activeSize, setActiveSize] = useState<string>(SIZE_ALL);
+  const [activeMaterial, setActiveMaterial] = useState<string>(MATERIAL_ALL);
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [addedId, setAddedId] = useState<string | null>(null);
@@ -120,9 +127,13 @@ export default function StoreClient({ products }: { products: Product[] }) {
     router.push('/checkout');
   }
 
-  const filtered = activeCategory === null
-    ? products
-    : products.filter((p) => p.bb_producttype === activeCategory);
+  const filtered = products
+    .filter(p => activeCategory === null || p.bb_producttype === activeCategory)
+    .filter(p => activeSize === SIZE_ALL || p.sizeLabel === activeSize)
+    .filter(p => activeMaterial === MATERIAL_ALL || p.materialLabel === activeMaterial);
+
+  const uniqueSizes = [SIZE_ALL, ...Array.from(new Set(products.filter(p => p.sizeLabel).map(p => p.sizeLabel as string))).sort()];
+  const uniqueMaterials = [MATERIAL_ALL, ...Array.from(new Set(products.filter(p => p.materialLabel).map(p => p.materialLabel as string))).sort()];
 
   return (
     <>
@@ -155,6 +166,71 @@ export default function StoreClient({ products }: { products: Product[] }) {
                 </button>
               );
             })}
+          </div>
+
+          {/* Size filters */}
+          {uniqueSizes.length > 1 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+              {uniqueSizes.map((size) => {
+                const active = activeSize === size;
+                return (
+                  <button
+                    key={size}
+                    onClick={() => setActiveSize(size)}
+                    style={{
+                      padding: '6px 16px',
+                      borderRadius: 4,
+                      border: active ? 'none' : '1.5px solid #CCCCCC',
+                      background: active ? '#B22234' : '#FFFFFF',
+                      color: active ? '#FFFFFF' : '#444444',
+                      fontFamily: 'Trebuchet MS, sans-serif',
+                      fontSize: '0.78rem',
+                      letterSpacing: '0.5px',
+                      cursor: 'pointer',
+                      fontWeight: active ? 700 : 400,
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {size}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Material filters */}
+          {uniqueMaterials.length > 1 && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+              {uniqueMaterials.map((material) => {
+                const active = activeMaterial === material;
+                return (
+                  <button
+                    key={material}
+                    onClick={() => setActiveMaterial(material)}
+                    style={{
+                      padding: '6px 16px',
+                      borderRadius: 4,
+                      border: active ? 'none' : '1.5px solid #CCCCCC',
+                      background: active ? '#C5A028' : '#FFFFFF',
+                      color: active ? '#FFFFFF' : '#444444',
+                      fontFamily: 'Trebuchet MS, sans-serif',
+                      fontSize: '0.78rem',
+                      letterSpacing: '0.5px',
+                      cursor: 'pointer',
+                      fontWeight: active ? 700 : 400,
+                      transition: 'all 0.15s',
+                    }}
+                  >
+                    {material}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Product count */}
+          <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', color: '#888888', marginBottom: 24 }}>
+            Showing {filtered.length} product{filtered.length !== 1 ? 's' : ''}
           </div>
 
           {/* Product grid */}

@@ -58,6 +58,7 @@ async function authHeaders(extra?: Record<string, string>): Promise<Record<strin
     'OData-Version': '4.0',
     Accept: 'application/json',
     'Content-Type': 'application/json',
+    'Prefer': 'odata.include-annotations="OData.Community.Display.V1.FormattedValue"',
     ...extra,
   };
 }
