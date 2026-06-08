@@ -79,6 +79,7 @@ function StoreConfirmationInner() {
 
   const [order, setOrder] = useState<StoreOrder | null>(null);
   const [mounted, setMounted] = useState(false);
+  const [gcCodes, setGcCodes] = useState<string[]>([]);
   const firedRef = useRef(false);
 
   useEffect(() => {
@@ -119,7 +120,14 @@ function StoreConfirmationInner() {
         cart: order.cart,
         appliedGCs: order.appliedGCs ?? [],
       }),
-    }).catch((err) => console.error('create-store-order error:', err));
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data?.gcCodes && Array.isArray(data.gcCodes)) {
+        setGcCodes(data.gcCodes);
+      }
+    })
+    .catch((err) => console.error('create-store-order error:', err));
 
     fetch('/api/flows/email-store-order', {
       method: 'POST',
@@ -295,6 +303,37 @@ function StoreConfirmationInner() {
                 <div>{order.city}, {order.state} {order.zipcode}</div>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Gift certificate codes */}
+        {gcCodes.length > 0 && (
+          <div style={{ background: '#FFFFFF', borderRadius: 8, border: '2px solid #1B7A3E', padding: 28, marginBottom: 28 }}>
+            <div style={{ ...sectionLabelStyle, color: '#1B7A3E' }}>★ Your Gift Certificate Codes</div>
+            <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#555555', lineHeight: 1.6, margin: '0 0 16px' }}>
+              Save these codes — they can be used at checkout on any future order.
+            </p>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {gcCodes.map((code) => (
+                <div
+                  key={code}
+                  style={{
+                    fontFamily: 'monospace',
+                    fontSize: '1.05rem',
+                    fontWeight: 700,
+                    color: '#1B7A3E',
+                    background: '#E8F5E9',
+                    border: '1px solid #A5D6A7',
+                    borderRadius: 4,
+                    padding: '10px 16px',
+                    letterSpacing: '1.5px',
+                    userSelect: 'all',
+                  }}
+                >
+                  {code}
+                </div>
+              ))}
+            </div>
           </div>
         )}
 
