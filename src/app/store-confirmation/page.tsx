@@ -13,11 +13,6 @@ interface CartItem {
   producttype: number;
 }
 
-interface GCCode {
-  code: string;
-  amount: number;
-}
-
 interface AppliedGC {
   code: string;
   amount: number;
@@ -84,7 +79,6 @@ function StoreConfirmationInner() {
 
   const [order, setOrder] = useState<StoreOrder | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [gcCodes, setGcCodes] = useState<GCCode[]>([]);
   const firedRef = useRef(false);
 
   useEffect(() => {
@@ -125,15 +119,7 @@ function StoreConfirmationInner() {
         cart: order.cart,
         appliedGCs: order.appliedGCs ?? [],
       }),
-    })
-    .then(res => res.json())
-    .then(data => {
-      console.log('create-store-order response:', JSON.stringify(data));
-      if (data?.gcCodes && Array.isArray(data.gcCodes)) {
-        setGcCodes(data.gcCodes);
-      }
-    })
-    .catch((err) => console.error('create-store-order error:', err));
+    }).catch((err) => console.error('create-store-order error:', err));
 
     fetch('/api/flows/email-store-order', {
       method: 'POST',
@@ -261,6 +247,22 @@ function StoreConfirmationInner() {
               </div>
             ))}
 
+            {order.hasGC && (
+              <div style={{
+                marginTop: 16,
+                padding: '12px 16px',
+                background: '#F0FBF4',
+                border: '1px solid #1B7A3E',
+                borderRadius: 4,
+                fontFamily: 'Trebuchet MS, sans-serif',
+                fontSize: '0.88rem',
+                color: '#1B7A3E',
+                lineHeight: 1.6,
+              }}>
+                🎁 Your gift certificate code{order.cart.filter(i => i.producttype === 121120004).reduce((s, i) => s + i.qty, 0) !== 1 ? 's' : ''} will arrive in a separate email shortly.
+              </div>
+            )}
+
             <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#666666' }}>
                 <span>Subtotal</span><span>${order.subtotal.toFixed(2)}</span>
@@ -309,42 +311,6 @@ function StoreConfirmationInner() {
                 <div>{order.city}, {order.state} {order.zipcode}</div>
               </div>
             )}
-          </div>
-        )}
-
-        {/* Gift certificate codes */}
-        {gcCodes.length > 0 && (
-          <div style={{ background: '#FFFFFF', borderRadius: 8, border: '2px solid #1B7A3E', padding: 28, marginBottom: 28 }}>
-            <div style={{ ...sectionLabelStyle, color: '#1B7A3E' }}>★ Your Gift Certificate Codes</div>
-            <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#555555', lineHeight: 1.6, margin: '0 0 16px' }}>
-              Save these codes — they can be used at checkout on any future order.
-            </p>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {gcCodes.map((gc) => (
-                <div
-                  key={gc.code}
-                  style={{
-                    fontFamily: 'Georgia, serif',
-                    fontSize: '1.2rem',
-                    fontWeight: 700,
-                    color: '#1B7A3E',
-                    background: '#F0FBF4',
-                    border: '1px solid #1B7A3E',
-                    borderRadius: 4,
-                    padding: '12px 20px',
-                    marginBottom: 8,
-                    letterSpacing: '2px',
-                    textAlign: 'center',
-                    userSelect: 'all',
-                  }}
-                >
-                  {gc.code}
-                  <div style={{ fontSize: '0.85rem', letterSpacing: '0px', fontWeight: 400, color: '#1B7A3E', marginTop: 4 }}>
-                    Value: ${gc.amount.toFixed(2)}
-                  </div>
-                </div>
-              ))}
-            </div>
           </div>
         )}
 
