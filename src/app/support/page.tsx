@@ -89,14 +89,13 @@ export default function SupportPage() {
 
       {/* FAQ */}
       <section style={{ background: '#FFFFFF', padding: '72px 24px' }}>
-        <div style={{ maxWidth: 760, margin: '0 auto' }}>
+        <div style={{ maxWidth: 680, margin: '0 auto', textAlign: 'center' }}>
           <p style={{
             fontFamily: 'Trebuchet MS, sans-serif',
             fontSize: '1rem',
             letterSpacing: '3px',
             textTransform: 'uppercase',
             color: '#C5A028',
-            textAlign: 'center',
             margin: '0 0 12px',
           }}>
             ★ Frequently Asked Questions ★
@@ -106,59 +105,35 @@ export default function SupportPage() {
             fontSize: '1.8rem',
             fontWeight: 700,
             color: '#1B2A4A',
-            textAlign: 'center',
-            margin: '0 0 32px',
+            margin: '0 0 16px',
           }}>
             Got Questions?
           </h2>
-
-          {/* Search bar */}
-          <div style={{ position: 'relative', marginBottom: 48 }}>
-            <input
-              type="search"
-              placeholder="Search frequently asked questions..."
-              style={{
-                width: '100%',
-                padding: '14px 48px 14px 20px',
-                fontFamily: 'Trebuchet MS, sans-serif',
-                fontSize: '1rem',
-                border: '2px solid #DDDDDD',
-                borderRadius: 4,
-                outline: 'none',
-                boxSizing: 'border-box',
-                color: '#333333',
-              }}
-            />
-            <span style={{
-              position: 'absolute',
-              right: 16,
-              top: '50%',
-              transform: 'translateY(-50%)',
-              color: '#AAAAAA',
-              fontSize: '1.1rem',
-              pointerEvents: 'none',
-            }}>
-              🔍
-            </span>
-          </div>
-
-          {/* FAQ placeholder */}
-          <div style={{
-            background: '#FAF7F2',
-            border: '2px dashed #DDDDDD',
-            borderRadius: 8,
-            padding: '48px 32px',
-            textAlign: 'center',
+          <p style={{
+            fontFamily: 'Trebuchet MS, sans-serif',
+            fontSize: '1rem',
+            color: '#555555',
+            lineHeight: 1.7,
+            margin: '0 0 32px',
           }}>
-            <p style={{
-              fontFamily: 'Trebuchet MS, sans-serif',
+            Browse our FAQ for quick answers to the most common questions about Banner Bumps, gift certificates, shipping, and more.
+          </p>
+          <Link
+            href="/faq"
+            style={{
+              display: 'inline-block',
+              background: '#1B2A4A',
+              color: '#FFFFFF',
+              fontFamily: 'Georgia, serif',
               fontSize: '1rem',
-              color: '#AAAAAA',
-              margin: 0,
-            }}>
-              Frequently asked questions coming soon.
-            </p>
-          </div>
+              fontWeight: 700,
+              padding: '16px 40px',
+              borderRadius: 4,
+              textDecoration: 'none',
+            }}
+          >
+            Browse our FAQ →
+          </Link>
         </div>
       </section>
     </>
