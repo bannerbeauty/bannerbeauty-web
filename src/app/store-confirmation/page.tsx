@@ -128,6 +128,7 @@ function StoreConfirmationInner() {
     })
     .then(res => res.json())
     .then(data => {
+      console.log('create-store-order response:', JSON.stringify(data));
       if (data?.gcCodes && Array.isArray(data.gcCodes)) {
         setGcCodes(data.gcCodes);
       }

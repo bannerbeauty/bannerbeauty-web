@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server';
 
 const FLOW_URL =
-  'https://2e1e3024670eed439dc2d049ff5827.18.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/45637e453fef4ac9b0bf0bba5fac002e/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ydQ4aG-Ug3J355hoMQEVl_02GNCgxY5NojYRc6csQAw';
+  'https://2e1e3024670eed439dc2d049ff5827.18.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/45637e453fef4ac9b0bf0bba5fac002e/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ydQ4aG-Ug3J355hoMQEVl_02GNCgxY5NojYRc6csQAw&$callback=false';
 
 export async function POST(req: NextRequest) {
   let body: unknown;
