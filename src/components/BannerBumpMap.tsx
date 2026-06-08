@@ -69,7 +69,7 @@ export default function BannerBumpMap({ locations, stateTotals, totalCount }: Pr
                     onMouseEnter={() => setHoveredState(name)}
                     onMouseLeave={() => setHoveredState(null)}
                     onClick={() => setSelectedState(isSelected ? null : name)}
-                    fill={isSelected ? '#B22234' : isHovered ? '#243558' : '#FAF7F2'}
+                    fill={isSelected ? '#C5A028' : isHovered ? '#243558' : '#FAF7F2'}
                     stroke="#C5A028"
                     strokeWidth={0.5}
                     style={{
@@ -85,7 +85,7 @@ export default function BannerBumpMap({ locations, stateTotals, totalCount }: Pr
 
           {locations.map((loc, i) => (
             <Marker key={i} coordinates={[loc.lng, loc.lat]}>
-              <circle r={4} fill="#C5A028" opacity={0.9} />
+              <circle r={2} fill="#B22234" opacity={0.9} />
             </Marker>
           ))}
         </ComposableMap>
