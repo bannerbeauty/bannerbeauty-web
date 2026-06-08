@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -127,13 +127,21 @@ export default function StoreClient({ products }: { products: Product[] }) {
     router.push('/checkout');
   }
 
-  const filtered = products
-    .filter(p => activeCategory === null || p.bb_producttype === activeCategory)
+  const availableCategories = [
+    { label: 'All', value: null },
+    ...CATEGORIES.slice(1).filter(cat => products.some(p => p.bb_producttype === cat.value)),
+  ];
+
+  const categoryFiltered = activeCategory === null
+    ? products
+    : products.filter(p => p.bb_producttype === activeCategory);
+
+  const uniqueSizes = [SIZE_ALL, ...Array.from(new Set(categoryFiltered.filter(p => p.sizeLabel).map(p => p.sizeLabel as string))).sort()];
+  const uniqueMaterials = [MATERIAL_ALL, ...Array.from(new Set(categoryFiltered.filter(p => p.materialLabel).map(p => p.materialLabel as string))).sort()];
+
+  const filtered = categoryFiltered
     .filter(p => activeSize === SIZE_ALL || p.sizeLabel === activeSize)
     .filter(p => activeMaterial === MATERIAL_ALL || p.materialLabel === activeMaterial);
-
-  const uniqueSizes = [SIZE_ALL, ...Array.from(new Set(products.filter(p => p.sizeLabel).map(p => p.sizeLabel as string))).sort()];
-  const uniqueMaterials = [MATERIAL_ALL, ...Array.from(new Set(products.filter(p => p.materialLabel).map(p => p.materialLabel as string))).sort()];
 
   return (
     <>
@@ -142,12 +150,12 @@ export default function StoreClient({ products }: { products: Product[] }) {
 
           {/* Category filters */}
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '28px 0 32px' }}>
-            {CATEGORIES.map((cat) => {
+            {availableCategories.map((cat) => {
               const active = activeCategory === cat.value;
               return (
                 <button
                   key={cat.label}
-                  onClick={() => setActiveCategory(cat.value)}
+                  onClick={() => { setActiveCategory(cat.value); setActiveSize(SIZE_ALL); setActiveMaterial(MATERIAL_ALL); }}
                   style={{
                     padding: '8px 20px',
                     borderRadius: 4,
