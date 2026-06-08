@@ -13,6 +13,11 @@ interface CartItem {
   producttype: number;
 }
 
+interface GCCode {
+  code: string;
+  amount: number;
+}
+
 interface AppliedGC {
   code: string;
   amount: number;
@@ -79,7 +84,7 @@ function StoreConfirmationInner() {
 
   const [order, setOrder] = useState<StoreOrder | null>(null);
   const [mounted, setMounted] = useState(false);
-  const [gcCodes, setGcCodes] = useState<string[]>([]);
+  const [gcCodes, setGcCodes] = useState<GCCode[]>([]);
   const firedRef = useRef(false);
 
   useEffect(() => {
@@ -314,23 +319,28 @@ function StoreConfirmationInner() {
               Save these codes — they can be used at checkout on any future order.
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-              {gcCodes.map((code) => (
+              {gcCodes.map((gc) => (
                 <div
-                  key={code}
+                  key={gc.code}
                   style={{
-                    fontFamily: 'monospace',
-                    fontSize: '1.05rem',
+                    fontFamily: 'Georgia, serif',
+                    fontSize: '1.2rem',
                     fontWeight: 700,
                     color: '#1B7A3E',
-                    background: '#E8F5E9',
-                    border: '1px solid #A5D6A7',
+                    background: '#F0FBF4',
+                    border: '1px solid #1B7A3E',
                     borderRadius: 4,
-                    padding: '10px 16px',
-                    letterSpacing: '1.5px',
+                    padding: '12px 20px',
+                    marginBottom: 8,
+                    letterSpacing: '2px',
+                    textAlign: 'center',
                     userSelect: 'all',
                   }}
                 >
-                  {code}
+                  {gc.code}
+                  <div style={{ fontSize: '0.85rem', letterSpacing: '0px', fontWeight: 400, color: '#1B7A3E', marginTop: 4 }}>
+                    Value: ${gc.amount.toFixed(2)}
+                  </div>
                 </div>
               ))}
             </div>
