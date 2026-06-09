@@ -5,6 +5,9 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 
 export const metadata: Metadata = {
+  icons: {
+    icon: '/favicon.ico',
+  },
   title: 'BannerBeauty - Building Patriotic Neighborhoods',
   description:
     'BannerBeauty connects neighbors through patriotic banner bumps — send a letter, flag, or gift certificate to honor a fellow American.',
