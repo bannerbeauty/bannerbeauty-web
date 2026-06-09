@@ -31,6 +31,8 @@ interface Props {
 export default function MyActivityClient({ orders, bannerBumps }: Props) {
   const [orderFilter, setOrderFilter] = useState<number | null>(null);
   const [bannerFilter, setBannerFilter] = useState<number | null>(null);
+  const [bannersOpen, setBannersOpen] = useState(true);
+  const [ordersOpen, setOrdersOpen] = useState(true);
 
   const filteredOrders = orderFilter === null
     ? orders
@@ -71,7 +73,13 @@ export default function MyActivityClient({ orders, bannerBumps }: Props) {
         {/* Banner Bumps Section */}
         <div style={{ marginBottom: 56 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
-            <div style={sectionLabelStyle}>★ My Banner Bumps ({filteredBanners.length})</div>
+            <button
+              onClick={() => setBannersOpen(o => !o)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, padding: 0 }}
+            >
+              <span style={{ fontSize: '0.7rem', color: '#B22234', display: 'inline-block', transform: bannersOpen ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s' }}>▼</span>
+              <div style={{ ...sectionLabelStyle, marginBottom: 0 }}>★ My Banner Bumps ({filteredBanners.length})</div>
+            </button>
             {uniqueBannerStatuses.length > 1 && (
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <button
@@ -113,7 +121,7 @@ export default function MyActivityClient({ orders, bannerBumps }: Props) {
             )}
           </div>
 
-          {bannerBumps.length === 0 ? (
+          {bannersOpen && (bannerBumps.length === 0 ? (
             <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: '40px 24px', textAlign: 'center' }}>
               <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.95rem', color: '#888888', margin: '0 0 16px' }}>
                 You haven&apos;t sent any Banner Bumps yet.
@@ -178,6 +186,8 @@ export default function MyActivityClient({ orders, bannerBumps }: Props) {
                               padding: '2px 8px',
                               borderRadius: 20,
                               textTransform: 'uppercase',
+                              whiteSpace: 'nowrap',
+                              flexShrink: 0,
                             }}>
                               {status.label}
                             </span>
@@ -200,13 +210,19 @@ export default function MyActivityClient({ orders, bannerBumps }: Props) {
                 );
               })}
             </div>
-          )}
+          ))}
         </div>
 
         {/* Store Orders Section */}
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, flexWrap: 'wrap', gap: 12 }}>
-            <div style={sectionLabelStyle}>★ My Store Orders ({filteredOrders.length})</div>
+            <button
+              onClick={() => setOrdersOpen(o => !o)}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, padding: 0 }}
+            >
+              <span style={{ fontSize: '0.7rem', color: '#B22234', display: 'inline-block', transform: ordersOpen ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s' }}>▼</span>
+              <div style={{ ...sectionLabelStyle, marginBottom: 0 }}>★ My Store Orders ({filteredOrders.length})</div>
+            </button>
             {uniqueOrderStatuses.length > 1 && (
               <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
                 <button
@@ -248,7 +264,7 @@ export default function MyActivityClient({ orders, bannerBumps }: Props) {
             )}
           </div>
 
-          {orders.length === 0 ? (
+          {ordersOpen && (orders.length === 0 ? (
             <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: '40px 24px', textAlign: 'center' }}>
               <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.95rem', color: '#888888', margin: '0 0 16px' }}>
                 You haven&apos;t placed any store orders yet.
@@ -312,6 +328,8 @@ export default function MyActivityClient({ orders, bannerBumps }: Props) {
                               padding: '2px 8px',
                               borderRadius: 20,
                               textTransform: 'uppercase',
+                              whiteSpace: 'nowrap',
+                              flexShrink: 0,
                             }}>
                               {status.label}
                             </span>
@@ -334,7 +352,7 @@ export default function MyActivityClient({ orders, bannerBumps }: Props) {
                 );
               })}
             </div>
-          )}
+          ))}
         </div>
 
       </div>

@@ -64,6 +64,7 @@ const BANNER_STATUS: Record<number, { label: string; color: string }> = {
   121120001: { label: 'Fulfilled',           color: '#1B7A3E' },
   2:         { label: 'Recipient Responded', color: '#0A7ABF' },
   121120002: { label: 'Cancelled',           color: '#888888' },
+  121120003: { label: 'Page Accessed',       color: '#0A7ABF' },
 };
 
 export { ORDER_STATUS, BANNER_STATUS };
