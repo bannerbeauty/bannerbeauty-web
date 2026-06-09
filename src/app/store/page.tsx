@@ -88,9 +88,9 @@ export default async function StorePage() {
           <Link
             href="/submit-banner"
             style={{
-              display: 'inline-flex',
-              alignItems: 'center',
-              gap: 8,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'flex-start',
               background: 'rgba(197,160,40,0.15)',
               border: '1px solid #C5A028',
               borderRadius: 4,
@@ -103,8 +103,8 @@ export default async function StorePage() {
               letterSpacing: '0.3px',
             }}
           >
-            ★ Want to Banner Bump a Fellow Patriot?
-            <span style={{ display: 'block' }}>Start here →</span>
+            <span>★ Want to Banner Bump a Fellow Patriot?</span>
+            <span style={{ marginTop: 4, fontWeight: 700 }}>Start here →</span>
           </Link>
 
           <div style={{ marginTop: 20 }}>
