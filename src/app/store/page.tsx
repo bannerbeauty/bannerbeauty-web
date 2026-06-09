@@ -84,9 +84,6 @@ export default async function StorePage() {
           }}>
             Quality American flags, poles, and accessories
           </p>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="https://bannerbeautystorage.blob.core.windows.net/logos/FMAA Logo.png" alt="Made in America" style={{ height: 48, width: 'auto', marginTop: 16, display: 'block' }} />
-
           {/* Nudge banner */}
           <Link
             href="/submit-banner"
@@ -109,6 +106,14 @@ export default async function StorePage() {
             ★ Want to Banner Bump a Fellow Patriot?
             <span style={{ display: 'block' }}>Start here →</span>
           </Link>
+
+          <div style={{ marginTop: 20 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://bannerbeautystorage.blob.core.windows.net/logos/FMAA Logo.png" alt="FMAA Certified" style={{ height: 48, width: 'auto', display: 'block' }} />
+            <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '1.5px', textTransform: 'uppercase', color: '#C5A028', marginTop: 4 }}>
+              Certified American-Made Flags
+            </div>
+          </div>
         </div>
       </section>
 

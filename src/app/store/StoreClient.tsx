@@ -149,7 +149,7 @@ export default function StoreClient({ products }: { products: Product[] }) {
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 64px' }}>
 
           {/* Category filters */}
-          <div style={{ padding: '28px 0 32px' }}>
+          <div style={{ padding: '28px 0 0', marginBottom: 24 }}>
           <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#888888', marginBottom: 6 }}>Type</div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {availableCategories.map((cat) => {
@@ -159,7 +159,8 @@ export default function StoreClient({ products }: { products: Product[] }) {
                   key={cat.label}
                   onClick={() => { setActiveCategory(cat.value); setActiveSize(SIZE_ALL); setActiveMaterial(MATERIAL_ALL); }}
                   style={{
-                    padding: '8px 20px',
+                    minWidth: 80,
+                    padding: '8px 16px',
                     borderRadius: 4,
                     border: active ? 'none' : '1.5px solid #CCCCCC',
                     background: active ? '#1B2A4A' : '#FFFFFF',
@@ -181,7 +182,7 @@ export default function StoreClient({ products }: { products: Product[] }) {
 
           {/* Size filters */}
           {uniqueSizes.length > 1 && (
-            <div style={{ marginBottom: 12 }}>
+            <div style={{ marginBottom: 24 }}>
             <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#888888', marginBottom: 6 }}>Size</div>
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {uniqueSizes.map((size) => {
@@ -191,13 +192,14 @@ export default function StoreClient({ products }: { products: Product[] }) {
                     key={size}
                     onClick={() => setActiveSize(size)}
                     style={{
-                      padding: '6px 16px',
+                      minWidth: 80,
+                      padding: '8px 16px',
                       borderRadius: 4,
                       border: active ? 'none' : '1.5px solid #CCCCCC',
-                      background: active ? '#B22234' : '#FFFFFF',
+                      background: active ? '#1B2A4A' : '#FFFFFF',
                       color: active ? '#FFFFFF' : '#444444',
                       fontFamily: 'Trebuchet MS, sans-serif',
-                      fontSize: '0.78rem',
+                      fontSize: '0.82rem',
                       letterSpacing: '0.5px',
                       cursor: 'pointer',
                       fontWeight: active ? 700 : 400,
@@ -224,13 +226,14 @@ export default function StoreClient({ products }: { products: Product[] }) {
                     key={material}
                     onClick={() => setActiveMaterial(material)}
                     style={{
-                      padding: '6px 16px',
+                      minWidth: 80,
+                      padding: '8px 16px',
                       borderRadius: 4,
                       border: active ? 'none' : '1.5px solid #CCCCCC',
-                      background: active ? '#C5A028' : '#FFFFFF',
+                      background: active ? '#1B2A4A' : '#FFFFFF',
                       color: active ? '#FFFFFF' : '#444444',
                       fontFamily: 'Trebuchet MS, sans-serif',
-                      fontSize: '0.78rem',
+                      fontSize: '0.82rem',
                       letterSpacing: '0.5px',
                       cursor: 'pointer',
                       fontWeight: active ? 700 : 400,
