@@ -130,7 +130,7 @@ export default function AddressAutocomplete({ onAddressSelect, placeholder = 'St
           border: `1.5px solid ${focused ? '#1B2A4A' : '#DDDDDD'}`,
           borderRadius: 4,
           fontFamily: 'Georgia, serif',
-          fontSize: '0.95rem',
+          fontSize: '16px',
           color: '#1B2A4A',
           background: '#FFFFFF',
           outline: 'none',

@@ -71,9 +71,9 @@ const BANNER_OPTIONS = [
 ];
 
 const ATTRIBUTION_TYPES = [
-  { value: 'from_me',     label: 'From Me',       icon: '🙋',  description: 'Your name will appear on the letter.' },
-  { value: 'in_honor',    label: 'In Honor Of',   icon: '⭐',  description: 'Dedicate this Banner Bump to someone special.' },
   { value: 'in_memoriam', label: 'In Memoriam',   icon: '🕊️', description: 'Honor the memory of a fallen patriot.' },
+  { value: 'in_honor',    label: 'In Honor Of',   icon: '⭐',  description: 'Dedicate this Banner Bump to someone special.' },
+  { value: 'from_me',     label: 'From Me',       icon: '🙋',  description: 'Your name will appear on the letter.' },
   { value: 'anonymous',   label: 'Anonymous',     icon: '🤫',  description: 'Your identity stays completely private.' },
 ];
 
@@ -234,7 +234,7 @@ export default function BannerBumpClient({
   const [recipientLng,       setRecipientLng]       = useState(0);
 
   // Step 3: Recognition / Attribution
-  const [attribution,     setAttribution]     = useState<'from_me' | 'in_honor' | 'in_memoriam' | 'anonymous'>('from_me');
+  const [attribution,     setAttribution]     = useState<'from_me' | 'in_honor' | 'in_memoriam' | 'anonymous'>('in_memoriam');
   const [attributionName, setAttributionName] = useState('');
   const [attributionText, setAttributionText] = useState('');
 
@@ -363,7 +363,7 @@ export default function BannerBumpClient({
     return true;
   }
 
-  function handleNext() { if (validateStep()) { setStepError(''); setStep((s) => s + 1); } }
+  function handleNext() { if (validateStep()) { setStepError(''); setStep((s) => s + 1); window.scrollTo({ top: 0, behavior: 'smooth' }); } }
   function handleBack() { setStepError(''); setOrderError(''); setStep((s) => s - 1); }
 
   // ── GC handlers ─────────────────────────────────────────────────────────────
@@ -503,21 +503,21 @@ export default function BannerBumpClient({
           <div style={cardStyle}>
             <div style={sectionTitleStyle}>★ Your Information</div>
             <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#555555', lineHeight: 1.6, marginBottom: 20 }}>
-              Confirm your name and email. We&apos;ll use these for your order confirmation and QR code.
+              Confirm your name and email. We&apos;ll send you an email confirmation of your banner bump.
             </p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
               <div>
                 <label style={labelStyle}>First Name *</label>
-                <input style={inputStyle} value={inFirstName} onChange={(e) => setInFirstName(e.target.value)} />
+                <input style={{ ...inputStyle, fontSize: '16px' }} value={inFirstName} onChange={(e) => setInFirstName(e.target.value)} />
               </div>
               <div>
                 <label style={labelStyle}>Last Name</label>
-                <input style={inputStyle} value={inLastName} onChange={(e) => setInLastName(e.target.value)} />
+                <input style={{ ...inputStyle, fontSize: '16px' }} value={inLastName} onChange={(e) => setInLastName(e.target.value)} />
               </div>
             </div>
             <div>
               <label style={labelStyle}>Email Address *</label>
-              <input style={inputStyle} type="email" value={inEmail} onChange={(e) => setInEmail(e.target.value)} />
+              <input style={{ ...inputStyle, fontSize: '16px' }} type="email" value={inEmail} onChange={(e) => setInEmail(e.target.value)} />
             </div>
             {stepError && <p style={{ color: '#B22234', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', marginTop: 12 }}>{stepError}</p>}
             <NavButtons showBack={false} onNext={handleNext} nextLabel="Next: Recipient Info →" />
@@ -528,14 +528,17 @@ export default function BannerBumpClient({
         {step === 2 && (
           <div style={cardStyle}>
             <div style={sectionTitleStyle}>★ Your Patriotic Neighbor</div>
+            <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#555555', lineHeight: 1.6, marginBottom: 20 }}>
+              Don&apos;t worry if you don&apos;t know your neighbor&apos;s name — their address is all we need.
+            </p>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
               <div>
-                <label style={labelStyle}>First Name *</label>
-                <input style={inputStyle} value={recipientFirstName} onChange={(e) => setRecipientFirstName(e.target.value)} placeholder="Jane" />
+                <label style={labelStyle}>First Name</label>
+                <input style={{ ...inputStyle, fontSize: '16px' }} value={recipientFirstName} onChange={(e) => setRecipientFirstName(e.target.value)} placeholder="Jane" />
               </div>
               <div>
-                <label style={labelStyle}>Last Name *</label>
-                <input style={inputStyle} value={recipientLastName} onChange={(e) => setRecipientLastName(e.target.value)} placeholder="Smith" />
+                <label style={labelStyle}>Last Name</label>
+                <input style={{ ...inputStyle, fontSize: '16px' }} value={recipientLastName} onChange={(e) => setRecipientLastName(e.target.value)} placeholder="Smith" />
               </div>
             </div>
             <div style={{ marginBottom: 16 }}>
@@ -555,29 +558,29 @@ export default function BannerBumpClient({
             </div>
             <div style={{ marginBottom: 16 }}>
               <label style={labelStyle}>Address Line 2</label>
-              <input style={inputStyle} value={recipientAddress2} onChange={(e) => setRecipientAddress2(e.target.value)} placeholder="Apt, Suite (optional)" />
+              <input style={{ ...inputStyle, fontSize: '16px' }} value={recipientAddress2} onChange={(e) => setRecipientAddress2(e.target.value)} placeholder="Apt, Suite (optional)" />
             </div>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 140px 100px', gap: 16 }}>
-              <div>
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
                 <label style={labelStyle}>City *</label>
-                <input style={inputStyle} value={recipientCity} onChange={(e) => setRecipientCity(e.target.value)} />
+                <input style={{ ...inputStyle, fontSize: '16px' }} value={recipientCity} onChange={(e) => setRecipientCity(e.target.value)} />
               </div>
-              <div>
+              <div style={{ width: 80 }}>
                 <label style={labelStyle}>State *</label>
                 <select
-                  style={selectStyle}
+                  style={{ ...selectStyle, fontSize: '16px' }}
                   value={recipientState}
                   onChange={(e) => setRecipientState(e.target.value)}
                 >
-                  <option value="">— Select —</option>
+                  <option value="">—</option>
                   {US_STATES.map((s) => (
-                    <option key={s.value} value={s.value}>{s.label}</option>
+                    <option key={s.value} value={s.value}>{s.value}</option>
                   ))}
                 </select>
               </div>
-              <div>
+              <div style={{ width: 85 }}>
                 <label style={labelStyle}>ZIP *</label>
-                <input style={inputStyle} value={recipientZipcode} maxLength={10} placeholder="93446" onChange={(e) => setRecipientZipcode(e.target.value)} />
+                <input style={{ ...inputStyle, fontSize: '16px' }} value={recipientZipcode} maxLength={10} placeholder="93446" onChange={(e) => setRecipientZipcode(e.target.value)} />
               </div>
             </div>
             {stepError && <p style={{ color: '#B22234', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', marginTop: 12 }}>{stepError}</p>}
@@ -619,7 +622,7 @@ export default function BannerBumpClient({
                     {attribution === 'in_honor' ? 'Honoring *' : 'In Memory Of *'}
                   </label>
                   <input
-                    style={inputStyle}
+                    style={{ ...inputStyle, fontSize: '16px' }}
                     value={attributionName}
                     onChange={(e) => setAttributionName(e.target.value)}
                     placeholder="Full name"
@@ -628,7 +631,7 @@ export default function BannerBumpClient({
                 <div>
                   <label style={labelStyle}>About Them (optional)</label>
                   <textarea
-                    style={{ ...inputStyle, height: 100, resize: 'vertical' }}
+                    style={{ ...inputStyle, fontSize: '16px', height: 100, resize: 'vertical' }}
                     value={attributionText}
                     onChange={(e) => setAttributionText(e.target.value)}
                     placeholder="Staff Sergeant Robert E. Hayes served with the 101st Airborne Division..."
@@ -752,7 +755,7 @@ export default function BannerBumpClient({
           <div style={cardStyle}>
             <div style={sectionTitleStyle}>★ Sharing Preferences</div>
             <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#555555', lineHeight: 1.6, marginBottom: 20 }}>
-              Choose what information to share with your neighbor on the letter.
+              Choose what information to share with your neighbor on the letter and possibly on the public Banner Beauty website.
               {isAnon && <strong style={{ color: '#B22234' }}> Anonymous attribution disables all sharing.</strong>}
             </p>
 
