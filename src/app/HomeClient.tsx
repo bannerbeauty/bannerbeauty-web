@@ -3,6 +3,20 @@
 import { useState, useEffect } from 'react';
 import BannerBumpMap from '@/components/BannerBumpMap';
 
+const STATE_NAMES: Record<string, string> = {
+  AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',
+  CO:'Colorado',CT:'Connecticut',DE:'Delaware',FL:'Florida',GA:'Georgia',
+  HI:'Hawaii',ID:'Idaho',IL:'Illinois',IN:'Indiana',IA:'Iowa',KS:'Kansas',
+  KY:'Kentucky',LA:'Louisiana',ME:'Maine',MD:'Maryland',MA:'Massachusetts',
+  MI:'Michigan',MN:'Minnesota',MS:'Mississippi',MO:'Missouri',MT:'Montana',
+  NE:'Nebraska',NV:'Nevada',NH:'New Hampshire',NJ:'New Jersey',NM:'New Mexico',
+  NY:'New York',NC:'North Carolina',ND:'North Dakota',OH:'Ohio',OK:'Oklahoma',
+  OR:'Oregon',PA:'Pennsylvania',RI:'Rhode Island',SC:'South Carolina',
+  SD:'South Dakota',TN:'Tennessee',TX:'Texas',UT:'Utah',VT:'Vermont',
+  VA:'Virginia',WA:'Washington',WV:'West Virginia',WI:'Wisconsin',WY:'Wyoming',
+  DC:'District of Columbia'
+};
+
 export interface FeaturedBanner {
   bannerId: string;
   attributionType: string;
@@ -32,19 +46,32 @@ export interface BannerLocation {
   lng: number;
 }
 
+export interface Dedication {
+  bannerId: string;
+  attributionType?: number;
+  attributionName?: string;
+  attributionText?: string;
+  bannerOption?: number;
+  shareName?: boolean;
+  initiatingFirstName?: string;
+  recipientCity?: string;
+  recipientState?: string;
+}
+
 interface HomeClientProps {
   featuredBanner: FeaturedBanner | null;
   quotes: Quote[];
   locations: BannerLocation[];
   stateTotals: Record<string, number>;
   totalCount: number;
+  dedication: Dedication | null;
 }
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
 }
 
-export default function HomeClient({ featuredBanner, quotes, locations, stateTotals, totalCount }: HomeClientProps) {
+export default function HomeClient({ featuredBanner, quotes, locations, stateTotals, totalCount, dedication }: HomeClientProps) {
   const [quoteIndex, setQuoteIndex] = useState(0);
   const [visible, setVisible] = useState(true);
 
@@ -75,6 +102,72 @@ export default function HomeClient({ featuredBanner, quotes, locations, stateTot
     <>
       {/* ── Banner Bump Map ─────────────────────────────────────────────────── */}
       <BannerBumpMap locations={locations} stateTotals={stateTotals} totalCount={totalCount} />
+
+      {/* ── Dedications ────────────────────────────────────────────────────── */}
+      {dedication && (
+        <section style={{ background: '#FFFFFF', padding: '72px 24px' }}>
+          <div style={{ maxWidth: 760, margin: '0 auto', textAlign: 'center' }}>
+            <p style={{
+              fontFamily: 'Trebuchet MS, sans-serif',
+              fontSize: '1rem',
+              letterSpacing: '3px',
+              textTransform: 'uppercase',
+              color: '#C5A028',
+              margin: '0 0 12px',
+            }}>
+              ★ Dedications ★
+            </p>
+            <div style={{
+              maxWidth: 600,
+              margin: '0 auto',
+              background: '#1B2A4A',
+              borderRadius: 8,
+              padding: '40px 48px',
+              borderTop: '4px solid #C5A028',
+              borderBottom: '4px solid #C5A028',
+            }}>
+              <div style={{
+                fontFamily: 'Trebuchet MS, sans-serif',
+                fontSize: '0.75rem',
+                letterSpacing: '3px',
+                textTransform: 'uppercase',
+                color: '#C5A028',
+                marginBottom: 16,
+              }}>
+                {dedication.attributionType === 121120001 ? 'In Memory Of' : 'In Honor Of'}
+              </div>
+              <div style={{
+                fontFamily: 'Georgia, serif',
+                fontSize: 'clamp(1.4rem, 3vw, 2rem)',
+                fontWeight: 700,
+                color: '#FFFFFF',
+                marginBottom: 12,
+              }}>
+                {dedication.attributionName}
+              </div>
+              <div style={{
+                fontFamily: 'Trebuchet MS, sans-serif',
+                fontSize: '0.88rem',
+                color: 'rgba(255,255,255,0.5)',
+                marginBottom: 28,
+                letterSpacing: '0.5px',
+              }}>
+                A flag flies in {dedication.recipientCity}, {STATE_NAMES[dedication.recipientState ?? ''] ?? dedication.recipientState}.
+              </div>
+              <p style={{
+                fontFamily: 'Georgia, serif',
+                fontSize: 'clamp(1.05rem, 2.5vw, 1.3rem)',
+                color: 'rgba(255,255,255,0.85)',
+                lineHeight: 1.8,
+                fontStyle: 'italic',
+                margin: 0,
+              }}>
+                &ldquo;{dedication.attributionText}&rdquo;
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Featured Banner ─────────────────────────────────────────────────── */}
       {featuredBanner && (
@@ -277,16 +370,8 @@ export default function HomeClient({ featuredBanner, quotes, locations, stateTot
                     fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem',
                     color: '#C5A028', margin: 0, letterSpacing: '1px',
                   }}>
-                    — {currentQuote.name}
+                    — {currentQuote.name}{(currentQuote.city || currentQuote.state) ? `, in ${[currentQuote.city, currentQuote.state ? (STATE_NAMES[currentQuote.state] ?? currentQuote.state) : ''].filter(Boolean).join(', ')}` : ''}
                   </p>
-                  {(currentQuote.city || currentQuote.state) && (
-                    <p style={{
-                      fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem',
-                      color: '#AAAAAA', margin: '6px 0 0', letterSpacing: '0.5px',
-                    }}>
-                      {[currentQuote.city, currentQuote.state].filter(Boolean).join(', ')}
-                    </p>
-                  )}
                 </>
               )}
             </div>

@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { dataverse } from '@/lib/dataverse';
-import HomeClient, { type FeaturedBanner, type Quote } from './HomeClient';
+import HomeClient, { type FeaturedBanner, type Quote, type Dedication } from './HomeClient';
 
 // ── Dataverse types ────────────────────────────────────────────────────────────
 
@@ -26,6 +26,7 @@ interface DvPublicNotesBanner {
   bb_notein?: string;
   bb_notern?: string;
   bb_ispublicnotern?: boolean;
+  bb_ispublicnotein?: boolean;
   bb_sharename?: boolean;
   bb_infirstname?: string;
   bb_rnfirstname?: string;
@@ -46,7 +47,7 @@ async function getBannerCount(): Promise<number> {
 
 async function getFeaturedBanners(): Promise<DvFeaturedBanner[]> {
   const result = await dataverse.get<{ value: DvFeaturedBanner[] }>(
-    'bb_banners?$filter=bb_isfeatureable eq true and statecode eq 0' +
+    'bb_banners?$filter=bb_isfeatureable eq true and statuscode ne 121120002' +
     '&$select=bb_bannerid,createdon,bb_attributiontype,bb_attributionname,bb_attributiontext,bb_notein,bb_notern,bb_beforephotourl,bb_afterphotourl,bb_sharename,bb_infirstname,bb_rnfirstname,bb_recipientcity,bb_recipientstate'
   );
   return result.value ?? [];
@@ -98,12 +99,53 @@ async function getProductPrices(): Promise<{ letterPrice: number; cheapestFlag: 
 }
 
 async function getPublicNotesBanners(): Promise<DvPublicNotesBanner[]> {
-  const result = await dataverse.get<{ value: DvPublicNotesBanner[] }>(
-    'bb_banners?$filter=(bb_ispublicnotern eq true or bb_notein ne null) and statecode eq 0' +
-    '&$select=bb_notein,bb_notern,bb_ispublicnotern,bb_sharename,bb_infirstname,bb_rnfirstname,bb_recipientcity,bb_recipientstate' +
-    '&$expand=bb_InitiatingNeighbor($select=bb_city,bb_state),bb_RecipientNeighbor($select=bb_city,bb_state)'
-  );
-  return result.value ?? [];
+  try {
+    const [rnRes, inRes] = await Promise.all([
+      dataverse.get<{ value: DvPublicNotesBanner[] }>(
+        'bb_banners?$filter=bb_isfeatureable eq true and bb_ispublicnotern eq true and statuscode ne 121120002' +
+        '&$select=bb_notein,bb_notern,bb_ispublicnotern,bb_sharename,bb_infirstname,bb_rnfirstname,bb_recipientcity,bb_recipientstate' +
+        '&$expand=bb_InitiatingNeighbor($select=bb_city,bb_state),bb_RecipientNeighbor($select=bb_city,bb_state)'
+      ),
+      dataverse.get<{ value: DvPublicNotesBanner[] }>(
+        'bb_banners?$filter=bb_isfeatureable eq true and bb_ispublicnotein eq true and statuscode ne 121120002' +
+        '&$select=bb_notein,bb_notern,bb_ispublicnotern,bb_sharename,bb_infirstname,bb_rnfirstname,bb_recipientcity,bb_recipientstate' +
+        '&$expand=bb_InitiatingNeighbor($select=bb_city,bb_state),bb_RecipientNeighbor($select=bb_city,bb_state)'
+      ),
+    ]);
+    console.log('RN notes count:', rnRes.value?.length ?? 0);
+    console.log('IN notes count:', inRes.value?.length ?? 0);
+    console.log('RN sample:', JSON.stringify(rnRes.value?.[0]));
+    return [...(rnRes.value ?? []), ...(inRes.value ?? [])];
+  } catch (err) {
+    console.error('getPublicNotesBanners failed:', err);
+    return [];
+  }
+}
+
+interface DvDedication {
+  bb_bannerid: string;
+  bb_attributiontype?: number;
+  bb_attributionname?: string;
+  bb_attributiontext?: string;
+  bb_banneroption?: number;
+  bb_sharename?: boolean;
+  bb_infirstname?: string;
+  bb_recipientcity?: string;
+  bb_recipientstate?: string;
+}
+
+async function getDedications(): Promise<DvDedication[]> {
+  try {
+    const result = await dataverse.get<{ value: DvDedication[] }>(
+      'bb_banners?$filter=bb_isfeatureable eq true and bb_ispublicattribution eq true and bb_attributiontext ne null and bb_attributionname ne null and statuscode ne 121120002' +
+      '&$select=bb_bannerid,bb_attributiontype,bb_attributionname,bb_attributiontext,bb_banneroption,bb_sharename,bb_infirstname,bb_recipientcity,bb_recipientstate'
+    );
+    console.log('Dedications count:', result.value?.length ?? 0);
+    console.log('Dedication sample:', JSON.stringify(result.value?.[0]));
+    return result.value ?? [];
+  } catch {
+    return [];
+  }
 }
 
 // ── Sub-components ─────────────────────────────────────────────────────────────
@@ -112,13 +154,14 @@ async function getPublicNotesBanners(): Promise<DvPublicNotesBanner[]> {
 // ── Page ───────────────────────────────────────────────────────────────────────
 
 export default async function HomePage() {
-  const [countRes, featuredRes, notesRes, locationsRes, totalsRes, pricesRes] = await Promise.allSettled([
+  const [countRes, featuredRes, notesRes, locationsRes, totalsRes, pricesRes, dedicationsRes] = await Promise.allSettled([
     getBannerCount(),
     getFeaturedBanners(),
     getPublicNotesBanners(),
     getBannerLocations(),
     getBannerTotals(),
     getProductPrices(),
+    getDedications(),
   ]);
 
   if (countRes.status === 'rejected') console.error('Banner count fetch failed:', countRes.reason);
@@ -127,6 +170,7 @@ export default async function HomePage() {
   if (locationsRes.status === 'rejected') console.error('Banner locations fetch failed:', locationsRes.reason);
   if (totalsRes.status === 'rejected') console.error('Banner totals fetch failed:', totalsRes.reason);
   if (pricesRes.status === 'rejected') console.error('Product prices fetch failed:', pricesRes.reason);
+  if (dedicationsRes.status === 'rejected') console.error('Dedications fetch failed:', dedicationsRes.reason);
 
   const count = countRes.status === 'fulfilled' ? countRes.value : 0;
   const featuredBanners = featuredRes.status === 'fulfilled' ? featuredRes.value : [];
@@ -134,6 +178,7 @@ export default async function HomePage() {
   const locations = locationsRes.status === 'fulfilled' ? locationsRes.value : [];
   const stateTotals = totalsRes.status === 'fulfilled' ? totalsRes.value : {};
   const { letterPrice, cheapestFlag, cheapestGC } = pricesRes.status === 'fulfilled' ? pricesRes.value : { letterPrice: 5.99, cheapestFlag: 30, cheapestGC: 25 };
+  const dedications = dedicationsRes.status === 'fulfilled' ? dedicationsRes.value : [];
 
   const OPTION_CARDS = [
     {
@@ -176,6 +221,19 @@ export default async function HomePage() {
     ? featuredBanners[dayIndex % featuredBanners.length]
     : null;
 
+  const dvDedication = dedications.length > 0 ? dedications[dayIndex % dedications.length] : null;
+  const dedication: Dedication | null = dvDedication ? {
+    bannerId: dvDedication.bb_bannerid,
+    attributionType: dvDedication.bb_attributiontype,
+    attributionName: dvDedication.bb_attributionname,
+    attributionText: dvDedication.bb_attributiontext,
+    bannerOption: dvDedication.bb_banneroption,
+    shareName: dvDedication.bb_sharename,
+    initiatingFirstName: dvDedication.bb_infirstname,
+    recipientCity: dvDedication.bb_recipientcity,
+    recipientState: dvDedication.bb_recipientstate,
+  } : null;
+
   const featuredBanner: FeaturedBanner | null = dvFeatured
     ? {
         bannerId: dvFeatured.bb_bannerid,
@@ -197,7 +255,7 @@ export default async function HomePage() {
   // Build quotes using denormalized name fields
   const quotes: Quote[] = [];
   for (const b of notesBanners) {
-    if (b.bb_notein) {
+    if (b.bb_notein && b.bb_ispublicnotein !== false) {
       quotes.push({
         quote: b.bb_notein,
         name: b.bb_sharename ? (b.bb_infirstname || 'A Fellow Patriot') : 'A Fellow Patriot',
@@ -436,7 +494,7 @@ export default async function HomePage() {
       </section>
 
       {/* Featured Banner + Quotes — client-rendered */}
-      <HomeClient featuredBanner={featuredBanner} quotes={quotes} locations={locations.map(l => ({ lat: l.bb_latitude, lng: l.bb_longitude }))} stateTotals={stateTotals} totalCount={count} />
+      <HomeClient featuredBanner={featuredBanner} quotes={quotes} locations={locations.map(l => ({ lat: l.bb_latitude, lng: l.bb_longitude }))} stateTotals={stateTotals} totalCount={count} dedication={dedication} />
     </>
   );
 }

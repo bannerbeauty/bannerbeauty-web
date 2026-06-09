@@ -639,7 +639,11 @@ export default function BannerBumpClient({
                     value={attributionText}
                     onChange={(e) => setAttributionText(e.target.value)}
                     placeholder="Staff Sergeant Robert E. Hayes served with the 101st Airborne Division..."
+                    maxLength={2000}
                   />
+                  <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: attributionText.length > 1800 ? '#B22234' : '#AAAAAA', textAlign: 'right', marginTop: 4 }}>
+                    {2000 - attributionText.length} characters remaining
+                  </div>
                 </div>
               </div>
             )}
