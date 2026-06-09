@@ -23,6 +23,8 @@ export interface Quote {
   quote: string;
   name: string;
   type: 'in' | 'rn';
+  city?: string;
+  state?: string;
 }
 
 export interface BannerLocation {
@@ -85,7 +87,7 @@ export default function HomeClient({ featuredBanner, quotes, locations, stateTot
               letterSpacing: '3px', textTransform: 'uppercase',
               color: '#C5A028', textAlign: 'center', margin: '0 0 10px',
             }}>
-              ★ Today&apos;s Featured Banner Bump ★
+              ★ Featured Banner Bump ★
             </p>
             <p style={{
               fontFamily: 'Trebuchet MS, sans-serif', fontSize: '1.6rem',
@@ -277,6 +279,14 @@ export default function HomeClient({ featuredBanner, quotes, locations, stateTot
                   }}>
                     — {currentQuote.name}
                   </p>
+                  {(currentQuote.city || currentQuote.state) && (
+                    <p style={{
+                      fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem',
+                      color: '#AAAAAA', margin: '6px 0 0', letterSpacing: '0.5px',
+                    }}>
+                      {[currentQuote.city, currentQuote.state].filter(Boolean).join(', ')}
+                    </p>
+                  )}
                 </>
               )}
             </div>

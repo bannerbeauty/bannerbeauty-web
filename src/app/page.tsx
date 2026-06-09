@@ -29,6 +29,10 @@ interface DvPublicNotesBanner {
   bb_sharename?: boolean;
   bb_infirstname?: string;
   bb_rnfirstname?: string;
+  bb_recipientcity?: string;
+  bb_recipientstate?: string;
+  bb_InitiatingNeighbor?: { bb_city?: string; bb_state?: string };
+  bb_RecipientNeighbor?: { bb_city?: string; bb_state?: string };
 }
 
 // ── Fetch helpers ──────────────────────────────────────────────────────────────
@@ -96,7 +100,8 @@ async function getProductPrices(): Promise<{ letterPrice: number; cheapestFlag: 
 async function getPublicNotesBanners(): Promise<DvPublicNotesBanner[]> {
   const result = await dataverse.get<{ value: DvPublicNotesBanner[] }>(
     'bb_banners?$filter=(bb_ispublicnotern eq true or bb_notein ne null) and statecode eq 0' +
-    '&$select=bb_notein,bb_notern,bb_ispublicnotern,bb_sharename,bb_infirstname,bb_rnfirstname'
+    '&$select=bb_notein,bb_notern,bb_ispublicnotern,bb_sharename,bb_infirstname,bb_rnfirstname,bb_recipientcity,bb_recipientstate' +
+    '&$expand=bb_InitiatingNeighbor($select=bb_city,bb_state),bb_RecipientNeighbor($select=bb_city,bb_state)'
   );
   return result.value ?? [];
 }
@@ -197,6 +202,8 @@ export default async function HomePage() {
         quote: b.bb_notein,
         name: b.bb_sharename ? (b.bb_infirstname || 'A Fellow Patriot') : 'A Fellow Patriot',
         type: 'in',
+        city: b.bb_InitiatingNeighbor?.bb_city,
+        state: b.bb_InitiatingNeighbor?.bb_state,
       });
     }
     if (b.bb_notern && b.bb_ispublicnotern) {
@@ -204,6 +211,8 @@ export default async function HomePage() {
         quote: b.bb_notern,
         name: b.bb_rnfirstname || 'A Grateful Patriot',
         type: 'rn',
+        city: b.bb_recipientcity,
+        state: b.bb_recipientstate,
       });
     }
   }
@@ -255,7 +264,7 @@ export default async function HomePage() {
             margin: '0 auto 40px',
             maxWidth: 560,
           }}>
-            See a tattered flag out there? Help a fellow patriot with a letter, gift certificate, or brand new flag.
+            See a tattered flag out there?<br/>Help a fellow patriot with<br/>a letter, gift certificate, or brand new flag.
           </p>
 
           <Link

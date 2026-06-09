@@ -94,7 +94,7 @@ export default function BannerBumpMap({ locations, stateTotals, totalCount }: Pr
         <div style={{
           display: 'flex',
           justifyContent: 'center',
-          alignItems: 'stretch',
+          alignItems: 'flex-end',
           gap: 0,
           marginTop: 32,
           borderRadius: 8,
