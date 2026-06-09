@@ -257,7 +257,8 @@ export default function TransactionClient({
         background: 'linear-gradient(135deg, #1A1A2E 0%, #2E2E4A 100%)',
         padding: '48px 24px', textAlign: 'center', color: '#FFFFFF',
       }}>
-        <div style={{ fontSize: '3rem', marginBottom: 12 }}>🎉</div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <div style={{ marginBottom: 12 }}><img src="https://bannerbeautystorage.blob.core.windows.net/images/banner-bump.png" alt="Banner Bump" style={{ height: '3em', width: 'auto', display: 'block', margin: '0 auto' }} /></div>
         <h1 style={{
           fontFamily: 'Georgia, serif', fontSize: '2.2rem', color: '#C5A028',
           margin: '0 0 12px', letterSpacing: '1px',

@@ -77,7 +77,7 @@ export default function MyActivityClient({ orders, bannerBumps }: Props) {
               onClick={() => setBannersOpen(o => !o)}
               style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, padding: 0 }}
             >
-              <span style={{ fontSize: '0.7rem', color: '#B22234', display: 'inline-block', transform: bannersOpen ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s' }}>▼</span>
+              <span style={{ fontSize: '0.7rem', color: '#0A7ABF', display: 'inline-block', transform:bannersOpen ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s' }}>▼</span>
               <div style={{ ...sectionLabelStyle, marginBottom: 0 }}>★ My Banner Bumps ({filteredBanners.length})</div>
             </button>
             {uniqueBannerStatuses.length > 1 && (
@@ -220,7 +220,7 @@ export default function MyActivityClient({ orders, bannerBumps }: Props) {
               onClick={() => setOrdersOpen(o => !o)}
               style={{ background: 'none', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 8, padding: 0 }}
             >
-              <span style={{ fontSize: '0.7rem', color: '#B22234', display: 'inline-block', transform: ordersOpen ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s' }}>▼</span>
+              <span style={{ fontSize: '0.7rem', color: '#0A7ABF', display: 'inline-block', transform:ordersOpen ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform 0.2s' }}>▼</span>
               <div style={{ ...sectionLabelStyle, marginBottom: 0 }}>★ My Store Orders ({filteredOrders.length})</div>
             </button>
             {uniqueOrderStatuses.length > 1 && (
