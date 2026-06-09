@@ -67,7 +67,7 @@ const TOTAL_STEPS = 7;
 const BANNER_OPTIONS = [
   { value: '121120000', label: 'Letter Only',              icon: '✉️',  description: 'Send a heartfelt patriotic letter to your neighbor.' },
   { value: '121120001', label: 'Letter + Gift Certificate', icon: '🎁',  description: 'A letter plus a gift certificate so they can pick their own flag.' },
-  { value: '121120002', label: 'Letter + Flag',            icon: '🇺🇸', description: 'A brand new flag delivered straight to their door, with a letter.' },
+  { value: '121120002', label: 'Letter + Flag',            icon: '',  description: 'A brand new flag delivered straight to their door, with a letter.' },
 ];
 
 const ATTRIBUTION_TYPES = [
@@ -487,7 +487,11 @@ export default function BannerBumpClient({
       <div style={{ maxWidth: 680, margin: '0 auto' }}>
 
         <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.4rem, 3vw, 1.8rem)', fontWeight: 700, color: '#1B2A4A', margin: '0 0 6px' }}>
-          Banner Bump a Patriot 🇺🇸
+          <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+            Banner Bump a Patriot
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://bannerbeautystorage.blob.core.windows.net/images/banner-bump.png" alt="" style={{ height: '1.2em', width: 'auto', display: 'inline', verticalAlign: 'middle' }} />
+          </span>
         </h1>
         <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#888888', margin: '0 0 24px' }}>
           Step {step} of {TOTAL_STEPS} — {STEP_NAMES[step - 1]}
@@ -670,7 +674,9 @@ export default function BannerBumpClient({
                 >
                   <div>
                     <div style={{ fontFamily: 'Georgia, serif', fontWeight: 700, color: '#1B2A4A', marginBottom: 4 }}>
-                      {opt.icon} {opt.label}
+                      {opt.value === '121120002'
+                        ? <>{/* eslint-disable-next-line @next/next/no-img-element */}<img src="https://bannerbeautystorage.blob.core.windows.net/images/banner-bump.png" alt="" style={{ height: '1.2em', width: 'auto', verticalAlign: 'middle' }} /> {opt.label}</>
+                        : <>{opt.icon} {opt.label}</>}
                     </div>
                     <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', color: '#666666' }}>{opt.description}</div>
                   </div>

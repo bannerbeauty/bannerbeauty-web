@@ -88,13 +88,13 @@ export default async function StorePage() {
           <Link
             href="/submit-banner"
             style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: 16,
               background: 'rgba(197,160,40,0.15)',
               border: '1px solid #C5A028',
               borderRadius: 4,
-              padding: '10px 18px',
+              padding: '12px 20px',
               color: '#C5A028',
               fontFamily: 'Trebuchet MS, sans-serif',
               fontSize: '0.85rem',
@@ -103,11 +103,15 @@ export default async function StorePage() {
               letterSpacing: '0.3px',
             }}
           >
-            <span>★ Want to Banner Bump a Fellow Patriot?</span>
-            <span style={{ marginTop: 4, fontWeight: 700 }}>Start here →</span>
+            <span style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <span>Buying a gift?</span>
+              <span>Do a Banner Bump instead.</span>
+            </span>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="https://bannerbeautystorage.blob.core.windows.net/images/banner-bump.png" alt="Banner Bump" style={{ height: '2.5em', width: 'auto', flexShrink: 0 }} />
           </Link>
 
-          <div style={{ marginTop: 20 }}>
+          <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="https://bannerbeautystorage.blob.core.windows.net/logos/FMAA Logo.png" alt="FMAA Certified" style={{ height: 48, width: 'auto', display: 'block' }} />
             <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '1.5px', textTransform: 'uppercase', color: '#C5A028', marginTop: 4 }}>
