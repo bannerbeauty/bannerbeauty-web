@@ -198,13 +198,13 @@ export default function FlagRegulationsPage() {
       </section>
 
       {/* CTA */}
-      <section style={{ background: '#1B2A4A', padding: '64px 24px', textAlign: 'center' }}>
+      <section style={{ background: '#C5A028', padding: '64px 24px', textAlign: 'center' }}>
         <p style={{
           fontFamily: 'Trebuchet MS, sans-serif',
           fontSize: '1rem',
           letterSpacing: '3px',
           textTransform: 'uppercase',
-          color: '#C5A028',
+          color: '#1B2A4A',
           margin: '0 0 16px',
         }}>
           ★ See a Tattered Flag? ★
@@ -213,7 +213,7 @@ export default function FlagRegulationsPage() {
           fontFamily: 'Georgia, serif',
           fontSize: 'clamp(1.6rem, 4vw, 2.4rem)',
           fontWeight: 700,
-          color: '#FFFFFF',
+          color: '#1B2A4A',
           margin: '0 0 16px',
         }}>
           Help a Fellow Patriot
@@ -221,7 +221,7 @@ export default function FlagRegulationsPage() {
         <p style={{
           fontFamily: 'Trebuchet MS, sans-serif',
           fontSize: '1rem',
-          color: 'rgba(255,255,255,0.7)',
+          color: '#1B2A4A',
           margin: '0 0 32px',
           lineHeight: 1.7,
         }}>
