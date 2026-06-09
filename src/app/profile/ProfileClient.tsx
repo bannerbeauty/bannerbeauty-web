@@ -18,6 +18,8 @@ interface ProfileClientProps {
   preferredAuth: string;
   emailOptin: boolean;
   smsOptin: boolean;
+  displayName: string;
+  handle: string;
 }
 
 const US_STATES = [
@@ -95,6 +97,8 @@ export default function ProfileClient({
   preferredAuth: initialPreferredAuth,
   emailOptin: initialEmailOptin,
   smsOptin: initialSmsOptin,
+  displayName: initialDisplayName,
+  handle: initialHandle,
 }: ProfileClientProps) {
   const [firstName, setFirstName] = useState(initialFirstName);
   const [lastName, setLastName] = useState(initialLastName);
@@ -109,6 +113,8 @@ export default function ProfileClient({
   const [preferredAuth, setPreferredAuth] = useState(initialPreferredAuth);
   const [emailOptin, setEmailOptin] = useState(initialEmailOptin);
   const [smsOptin, setSmsOptin] = useState(initialSmsOptin);
+  const [displayName, setDisplayName] = useState(initialDisplayName ?? '');
+  const [handle, setHandle] = useState(initialHandle ?? '');
 
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -140,6 +146,8 @@ export default function ProfileClient({
             smsOptin,
             lat,
             lng,
+            displayName,
+            handle,
           }),
         }),
       });
@@ -231,6 +239,51 @@ export default function ProfileClient({
                 placeholder="(555) 555-5555"
                 maxLength={14}
               />
+            </div>
+          </section>
+
+          {/* Public Identity */}
+          <section style={{
+            background: '#FFFFFF', borderRadius: 8, padding: 28,
+            marginBottom: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+          }}>
+            <div style={sectionTitleStyle}>Public Identity</div>
+            <div style={{ marginBottom: 16 }}>
+              <label style={labelStyle}>Display Name</label>
+              <input
+                type="text"
+                value={displayName}
+                onChange={e => setDisplayName(e.target.value)}
+                style={inputStyle}
+                placeholder="Your public name"
+              />
+            </div>
+            <div>
+              <label style={labelStyle}>Handle</label>
+              <div style={{ display: 'flex', alignItems: 'center', border: '1.5px solid #DDDDDD', borderRadius: 4, overflow: 'hidden', background: '#FFFFFF' }}>
+                <span style={{
+                  padding: '10px 12px',
+                  fontFamily: 'Georgia, serif',
+                  fontSize: '0.95rem',
+                  color: '#888888',
+                  background: '#F5F5F5',
+                  borderRight: '1.5px solid #DDDDDD',
+                  userSelect: 'none',
+                }}>@</span>
+                <input
+                  type="text"
+                  value={handle}
+                  onChange={e => setHandle(e.target.value.replace(/[^a-zA-Z0-9_]/g, ''))}
+                  style={{ ...inputStyle, border: 'none', borderRadius: 0, flex: 1 }}
+                  placeholder="your_handle"
+                />
+              </div>
+              <p style={{
+                fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem',
+                color: '#AAAAAA', margin: '6px 0 0', letterSpacing: '0.3px',
+              }}>
+                Your unique public identifier on Banner Beauty. Letters, numbers, and underscores only.
+              </p>
             </div>
           </section>
 

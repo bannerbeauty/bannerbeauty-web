@@ -16,6 +16,8 @@ interface DvNeighbor {
   bb_preferredauthmethod?: number;
   bb_emailoptin?: boolean;
   bb_smsoptin?: boolean;
+  bb_displayname?: string;
+  bb_handle?: string;
 }
 
 export default async function ProfilePage() {
@@ -30,7 +32,7 @@ export default async function ProfilePage() {
   try {
     const res = await dataverse.get<{ value: DvNeighbor[] }>(
       `bb_neighbors?$filter=bb_email eq '${userEmail}' and statecode eq 0` +
-      `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_phone,bb_addressline1,bb_addressline2,bb_city,bb_state,bb_zipcode,bb_preferredauthmethod,bb_emailoptin,bb_smsoptin` +
+      `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_phone,bb_addressline1,bb_addressline2,bb_city,bb_state,bb_zipcode,bb_preferredauthmethod,bb_emailoptin,bb_smsoptin,bb_displayname,bb_handle` +
       `&$top=1`
     );
     neighbor = res.value?.[0] ?? null;
@@ -54,6 +56,8 @@ export default async function ProfilePage() {
       preferredAuth={neighbor?.bb_preferredauthmethod != null ? String(neighbor.bb_preferredauthmethod) : '121120000'}
       emailOptin={neighbor?.bb_emailoptin ?? false}
       smsOptin={neighbor?.bb_smsoptin ?? false}
+      displayName={neighbor?.bb_displayname ?? ''}
+      handle={neighbor?.bb_handle ?? ''}
     />
   );
 }
