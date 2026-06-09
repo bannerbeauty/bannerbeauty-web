@@ -22,12 +22,14 @@ interface DvOrder {
 
 interface DvOrderItem {
   bb_orderitemid: string;
-  bb_name?: string;
-  bb_productnumber?: string;
   bb_quantity?: number;
   bb_unitprice?: number;
-  bb_producttype?: number;
   bb_giftcertcode?: string;
+  bb_Product?: {
+    bb_productname?: string;
+    bb_productnumber?: string;
+    bb_producttype?: number;
+  };
 }
 
 const ORDER_STATUS: Record<number, { label: string; color: string }> = {
@@ -46,10 +48,9 @@ function formatDate(iso: string) {
 
 const sectionLabelStyle: React.CSSProperties = {
   fontFamily: 'Trebuchet MS, sans-serif',
-  fontSize: '0.72rem',
-  letterSpacing: '2px',
-  textTransform: 'uppercase',
-  color: '#C5A028',
+  fontSize: '0.85rem',
+  letterSpacing: '1px',
+  color: '#1B2A4A',
   marginBottom: 16,
 };
 
@@ -81,7 +82,8 @@ export default async function OrderDetailPage({
       ),
       dataverse.get<{ value: DvOrderItem[] }>(
         `bb_orderitems?$filter=_bb_order_value eq '${id}'` +
-        `&$select=bb_orderitemid,bb_name,bb_productnumber,bb_quantity,bb_unitprice,bb_producttype,bb_giftcertcode`
+        `&$select=bb_orderitemid,bb_quantity,bb_unitprice,bb_giftcertcode` +
+        `&$expand=bb_Product($select=bb_productname,bb_productnumber,bb_producttype)`
       ),
       dataverse.get<{ value: { bb_neighborid: string }[] }>(
         `bb_neighbors?$filter=bb_email eq '${userEmail}' and statecode eq 0&$select=bb_neighborid&$top=1`
@@ -108,7 +110,7 @@ export default async function OrderDetailPage({
   if (!order) notFound();
 
   const status = ORDER_STATUS[order.statuscode ?? 1];
-  const hasPhysical = orderItems.some(i => i.bb_producttype === 121120000 || i.bb_producttype === 121120001 || i.bb_producttype === 121120002 || i.bb_producttype === 121120003);
+  const hasPhysical = orderItems.some(i => i.bb_Product?.bb_producttype === 121120000 || i.bb_Product?.bb_producttype === 121120001 || i.bb_Product?.bb_producttype === 121120002 || i.bb_Product?.bb_producttype === 121120003);
   const gcItems = orderItems.filter(i => i.bb_giftcertcode);
 
   return (
@@ -186,11 +188,11 @@ export default async function OrderDetailPage({
                   color: '#333333',
                   marginBottom: 2,
                 }}>
-                  {item.bb_name} × {item.bb_quantity ?? 1}
+                  {item.bb_Product?.bb_productname} × {item.bb_quantity ?? 1}
                 </div>
-                {item.bb_productnumber && (
+                {item.bb_Product?.bb_productnumber && (
                   <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#AAAAAA', letterSpacing: '1px' }}>
-                    {item.bb_productnumber}
+                    {item.bb_Product?.bb_productnumber}
                   </div>
                 )}
                 {item.bb_giftcertcode && (

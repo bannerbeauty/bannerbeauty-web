@@ -16,11 +16,10 @@ function formatDate(iso: string) {
 }
 
 const sectionLabelStyle: React.CSSProperties = {
-  fontFamily: 'Trebuchet MS, sans-serif',
-  fontSize: '0.72rem',
-  letterSpacing: '2px',
-  textTransform: 'uppercase',
-  color: '#C5A028',
+  fontFamily: 'Georgia, serif',
+  fontSize: '1.1rem',
+  fontWeight: 700,
+  color: '#B22234',
   marginBottom: 16,
 };
 
