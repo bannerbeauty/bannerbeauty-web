@@ -135,6 +135,21 @@ export default function Header() {
                     >
                       My Profile
                     </Link>
+                    <Link
+                      href="/my-activity"
+                      onClick={() => setDropdownOpen(false)}
+                      style={{
+                        display: 'block',
+                        padding: '12px 16px',
+                        fontFamily: 'Georgia, serif',
+                        fontSize: '0.88rem',
+                        color: '#1B2A4A',
+                        textDecoration: 'none',
+                        borderBottom: '1px solid #EEEEEE',
+                      }}
+                    >
+                      My Activity
+                    </Link>
                     <button
                       onClick={() => signOut()}
                       style={{
@@ -262,6 +277,21 @@ export default function Header() {
                     }}
                   >
                     My Profile
+                  </Link>
+                  <Link
+                    href="/my-activity"
+                    onClick={() => setMenuOpen(false)}
+                    style={{
+                      display: 'block',
+                      color: '#C5A028',
+                      textDecoration: 'none',
+                      fontFamily: 'Georgia, serif',
+                      fontSize: '0.95rem',
+                      padding: '12px 0',
+                      borderBottom: '1px solid rgba(255,255,255,0.08)',
+                    }}
+                  >
+                    My Activity
                   </Link>
                   <button
                     onClick={() => { setMenuOpen(false); signOut(); }}

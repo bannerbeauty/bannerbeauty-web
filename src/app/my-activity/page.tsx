@@ -1,0 +1,138 @@
+import { redirect } from 'next/navigation';
+import { auth } from '@/lib/auth';
+import { dataverse } from '@/lib/dataverse';
+import MyActivityClient from './MyActivityClient';
+
+interface DvNeighbor {
+  bb_neighborid: string;
+}
+
+interface DvOrder {
+  bb_orderid: string;
+  bb_ordernumber?: string;
+  createdon?: string;
+  bb_grandtotal?: number;
+  statuscode?: number;
+  statecode?: number;
+}
+
+interface DvBanner {
+  bb_bannerid: string;
+  bb_bannernumber?: string;
+  createdon?: string;
+  bb_banneroption?: number;
+  bb_recipientcity?: string;
+  bb_recipientstate?: string;
+  bb_isletterprinted?: boolean;
+  bb_qrtoken?: string;
+  statuscode?: number;
+  bb_recipientrespondeddatetime?: string;
+}
+
+export interface Order {
+  orderId: string;
+  orderNumber: string;
+  date: string;
+  total: number;
+  statusCode: number;
+}
+
+export interface BannerBump {
+  bannerId: string;
+  bannerNumber: string;
+  date: string;
+  bannerOption: number;
+  recipientCity: string;
+  recipientState: string;
+  isLetterPrinted: boolean;
+  qrToken: string;
+  statusCode: number;
+  recipientResponded: boolean;
+}
+
+const ORDER_STATUS: Record<number, { label: string; color: string }> = {
+  1:         { label: 'Pending',    color: '#C5A028' },
+  121120001: { label: 'Processing', color: '#1B2A4A' },
+  121120002: { label: 'Shipped',    color: '#0A7ABF' },
+  2:         { label: 'Delivered',  color: '#1B7A3E' },
+  121120003: { label: 'Returned',   color: '#B22234' },
+  121120004: { label: 'Cancelled',  color: '#888888' },
+};
+
+const BANNER_STATUS: Record<number, { label: string; color: string }> = {
+  1:         { label: 'Submitted',           color: '#C5A028' },
+  121120001: { label: 'Fulfilled',           color: '#1B7A3E' },
+  2:         { label: 'Recipient Responded', color: '#0A7ABF' },
+  121120002: { label: 'Cancelled',           color: '#888888' },
+};
+
+export { ORDER_STATUS, BANNER_STATUS };
+
+export default async function MyActivityPage() {
+  const session = await auth();
+  if (!session?.user?.email) {
+    redirect('/api/auth/signin?callbackUrl=/my-activity');
+  }
+
+  const userEmail = session.user.email;
+
+  let neighborId: string | null = null;
+  try {
+    const res = await dataverse.get<{ value: DvNeighbor[] }>(
+      `bb_neighbors?$filter=bb_email eq '${userEmail}' and statecode eq 0&$select=bb_neighborid&$top=1`
+    );
+    neighborId = res.value?.[0]?.bb_neighborid ?? null;
+  } catch (err) {
+    console.error('MyActivity neighbor fetch failed:', err);
+  }
+
+  let orders: Order[] = [];
+  let bannerBumps: BannerBump[] = [];
+
+  if (neighborId) {
+    try {
+      const [ordersRes, bannersRes] = await Promise.all([
+        dataverse.get<{ value: DvOrder[] }>(
+          `bb_orders?$filter=_bb_neighbor_value eq '${neighborId}'` +
+          `&$select=bb_orderid,bb_ordernumber,createdon,bb_grandtotal,statuscode,statecode` +
+          `&$orderby=createdon desc`
+        ),
+        dataverse.get<{ value: DvBanner[] }>(
+          `bb_banners?$filter=_bb_initiatingneighbor_value eq '${neighborId}'` +
+          `&$select=bb_bannerid,bb_bannernumber,createdon,bb_banneroption,bb_recipientcity,bb_recipientstate,bb_isletterprinted,bb_qrtoken,statuscode,bb_recipientrespondeddatetime` +
+          `&$orderby=createdon desc`
+        ),
+      ]);
+
+      orders = (ordersRes.value ?? []).map(o => ({
+        orderId: o.bb_orderid,
+        orderNumber: o.bb_ordernumber ?? '',
+        date: o.createdon ?? '',
+        total: o.bb_grandtotal ?? 0,
+        statusCode: o.statuscode ?? 1,
+      }));
+
+      bannerBumps = (bannersRes.value ?? []).map(b => ({
+        bannerId: b.bb_bannerid,
+        bannerNumber: b.bb_bannernumber ?? '',
+        date: b.createdon ?? '',
+        bannerOption: b.bb_banneroption ?? 121120000,
+        recipientCity: b.bb_recipientcity ?? '',
+        recipientState: b.bb_recipientstate ?? '',
+        isLetterPrinted: b.bb_isletterprinted ?? false,
+        qrToken: b.bb_qrtoken ?? '',
+        statusCode: b.statuscode ?? 1,
+        recipientResponded: !!b.bb_recipientrespondeddatetime,
+      }));
+    } catch (err) {
+      console.error('MyActivity data fetch failed:', err);
+    }
+  }
+
+  return (
+    <MyActivityClient
+      orders={orders}
+      bannerBumps={bannerBumps}
+    />
+  );
+}

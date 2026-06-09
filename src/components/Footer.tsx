@@ -71,7 +71,7 @@ export default function Footer() {
           <p style={colHeaderStyle}>Support</p>
           <Link href="/faq" style={linkStyle}>FAQ</Link>
           <Link href="/support" style={linkStyle}>Contact Us</Link>
-          <Link href="/track" style={linkStyle}>Track My Order</Link>
+          <Link href="/my-activity" style={linkStyle}>My Activity</Link>
         </div>
 
         {/* Col 4: Legal */}
