@@ -90,6 +90,17 @@ export default function BannerBumpMap({ locations, stateTotals, totalCount }: Pr
           ))}
         </ComposableMap>
 
+        <div style={{
+          fontFamily: 'Georgia, serif',
+          fontSize: 'clamp(1.6rem, 3vw, 2.2rem)',
+          fontWeight: 700,
+          color: '#FFFFFF',
+          textAlign: 'center',
+          margin: '24px 0 12px',
+        }}>
+          Bump Counts
+        </div>
+
         {/* Stats display */}
         <div style={{
           display: 'flex',
@@ -141,14 +152,6 @@ export default function BannerBumpMap({ locations, stateTotals, totalCount }: Pr
               lineHeight: 1,
             }}>
               {totalCount.toLocaleString()}
-            </div>
-            <div style={{
-              fontFamily: 'Trebuchet MS, sans-serif',
-              fontSize: '0.75rem',
-              color: 'rgba(255,255,255,0.5)',
-              marginTop: 6,
-            }}>
-              Banner Bump{totalCount !== 1 ? 's' : ''}
             </div>
           </div>
 
@@ -205,14 +208,6 @@ export default function BannerBumpMap({ locations, stateTotals, totalCount }: Pr
               transition: 'color 0.2s',
             }}>
               {activeCount !== null ? activeCount.toLocaleString() : '—'}
-            </div>
-            <div style={{
-              fontFamily: 'Trebuchet MS, sans-serif',
-              fontSize: '0.75rem',
-              color: 'rgba(255,255,255,0.5)',
-              marginTop: 6,
-            }}>
-              {activeCount !== null ? `Banner Bump${activeCount !== 1 ? 's' : ''}` : 'Hover or tap a state'}
             </div>
           </div>
 
