@@ -231,27 +231,6 @@ export default function TransactionClient({
   return (
     <div style={{ minHeight: '100vh', background: '#F9F6F0', display: 'flex', flexDirection: 'column' }}>
 
-      {/* Header */}
-      <header style={{
-        background: '#1A1A2E', padding: '16px 24px',
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      }}>
-        <a href="/" style={{ textDecoration: 'none' }}>
-          <span style={{
-            fontFamily: 'Georgia, serif', fontSize: '1.4rem', fontWeight: 'bold',
-            color: '#C5A028', letterSpacing: '2px',
-          }}>
-            BANNER BEAUTY
-          </span>
-        </a>
-        <a href="/store" style={{
-          fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.8rem',
-          letterSpacing: '1px', textTransform: 'uppercase', color: '#C5A028', textDecoration: 'none',
-        }}>
-          Store
-        </a>
-      </header>
-
       {/* Hero */}
       <div style={{
         background: 'linear-gradient(135deg, #1A1A2E 0%, #2E2E4A 100%)',
@@ -269,7 +248,7 @@ export default function TransactionClient({
           fontFamily: 'Trebuchet MS, sans-serif', fontSize: '1rem',
           color: '#CCCCCC', margin: '0 0 8px',
         }}>
-          Someone in your community is celebrating your service.
+          A fellow patriot supports you!
         </p>
         {bannerNumber && (
           <p style={{
@@ -277,7 +256,6 @@ export default function TransactionClient({
             color: '#888888', margin: 0, letterSpacing: '1px',
           }}>
             Bump #{bannerNumber}
-            {totalCount > 1 && ` · ${totalCount} bumps in this chain`}
           </p>
         )}
       </div>
@@ -652,7 +630,8 @@ export default function TransactionClient({
             background: 'linear-gradient(135deg, #1A1A2E, #2E2E4A)',
             textAlign: 'center',
           }}>
-            <div style={{ fontSize: '2rem', marginBottom: 12 }}>🇺🇸</div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <div style={{ marginBottom: 12 }}><img src="https://bannerbeautystorage.blob.core.windows.net/images/banner-bump.png" alt="Banner Bump" style={{ height: '1.5em', width: 'auto', display: 'block', margin: '0 auto' }} /></div>
             <h2 style={{
               fontFamily: 'Georgia, serif', fontSize: '1.5rem', color: '#C5A028',
               marginBottom: 12,
@@ -663,8 +642,8 @@ export default function TransactionClient({
               fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.9rem',
               color: '#CCCCCC', lineHeight: 1.7, marginBottom: 24,
             }}>
-              Pay it forward — send a Banner Bump to another patriot in your community
-              and keep the chain of gratitude going.
+              Banner Bump another patriot in your community.<br />
+              Keep the chain of gratitude going!
             </p>
             <a href="/submit-banner" style={btnPrimaryStyle}>
               Banner Bump a Patriot
@@ -673,16 +652,6 @@ export default function TransactionClient({
 
         </div>
       </main>
-
-      {/* Footer */}
-      <footer style={{ background: '#1A1A2E', padding: '16px 24px', textAlign: 'center' }}>
-        <p style={{
-          fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem',
-          color: '#888888', margin: 0, letterSpacing: '0.5px',
-        }}>
-          © {new Date().getFullYear()} Banner Beauty · All rights reserved
-        </p>
-      </footer>
 
     </div>
   );
