@@ -163,8 +163,8 @@ export default function StoreClient({ products }: { products: Product[] }) {
                     padding: '8px 16px',
                     borderRadius: 4,
                     border: active ? 'none' : '1.5px solid #CCCCCC',
-                    background: active ? '#1B2A4A' : '#B22234',
-                    color: active ? '#B22234' : '#444444',
+                    background: active ? '#1B2A4A' : '#FFFFFF',
+                    color: active ? '#FFFFFF' : '#444444',
                     fontFamily: 'Trebuchet MS, sans-serif',
                     fontSize: '0.82rem',
                     letterSpacing: '0.5px',
@@ -196,8 +196,8 @@ export default function StoreClient({ products }: { products: Product[] }) {
                       padding: '8px 16px',
                       borderRadius: 4,
                       border: active ? 'none' : '1.5px solid #CCCCCC',
-                      background: active ? '#1B2A4A' : '#B22234',
-                      color: active ? '#B22234' : '#444444',
+                      background: active ? '#1B2A4A' : '#FFFFFF',
+                      color: active ? '#FFFFFF' : '#444444',
                       fontFamily: 'Trebuchet MS, sans-serif',
                       fontSize: '0.82rem',
                       letterSpacing: '0.5px',
@@ -230,8 +230,8 @@ export default function StoreClient({ products }: { products: Product[] }) {
                       padding: '8px 16px',
                       borderRadius: 4,
                       border: active ? 'none' : '1.5px solid #CCCCCC',
-                      background: active ? '#1B2A4A' : '#B22234',
-                      color: active ? '#B22234' : '#444444',
+                      background: active ? '#1B2A4A' : '#FFFFFF',
+                      color: active ? '#FFFFFF' : '#444444',
                       fontFamily: 'Trebuchet MS, sans-serif',
                       fontSize: '0.82rem',
                       letterSpacing: '0.5px',
@@ -266,7 +266,7 @@ export default function StoreClient({ products }: { products: Product[] }) {
                   <div
                     key={product.bb_productid}
                     style={{
-                      background: '#B22234',
+                      background: '#FFFFFF',
                       borderRadius: 8,
                       border: '1px solid #EEEEEE',
                       overflow: 'hidden',
@@ -314,7 +314,7 @@ export default function StoreClient({ products }: { products: Product[] }) {
                         </Link>
                         <button
                           onClick={() => addToCart(product)}
-                          style={{ flex: 1, padding: '10px 0', background: isAdded ? '#1B7A3E' : '#B22234', border: 'none', borderRadius: 4, color: '#B22234', fontFamily: 'Georgia, serif', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s' }}
+                          style={{ flex: 1, padding: '10px 0', background: isAdded ? '#1B7A3E' : '#B22234', border: 'none', borderRadius: 4, color: '#FFFFFF', fontFamily: 'Georgia, serif', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer', transition: 'background 0.2s' }}
                         >
                           {isAdded ? '✓ Added' : 'Add to Cart'}
                         </button>
@@ -353,11 +353,11 @@ export default function StoreClient({ products }: { products: Product[] }) {
         onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; }}
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 48 48">
-          <g fill="#B22234">
-            <path d="M37 46C39.7614 46 42 43.7614 42 41C42 38.2386 39.7614 36 37 36C34.2386 36 32 38.2386 32 41C32 43.7614 34.2386 46 37 46Z" fill="#B22234"/>
-            <path d="M11 46C13.7614 46 16 43.7614 16 41C16 38.2386 13.7614 36 11 36C8.23858 36 6 38.2386 6 41C6 43.7614 8.23858 46 11 46Z" fill="#B22234"/>
-            <path fillRule="evenodd" clipRule="evenodd" d="M2 2H5.34574C7.32662 2 9.00915 3.44984 9.30184 5.40898L12.298 25.4646L9.07567 28.2426C8.37357 28.8479 8.80163 30 9.72862 30H42.5V33H9.72862C6.02065 33 4.30839 28.3916 7.1168 25.9704L9.0866 24.2722L6.33476 5.85224C6.26159 5.36246 5.84096 5 5.34574 5H2V2Z" fill="#B22234"/>
-            <path fillRule="evenodd" clipRule="evenodd" d="M43.0578 9H8.5L10.5 26H32.8553C35.6788 26 38.1794 24.1772 39.0434 21.4891L43.0578 9ZM19 20.5V14.5H16L16 20.5H19ZM25.5 14.5V20.5H22.5V14.5H25.5ZM32 14.5V20.5H29V14.5H32Z" fill="#B22234"/>
+          <g fill="#1B2A4A">
+            <path d="M37 46C39.7614 46 42 43.7614 42 41C42 38.2386 39.7614 36 37 36C34.2386 36 32 38.2386 32 41C32 43.7614 34.2386 46 37 46Z" fill="#1B2A4A"/>
+            <path d="M11 46C13.7614 46 16 43.7614 16 41C16 38.2386 13.7614 36 11 36C8.23858 36 6 38.2386 6 41C6 43.7614 8.23858 46 11 46Z" fill="#1B2A4A"/>
+            <path fillRule="evenodd" clipRule="evenodd" d="M2 2H5.34574C7.32662 2 9.00915 3.44984 9.30184 5.40898L12.298 25.4646L9.07567 28.2426C8.37357 28.8479 8.80163 30 9.72862 30H42.5V33H9.72862C6.02065 33 4.30839 28.3916 7.1168 25.9704L9.0866 24.2722L6.33476 5.85224C6.26159 5.36246 5.84096 5 5.34574 5H2V2Z" fill="#1B2A4A"/>
+            <path fillRule="evenodd" clipRule="evenodd" d="M43.0578 9H8.5L10.5 26H32.8553C35.6788 26 38.1794 24.1772 39.0434 21.4891L43.0578 9ZM19 20.5V14.5H16L16 20.5H19ZM25.5 14.5V20.5H22.5V14.5H25.5ZM32 14.5V20.5H29V14.5H32Z" fill="#1B2A4A"/>
           </g>
         </svg>
         {cartCount > 0 && (
@@ -371,7 +371,7 @@ export default function StoreClient({ products }: { products: Product[] }) {
             borderRadius: '50%',
             fontSize: '0.7rem',
             fontWeight: 700,
-            color: '#B22234',
+            color: '#FFFFFF',
             display: 'flex',
             alignItems: 'center',justifyContent: 'center',
           }}>
@@ -400,7 +400,7 @@ export default function StoreClient({ products }: { products: Product[] }) {
         right: cartOpen ? 0 : -420,
         width: 420,
         height: '100vh',
-        background: '#B22234',
+        background: '#FFFFFF',
         zIndex: 1001,
         transition: 'right 0.3s',
         display: 'flex',
@@ -409,10 +409,10 @@ export default function StoreClient({ products }: { products: Product[] }) {
       }}>
         {/* Header */}
         <div style={{ padding: '20px 24px', borderBottom: '1px solid #EEEEEE', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#1B2A4A' }}>
-          <span style={{ fontFamily: 'Georgia, serif', fontSize: '1.2rem', fontWeight: 700, color: '#B22234' }}>
+          <span style={{ fontFamily: 'Georgia, serif', fontSize: '1.2rem', fontWeight: 700, color: '#FFFFFF' }}>
             Your Cart
           </span>
-          <button onClick={() => setCartOpen(false)} style={{ background: 'none', border: 'none', color: '#B22234', fontSize: '1.5rem', cursor: 'pointer', lineHeight: 1 }}>×</button>
+          <button onClick={() => setCartOpen(false)} style={{ background: 'none', border: 'none', color: '#FFFFFF', fontSize: '1.5rem', cursor: 'pointer', lineHeight: 1 }}>×</button>
         </div>
 
         {/* Items */}
@@ -435,9 +435,9 @@ export default function StoreClient({ products }: { products: Product[] }) {
                   <div style={{ fontFamily: 'Georgia, serif', fontSize: '0.9rem', fontWeight: 700, color: '#1B2A4A', marginBottom: 4 }}>{item.name}</div>
                   <div style={{ fontSize: '0.88rem', color: '#B22234', fontWeight: 700, marginBottom: 6 }}>{formatPrice(item.price * item.qty)}</div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                    <button onClick={() => updateQty(item.productid, -1)} style={{ width: 24, height: 24, border: '1px solid #DDDDDD', borderRadius: 4, background: '#B22234', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
+                    <button onClick={() => updateQty(item.productid, -1)} style={{ width: 24, height: 24, border: '1px solid #DDDDDD', borderRadius: 4, background: '#FFFFFF', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>−</button>
                     <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.9rem' }}>{item.qty}</span>
-                    <button onClick={() => updateQty(item.productid, 1)} style={{ width: 24, height: 24, border: '1px solid #DDDDDD', borderRadius: 4, background: '#B22234', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
+                    <button onClick={() => updateQty(item.productid, 1)} style={{ width: 24, height: 24, border: '1px solid #DDDDDD', borderRadius: 4, background: '#FFFFFF', cursor: 'pointer', fontSize: '1rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>+</button>
                   </div>
                 </div>
                 <button onClick={() => removeFromCart(item.productid)} style={{ background: 'none', border: 'none', color: '#AAAAAA', cursor: 'pointer', fontSize: '1.2rem', lineHeight: 1, padding: 0 }}
@@ -468,7 +468,7 @@ export default function StoreClient({ products }: { products: Product[] }) {
           <button
             onClick={proceedToCheckout}
             disabled={cart.length === 0}
-            style={{ width: '100%', padding: 16, background: cart.length === 0 ? '#CCCCCC' : '#B22234', color: '#B22234', border: 'none', borderRadius: 4, fontFamily: 'Georgia, serif', fontSize: '1.05rem', fontWeight: 700, cursor: cart.length === 0 ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}
+            style={{ width: '100%', padding: 16, background: cart.length === 0 ? '#CCCCCC' : '#B22234', color: '#FFFFFF', border: 'none', borderRadius: 4, fontFamily: 'Georgia, serif', fontSize: '1.05rem', fontWeight: 700, cursor: cart.length === 0 ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}
           >
             Proceed to Checkout →
           </button>
