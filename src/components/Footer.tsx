@@ -42,9 +42,11 @@ export default function Footer() {
             alt="BannerBeauty"
             width={240}
             height={80}
-            style={{ height: 80, width: 'auto', objectFit: 'contain', display: 'block', marginBottom: 16 }}
+            style={{ height: 80, width: 'auto', objectFit: 'contain', display: 'block', marginBottom: 12 }}
             unoptimized
           />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="https://bannerbeautystorage.blob.core.windows.net/logos/FMAA Logo.png" alt="Made in America" style={{ height: 40, width: 'auto', display: 'block', marginBottom: 16 }} />
           <p style={{
             fontFamily: 'Georgia, serif',
             fontSize: '0.88rem',

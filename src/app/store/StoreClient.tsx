@@ -149,7 +149,9 @@ export default function StoreClient({ products }: { products: Product[] }) {
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 24px 64px' }}>
 
           {/* Category filters */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, padding: '28px 0 32px' }}>
+          <div style={{ padding: '28px 0 32px' }}>
+          <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#888888', marginBottom: 6 }}>Type</div>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             {availableCategories.map((cat) => {
               const active = activeCategory === cat.value;
               return (
@@ -175,10 +177,13 @@ export default function StoreClient({ products }: { products: Product[] }) {
               );
             })}
           </div>
+          </div>
 
           {/* Size filters */}
           {uniqueSizes.length > 1 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 12 }}>
+            <div style={{ marginBottom: 12 }}>
+            <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#888888', marginBottom: 6 }}>Size</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {uniqueSizes.map((size) => {
                 const active = activeSize === size;
                 return (
@@ -204,11 +209,14 @@ export default function StoreClient({ products }: { products: Product[] }) {
                 );
               })}
             </div>
+            </div>
           )}
 
           {/* Material filters */}
           {uniqueMaterials.length > 1 && (
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 24 }}>
+            <div style={{ marginBottom: 24 }}>
+            <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#888888', marginBottom: 6 }}>Material</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
               {uniqueMaterials.map((material) => {
                 const active = activeMaterial === material;
                 return (
@@ -233,6 +241,7 @@ export default function StoreClient({ products }: { products: Product[] }) {
                   </button>
                 );
               })}
+            </div>
             </div>
           )}
 
