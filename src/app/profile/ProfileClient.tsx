@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { APIProvider } from '@vis.gl/react-google-maps';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 
@@ -115,6 +115,28 @@ export default function ProfileClient({
   const [smsOptin, setSmsOptin] = useState(initialSmsOptin);
   const [displayName, setDisplayName] = useState(initialDisplayName ?? '');
   const [handle, setHandle] = useState(initialHandle ?? '');
+
+  const [handleStatus, setHandleStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
+
+  useEffect(() => {
+    if (!handle || handle === initialHandle || handle.length < 3) {
+      setHandleStatus('idle');
+      return;
+    }
+    setHandleStatus('checking');
+    const timer = setTimeout(async () => {
+      try {
+        const params = new URLSearchParams({ handle });
+        if (neighborId) params.set('neighborId', neighborId);
+        const res = await fetch(`/api/profile/check-handle?${params}`);
+        const data = await res.json() as { available: boolean };
+        setHandleStatus(data.available ? 'available' : 'taken');
+      } catch {
+        setHandleStatus('idle');
+      }
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [handle, initialHandle, neighborId]);
 
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -284,6 +306,21 @@ export default function ProfileClient({
               }}>
                 Your unique public identifier on Banner Beauty. Letters, numbers, and underscores only.
               </p>
+              {handleStatus === 'checking' && (
+                <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#888888', margin: '6px 0 0' }}>
+                  Checking availability…
+                </p>
+              )}
+              {handleStatus === 'available' && (
+                <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#2E7D32', margin: '6px 0 0' }}>
+                  ✓ @{handle} is available
+                </p>
+              )}
+              {handleStatus === 'taken' && (
+                <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#C62828', margin: '6px 0 0' }}>
+                  ✗ @{handle} is already taken
+                </p>
+              )}
             </div>
           </section>
 
@@ -491,14 +528,14 @@ export default function ProfileClient({
           <button
             type="button"
             onClick={handleSave}
-            disabled={saving}
+            disabled={saving || handleStatus === 'taken'}
             style={{
               width: '100%', padding: '14px 24px',
-              background: saving ? '#AAAAAA' : '#C5A028',
+              background: saving || handleStatus === 'taken' ? '#AAAAAA' : '#C5A028',
               color: '#FFFFFF', border: 'none', borderRadius: 4,
               fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.9rem',
               letterSpacing: '1.5px', textTransform: 'uppercase',
-              cursor: saving ? 'not-allowed' : 'pointer',
+              cursor: saving || handleStatus === 'taken' ? 'not-allowed' : 'pointer',
               transition: 'background 0.2s',
             }}
           >
