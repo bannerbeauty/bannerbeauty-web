@@ -482,7 +482,7 @@ export default async function HomePage() {
             <iframe
               width="100%"
               height="100%"
-              src="https://www.youtube.com/embed/1w3plWa3XaU"
+              src="https://www.youtube.com/embed/CHg0NyUGrQk"
               title="What is a Banner Bump?"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
