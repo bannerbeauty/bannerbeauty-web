@@ -113,7 +113,7 @@ export default function HomeClient({ featuredBanner, quotes, locations, stateTot
               letterSpacing: '3px',
               textTransform: 'uppercase',
               color: '#C5A028',
-              margin: '0 0 12px',
+              margin: '0 0 28px',
             }}>
               ★ Dedications ★
             </p>
@@ -213,7 +213,7 @@ export default function HomeClient({ featuredBanner, quotes, locations, stateTot
                   color: '#FFFFFF', margin: 0,
                 }}>
                   <span style={{ color: '#C5A028', fontWeight: 700 }}>{senderName}</span>
-                  {' bumped '}
+                  {' '}<em>banner bumped</em>{' '}
                   <span style={{ color: '#C5A028', fontWeight: 700 }}>
                     {featuredBanner.recipientFirstName || 'a Patriot'}
                   </span>
