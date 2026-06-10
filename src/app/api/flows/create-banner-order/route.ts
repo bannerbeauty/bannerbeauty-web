@@ -11,8 +11,6 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: 'Invalid request body' }, { status: 400 });
   }
 
-  console.log('BB_API_SECRET:', process.env.BB_API_SECRET ? 'set (' + process.env.BB_API_SECRET.substring(0, 8) + '...)' : 'MISSING');
-
   let flowRes: Response;
   try {
     flowRes = await fetch(FLOW_URL, {
@@ -28,9 +26,7 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: 'Flow request failed' }, { status: 502 });
   }
 
-  console.log('Flow response status:', flowRes.status);
   const responseText = await flowRes.text();
-  console.log('Flow response body:', responseText);
 
   let data: unknown;
   try {

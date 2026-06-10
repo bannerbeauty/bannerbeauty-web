@@ -134,11 +134,6 @@ export default async function SubmitBannerPage() {
         }))
       : [];
 
-  console.log('letterTemplates:', letterTemplates.length);
-  console.log('flagProducts:', flagProducts.length);
-  console.log('gcProducts:', gcProducts.length);
-  console.log('letterPrice:', letterPrice);
-
   return (
     <Suspense fallback={<div style={{ minHeight: '60vh', background: '#FAF7F2' }} />}>
       <BannerBumpClient

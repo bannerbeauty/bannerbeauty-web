@@ -11,8 +11,6 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: 'Invalid request body' }, { status: 400 });
   }
 
-  console.log('Stripe PI request body:', body);
-
   let flowRes: Response;
   try {
     flowRes = await fetch(FLOW_URL, {
@@ -28,10 +26,7 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: 'Flow request failed' }, { status: 502 });
   }
 
-  console.log('Stripe PI flow response status:', flowRes.status);
-
   const responseText = await flowRes.text();
-  console.log('Stripe PI flow response:', responseText);
 
   let data: unknown;
   try {

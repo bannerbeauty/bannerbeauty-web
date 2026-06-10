@@ -299,7 +299,6 @@ export default function BannerBumpClient({
 
   // Fetch Stripe PI when reaching step 7 with amountDue > 0
   useEffect(() => {
-    console.log('[BannerBump] PI effect fired — step:', step, 'amountDue:', amountDue, 'clientSecret:', clientSecret ? '✓ exists' : '✗ none');
     if (step !== 7 || amountDue === 0 || clientSecret) return;
     const piBody = {
       amount: Math.round(amountDue * 100),
@@ -311,21 +310,15 @@ export default function BannerBumpClient({
       shipZip: recipientZipcode || '',
       description: 'Banner Bump Order',
     };
-    console.log('[BannerBump] Sending PI request:', piBody);
     fetch('/api/flows/stripe-payment-intent', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(piBody),
     })
-      .then((r) => {
-        console.log('[BannerBump] Stripe PI HTTP status:', r.status);
-        return r.json();
-      })
+      .then((r) => r.json())
       .then((data) => {
-        console.log('[BannerBump] Stripe PI response:', data);
         const secret = data.clientSecret as string;
-        if (!secret) { console.error('[BannerBump] clientSecret missing from response'); setOrderError('Unable to load payment form. Please try again.'); return; }
-        console.log('[BannerBump] clientSecret set ✓');
+        if (!secret) { setOrderError('Unable to load payment form. Please try again.'); return; }
         setClientSecret(secret);
       })
       .catch((err) => { console.error('[BannerBump] Stripe PI fetch error:', err); setOrderError('Unable to load payment form. Please try again.'); });
@@ -397,14 +390,12 @@ export default function BannerBumpClient({
 
   // ── Submission ───────────────────────────────────────────────────────────────
   async function submitBannerBump() {
-    console.log('[BannerBump] submitBannerBump called');
     if (!validateStep()) return;
     if (amountDue > 0 && !stripeRef.current) { setOrderError('Payment form not ready. Please wait.'); return; }
     setPlacing(true); setOrderError('');
 
     let orderData: { orderId?: string; qrToken?: string; bannerId?: string } = {};
     try {
-      console.log('[BannerBump] Calling create-banner-order...');
       const res = await fetch('/api/flows/create-banner-order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -441,7 +432,6 @@ export default function BannerBumpClient({
         }),
       });
       orderData = await res.json();
-      console.log('[BannerBump] Order created:', orderData);
     } catch (err) {
       console.error('[BannerBump] create-banner-order error:', err);
       setOrderError('Order creation failed: ' + String(err));
@@ -466,7 +456,6 @@ export default function BannerBumpClient({
 
     if (amountDue === 0) { router.push('/banner-bump-confirmation?redirect_status=succeeded'); return; }
 
-    console.log('[BannerBump] About to call stripe.confirmPayment');
     const { stripe, elements } = stripeRef.current!;
     const { error } = await stripe.confirmPayment({
       elements,

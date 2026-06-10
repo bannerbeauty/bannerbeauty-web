@@ -225,6 +225,73 @@ function BannerBumpConfirmationInner() {
           </p>
         </div>
 
+        {/* Share */}
+        <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: '24px 28px', marginBottom: 28, textAlign: 'center' }}>
+          <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#C5A028', marginBottom: 16 }}>
+            ★ Spread the Word ★
+          </div>
+          <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#555555', margin: '0 0 20px', lineHeight: 1.6 }}>
+            Share your Banner Bump and inspire others to help a fellow patriot!
+          </p>
+          <div style={{ display: 'flex', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
+
+            {/* Facebook */}
+            <a
+              href="https://www.facebook.com/sharer/sharer.php?u=https://www.bannerbeauty.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: '#1877F2', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', fontWeight: 700, textDecoration: 'none' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              Facebook
+            </a>
+
+            {/* X / Twitter */}
+            <a
+              href="https://twitter.com/intent/tweet?text=I%20just%20Banner%20Bumped%20a%20neighbor!%20%F0%9F%87%BA%F0%9F%87%B8%20Helping%20a%20fellow%20patriot%20fly%20their%20flag%20with%20pride.%20Join%20me%20at%20BannerBeauty.com%20%23BannerBeauty%20%23PatrioticNeighbors%20%23America250&url=https://www.bannerbeauty.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: '#000000', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', fontWeight: 700, textDecoration: 'none' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+              X
+            </a>
+
+            {/* LinkedIn */}
+            <a
+              href="https://www.linkedin.com/sharing/share-offsite/?url=https://www.bannerbeauty.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: '#0A66C2', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', fontWeight: 700, textDecoration: 'none' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+              LinkedIn
+            </a>
+
+            {/* SMS */}
+            <a
+              href="sms:?body=I%20just%20Banner%20Bumped%20a%20neighbor!%20%F0%9F%87%BA%F0%9F%87%B8%20Helping%20a%20fellow%20patriot%20fly%20their%20flag%20with%20pride.%20Check%20out%20BannerBeauty.com%20%23BannerBeauty"
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: '#1B7A3E', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', fontWeight: 700, textDecoration: 'none' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+              SMS
+            </a>
+
+            {/* Copy Link */}
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText('https://www.bannerbeauty.com');
+                alert('Link copied!');
+              }}
+              style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '10px 20px', background: '#C5A028', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', fontWeight: 700, border: 'none', cursor: 'pointer' }}
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+              Copy Link
+            </button>
+
+          </div>
+        </div>
+
         {/* CTAs */}
         <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center', marginBottom: 36 }}>
           <Link

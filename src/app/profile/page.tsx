@@ -36,7 +36,6 @@ export default async function ProfilePage() {
       `&$top=1`
     );
     neighbor = res.value?.[0] ?? null;
-    console.log('Neighbor fetch result:', JSON.stringify(res.value?.[0] || 'no results'));
   } catch (err) {
     console.error('Profile neighbor fetch failed:', err);
   }

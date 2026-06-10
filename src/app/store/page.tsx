@@ -52,15 +52,11 @@ async function getProducts(): Promise<Product[]> {
 
 export default async function StorePage() {
   let products: Product[] = [];
-  let error: unknown = null;
   try {
     products = await getProducts();
   } catch (err) {
     console.error('Store fetch error:', err);
-    error = err;
   }
-
-  if (error) return <div>Error: {String(error)}</div>;
 
   return (
     <>

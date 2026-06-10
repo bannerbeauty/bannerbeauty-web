@@ -112,9 +112,6 @@ async function getPublicNotesBanners(): Promise<DvPublicNotesBanner[]> {
         '&$expand=bb_InitiatingNeighbor($select=bb_city,bb_state),bb_RecipientNeighbor($select=bb_city,bb_state)'
       ),
     ]);
-    console.log('RN notes count:', rnRes.value?.length ?? 0);
-    console.log('IN notes count:', inRes.value?.length ?? 0);
-    console.log('RN sample:', JSON.stringify(rnRes.value?.[0]));
     return [...(rnRes.value ?? []), ...(inRes.value ?? [])];
   } catch (err) {
     console.error('getPublicNotesBanners failed:', err);
@@ -140,8 +137,6 @@ async function getDedications(): Promise<DvDedication[]> {
       'bb_banners?$filter=bb_isfeatureable eq true and bb_ispublicattribution eq true and bb_attributiontext ne null and bb_attributionname ne null and statuscode ne 121120002' +
       '&$select=bb_bannerid,bb_attributiontype,bb_attributionname,bb_attributiontext,bb_banneroption,bb_sharename,bb_infirstname,bb_recipientcity,bb_recipientstate'
     );
-    console.log('Dedications count:', result.value?.length ?? 0);
-    console.log('Dedication sample:', JSON.stringify(result.value?.[0]));
     return result.value ?? [];
   } catch {
     return [];

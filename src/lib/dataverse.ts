@@ -6,7 +6,6 @@ let tokenPromise: Promise<string> | null = null;
 
 async function fetchNewToken(): Promise<string> {
   const dataverseUrl = process.env.DATAVERSE_URL;
-  console.log('dataverseUrl in fetchNewToken:', dataverseUrl);
   if (!dataverseUrl) throw new Error('DATAVERSE_URL environment variable is not set');
   const scope = `${dataverseUrl}/.default`;
 
