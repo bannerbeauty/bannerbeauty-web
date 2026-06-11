@@ -71,6 +71,11 @@ export default function CommunityClient({
   const touchStartX = useRef<number | null>(null);
 
   useEffect(() => {
+    document.body.classList.add('hide-footer');
+    return () => document.body.classList.remove('hide-footer');
+  }, []);
+
+  useEffect(() => {
     const check = () => setIsMobile(window.innerWidth <= 768);
     check();
     window.addEventListener('resize', check);
