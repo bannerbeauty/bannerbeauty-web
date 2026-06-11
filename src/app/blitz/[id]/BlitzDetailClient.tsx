@@ -84,6 +84,10 @@ export default function BlitzDetailClient({
     }
   };
 
+  console.log('participatingIds:', Array.from(participatingIds));
+  console.log('userBrigades:', userBrigades.map(b => b.brigadeId));
+  console.log('eligibleBrigades:', eligibleBrigades.map(b => b.brigadeId));
+
   return (
     <div style={{ background: '#FAF7F2', minHeight: '80vh' }}>
 

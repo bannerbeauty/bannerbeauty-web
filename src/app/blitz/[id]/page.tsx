@@ -122,16 +122,25 @@ export default async function BlitzDetailPage({
 
     // Fetch participating brigades
     const participatingRes = await dataverse.get<{ value: any[] }>(
-      `bb_blitzbrigades?$filter=_bb_blitz_value eq '${id}' and statuscode eq 121120001` +
-      `&$select=bb_blitzbrigadeid` +
-      `&$expand=bb_blitzbrigade_Brigade_bb_brigade($select=bb_brigadeid,bb_name,bb_profileimageurl,bb_isverified)`
+      `bb_blitzbrigades?$filter=_bb_blitz_value eq '${id}' and statuscode eq 121120002` +
+      `&$select=bb_blitzbrigadeid,_bb_brigade_value`
     );
 
+    console.log('participatingRes raw:', JSON.stringify(participatingRes.value));
+    const participatingBrigadeIds = (participatingRes.value ?? []).map((bb: any) => bb._bb_brigade_value).filter(Boolean);
+    let participatingBrigadeDetails: any[] = [];
+    if (participatingBrigadeIds.length > 0) {
+      const brigadeRes = await dataverse.get<{ value: any[] }>(
+        `bb_brigades?$filter=${participatingBrigadeIds.map((bid: string) => `bb_brigadeid eq '${bid}'`).join(' or ')}&$select=bb_brigadeid,bb_name,bb_profileimageurl,bb_isverified`
+      );
+      participatingBrigadeDetails = brigadeRes.value ?? [];
+    }
+
     participatingBrigades = (participatingRes.value ?? []).map((bb: any) => {
-      const brigade = bb.bb_blitzbrigade_Brigade_bb_brigade;
+      const brigade = participatingBrigadeDetails.find((b: any) => b.bb_brigadeid === bb._bb_brigade_value);
       return {
         blitzbrigadeid: bb.bb_blitzbrigadeid,
-        brigadeId: brigade?.bb_brigadeid ?? '',
+        brigadeId: bb._bb_brigade_value ?? '',
         brigadeName: brigade?.bb_name ?? '',
         brigadeProfileImageUrl: brigade?.bb_profileimageurl ?? '',
         brigadeIsVerified: brigade?.bb_isverified ?? false,
@@ -142,15 +151,23 @@ export default async function BlitzDetailPage({
     // Fetch pending brigade requests
     const pendingRes = await dataverse.get<{ value: any[] }>(
       `bb_blitzbrigades?$filter=_bb_blitz_value eq '${id}' and statuscode eq 1` +
-      `&$select=bb_blitzbrigadeid` +
-      `&$expand=bb_blitzbrigade_Brigade_bb_brigade($select=bb_brigadeid,bb_name,bb_profileimageurl)`
+      `&$select=bb_blitzbrigadeid,_bb_brigade_value`
     );
 
+    const pendingBrigadeIds = (pendingRes.value ?? []).map((bb: any) => bb._bb_brigade_value).filter(Boolean);
+    let pendingBrigadeDetails: any[] = [];
+    if (pendingBrigadeIds.length > 0) {
+      const pendingBrigadeRes = await dataverse.get<{ value: any[] }>(
+        `bb_brigades?$filter=${pendingBrigadeIds.map((bid: string) => `bb_brigadeid eq '${bid}'`).join(' or ')}&$select=bb_brigadeid,bb_name,bb_profileimageurl`
+      );
+      pendingBrigadeDetails = pendingBrigadeRes.value ?? [];
+    }
+
     pendingBrigades = (pendingRes.value ?? []).map((bb: any) => {
-      const brigade = bb.bb_blitzbrigade_Brigade_bb_brigade;
+      const brigade = pendingBrigadeDetails.find((b: any) => b.bb_brigadeid === bb._bb_brigade_value);
       return {
         blitzbrigadeid: bb.bb_blitzbrigadeid,
-        brigadeId: brigade?.bb_brigadeid ?? '',
+        brigadeId: bb._bb_brigade_value ?? '',
         brigadeName: brigade?.bb_name ?? '',
         brigadeProfileImageUrl: brigade?.bb_profileimageurl ?? '',
         brigadeIsVerified: false,
