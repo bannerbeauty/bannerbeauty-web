@@ -124,16 +124,11 @@ export default function CommunityClient({
   };
 
   const handleFeedTouchEnd = (e: React.TouchEvent) => {
+    if (panelOpen) return; // capture div handles this
     const deltaX = e.changedTouches[0].clientX - touchStartX.current;
     const deltaY = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
-
     if (deltaY > 30) return;
-
-    if (!panelOpen && deltaX > 50) {
-      setPanelOpen(true);
-    } else if (panelOpen && deltaX < -50) {
-      setPanelOpen(false);
-    }
+    if (deltaX > 50) setPanelOpen(true);
   };
 
   const tabs: { key: Tab; label: string }[] = [
@@ -453,7 +448,7 @@ export default function CommunityClient({
               left: 0,
               right: 0,
               bottom: 0,
-              zIndex: 45,
+              zIndex: 65,
               background: 'transparent',
             }}
           />
