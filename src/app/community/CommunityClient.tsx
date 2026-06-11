@@ -73,6 +73,7 @@ export default function CommunityClient({
   const [panelOpen, setPanelOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   useEffect(() => {
     document.body.classList.add('hide-footer');
@@ -86,16 +87,30 @@ export default function CommunityClient({
     return () => window.removeEventListener('resize', check);
   }, []);
 
+  useEffect(() => {
+    if (panelOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+    return () => { document.body.style.overflow = ''; };
+  }, [panelOpen]);
+
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null) return;
+    if (touchStartX.current === null || touchStartY.current === null) return;
     const dx = e.changedTouches[0].clientX - touchStartX.current;
-    if (dx > 50) setPanelOpen(true);
-    if (dx < -50) setPanelOpen(false);
+    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
     touchStartX.current = null;
+    touchStartY.current = null;
+    // Ignore if primarily a vertical scroll gesture
+    if (dy > 30) return;
+    if (!panelOpen && dx > 50) setPanelOpen(true);
+    if (panelOpen && dx < -50) setPanelOpen(false);
   };
 
   const tabs: { key: Tab; label: string }[] = [
@@ -415,6 +430,8 @@ export default function CommunityClient({
             background: '#FAF7F2',
             minHeight: 'calc(100vh - 52px)',
             padding: '20px 16px 80px',
+            overflow: panelOpen ? 'hidden' : 'auto',
+            boxShadow: '-8px 0 16px rgba(0,0,0,0.15)',
           }}
         >
           {feedContent}
