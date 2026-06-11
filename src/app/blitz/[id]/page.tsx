@@ -236,7 +236,8 @@ export default async function BlitzDetailPage({
 
   } catch (err) {
     console.error('BlitzDetail fetch failed:', err);
-    notFound();
+    // Only 404 if we have no blitz data at all
+    if (!blitz) notFound();
   }
 
   if (!blitz) notFound();
