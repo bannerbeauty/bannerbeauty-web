@@ -79,6 +79,7 @@ export interface BrigadeDetail {
   ownerProfileImageUrl: string;
   typeLabel: string;
   scopeLabel: string;
+  countyNameFull: string;
 }
 
 export default async function BrigadeDetailPage({
@@ -112,8 +113,7 @@ export default async function BrigadeDetailPage({
     const [brigadeRes, membersRes, blitzesRes, bumpsRes] = await Promise.all([
       dataverse.get<{ value: any[] }>(
         `bb_brigades?$filter=bb_brigadeid eq '${id}'` +
-        `&$select=bb_brigadeid,bb_brigadenumber,bb_name,bb_brigadetype,bb_brigadescope,bb_brigadestate,bb_brigadecity,bb_brigadescopedescription,bb_description,bb_imageurl,bb_profileimageurl,bb_isverified` +
-        `&$expand=brigade_Owner_bb_neighbor($select=bb_neighborid,bb_firstname,bb_lastname,bb_profileimageurl)` +
+        `&$select=bb_brigadeid,bb_brigadenumber,bb_name,bb_brigadetype,bb_brigadescope,bb_brigadestate,bb_brigadecity,bb_brigadescopedescription,bb_description,bb_imageurl,bb_profileimageurl,bb_isverified,_bb_owner_value,_bb_brigadecounty_value` +
         `&$top=1`
       ),
       dataverse.get<{ value: any[] }>(
@@ -122,7 +122,7 @@ export default async function BrigadeDetailPage({
         `&$expand=bb_Neighbor($select=bb_neighborid,bb_firstname,bb_lastname,bb_profileimageurl,bb_displayname,bb_handle)`
       ),
       dataverse.get<{ value: any[] }>(
-        `bb_blitzs?$filter=_bb_ownerbrigade_value eq '${id}' and statuscode eq 121120001` +
+        `bb_blitzs?$filter=_bb_owner_value eq '${id}' and statuscode eq 121120001` +
         `&$select=bb_blitzid,bb_blitznumber,bb_name,bb_datestart,bb_dateend`
       ),
       dataverse.get<{ value: any[] }>(
@@ -134,6 +134,22 @@ export default async function BrigadeDetailPage({
 
     const b = brigadeRes.value?.[0];
     if (!b) notFound();
+
+    const ownerRes = await dataverse.get<{ value: any[] }>(
+      `bb_neighbors?$filter=bb_neighborid eq '${b._bb_owner_value}'&$select=bb_neighborid,bb_firstname,bb_lastname,bb_profileimageurl&$top=1`
+    );
+    console.log('Owner result:', JSON.stringify(ownerRes.value?.[0]));
+    const owner = ownerRes.value?.[0];
+
+    let countyNameFull = '';
+    if (b._bb_brigadecounty_value) {
+      try {
+        const countyRes = await dataverse.get<{ value: any[] }>(
+          `bb_counties?$filter=bb_countyid eq '${b._bb_brigadecounty_value}'&$select=bb_countyname,bb_countynamefull&$top=1`
+        );
+        countyNameFull = countyRes.value?.[0]?.bb_countynamefull ?? '';
+      } catch {}
+    }
 
     brigade = {
       brigadeId: b.bb_brigadeid,
@@ -148,12 +164,13 @@ export default async function BrigadeDetailPage({
       imageUrl: b.bb_imageurl ?? '',
       profileImageUrl: b.bb_profileimageurl ?? '',
       isVerified: b.bb_isverified ?? false,
-      ownerNeighborId: b.brigade_Owner_bb_neighbor?.bb_neighborid ?? '',
-      ownerFirstName: b.brigade_Owner_bb_neighbor?.bb_firstname ?? '',
-      ownerLastName: b.brigade_Owner_bb_neighbor?.bb_lastname ?? '',
-      ownerProfileImageUrl: b.brigade_Owner_bb_neighbor?.bb_profileimageurl ?? '',
+      ownerNeighborId: owner?.bb_neighborid ?? '',
+      ownerFirstName: owner?.bb_firstname ?? '',
+      ownerLastName: owner?.bb_lastname ?? '',
+      ownerProfileImageUrl: owner?.bb_profileimageurl ?? '',
       typeLabel: BRIGADE_TYPE_LABELS[b.bb_brigadetype] ?? 'Other',
       scopeLabel: BRIGADE_SCOPE_LABELS[b.bb_brigadescope] ?? '',
+      countyNameFull,
     };
 
     members = (membersRes.value ?? []).map((m: any) => ({

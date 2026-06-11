@@ -79,11 +79,9 @@ export default function BrigadeDetailClient({
     }
   };
 
-  const scopeDisplay = [
-    brigade.brigadeCity,
-    brigade.brigadeState,
-    brigade.brigadeScopeDescription,
-  ].filter(Boolean).join(', ');
+  const scopeDisplay = brigade.countyNameFull
+    ? brigade.countyNameFull
+    : [brigade.brigadeCity, brigade.brigadeState, brigade.brigadeScopeDescription].filter(Boolean).join(', ');
 
   return (
     <div style={{ background: '#FAF7F2', minHeight: '80vh' }}>
@@ -170,7 +168,7 @@ export default function BrigadeDetailClient({
               <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontFamily: 'Georgia, serif', fontSize: '1.4rem', fontWeight: 700, color: '#FFFFFF' }}>
-                    {members.length}
+                    {members.length + 1}
                   </div>
                   <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '1px', textTransform: 'uppercase' }}>
                     Members
@@ -178,7 +176,7 @@ export default function BrigadeDetailClient({
                 </div>
                 <div style={{ textAlign: 'center' }}>
                   <div style={{ fontFamily: 'Georgia, serif', fontSize: '1.4rem', fontWeight: 700, color: '#FFFFFF' }}>
-                    {recentBumps.length}+
+                    {recentBumps.length === 10 ? '10+' : recentBumps.length}
                   </div>
                   <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '1px', textTransform: 'uppercase' }}>
                     Bumps
@@ -359,7 +357,7 @@ export default function BrigadeDetailClient({
 
             {/* Members */}
             <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: 24, marginBottom: 24 }}>
-              <div style={sectionLabelStyle}>★ Members ({members.length})</div>
+              <div style={sectionLabelStyle}>★ Members ({members.length + 1})</div>
 
               {/* Owner */}
               <div style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #F5F5F5' }}>
