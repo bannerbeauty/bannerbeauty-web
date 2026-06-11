@@ -385,10 +385,12 @@ export default function CommunityClient({
           {leftPanelContents(true)}
         </div>
 
-        {/* Sticky tab bar */}
+        {/* Tab bar — fixed so it's never affected by feed transform */}
         <div style={{
-          position: 'sticky',
-          top: 0,
+          position: 'fixed',
+          top: HEADER_H,
+          left: 0,
+          right: 0,
           height: TAB_BAR_H,
           background: '#1B2A4A',
           zIndex: 90,
@@ -464,7 +466,8 @@ export default function CommunityClient({
             transform: panelOpen ? 'translateX(85%)' : 'translateX(0)',
             transition: 'transform 0.3s ease',
             background: '#FAF7F2',
-            minHeight: 'calc(100vh - 52px)',
+            minHeight: '100vh',
+            paddingTop: TAB_BAR_H,
             overflow: panelOpen ? 'hidden' : 'auto',
             boxShadow: '-8px 0 16px rgba(0,0,0,0.15)',
           }}
