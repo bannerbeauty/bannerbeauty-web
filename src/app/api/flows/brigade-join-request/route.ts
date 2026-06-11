@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 
-const FLOW_URL = 'BRIGADE_JOIN_REQUEST_FLOW_URL_PLACEHOLDER';
+const FLOW_URL =
+  'https://2e1e3024670eed439dc2d049ff5827.18.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/c4097781273f4d3891bfb83493a42d0a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=N_uod3nMj5pPwKgJOTaL8WCobHO-5jZyLDZDMXqdDRg';
 
 export async function POST(req: NextRequest) {
   let body: unknown;

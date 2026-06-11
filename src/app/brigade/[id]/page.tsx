@@ -113,7 +113,7 @@ export default async function BrigadeDetailPage({
       dataverse.get<{ value: any[] }>(
         `bb_brigades?$filter=bb_brigadeid eq '${id}'` +
         `&$select=bb_brigadeid,bb_brigadenumber,bb_name,bb_brigadetype,bb_brigadescope,bb_brigadestate,bb_brigadecity,bb_brigadescopedescription,bb_description,bb_imageurl,bb_profileimageurl,bb_isverified` +
-        `&$expand=bb_Owner($select=bb_neighborid,bb_firstname,bb_lastname,bb_profileimageurl)` +
+        `&$expand=brigade_Owner_bb_neighbor($select=bb_neighborid,bb_firstname,bb_lastname,bb_profileimageurl)` +
         `&$top=1`
       ),
       dataverse.get<{ value: any[] }>(
@@ -148,10 +148,10 @@ export default async function BrigadeDetailPage({
       imageUrl: b.bb_imageurl ?? '',
       profileImageUrl: b.bb_profileimageurl ?? '',
       isVerified: b.bb_isverified ?? false,
-      ownerNeighborId: b.bb_Owner?.bb_neighborid ?? '',
-      ownerFirstName: b.bb_Owner?.bb_firstname ?? '',
-      ownerLastName: b.bb_Owner?.bb_lastname ?? '',
-      ownerProfileImageUrl: b.bb_Owner?.bb_profileimageurl ?? '',
+      ownerNeighborId: b.brigade_Owner_bb_neighbor?.bb_neighborid ?? '',
+      ownerFirstName: b.brigade_Owner_bb_neighbor?.bb_firstname ?? '',
+      ownerLastName: b.brigade_Owner_bb_neighbor?.bb_lastname ?? '',
+      ownerProfileImageUrl: b.brigade_Owner_bb_neighbor?.bb_profileimageurl ?? '',
       typeLabel: BRIGADE_TYPE_LABELS[b.bb_brigadetype] ?? 'Other',
       scopeLabel: BRIGADE_SCOPE_LABELS[b.bb_brigadescope] ?? '',
     };
