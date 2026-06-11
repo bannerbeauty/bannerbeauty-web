@@ -72,8 +72,8 @@ export default function CommunityClient({
   const [activeTab, setActiveTab] = useState<Tab>('all');
   const [panelOpen, setPanelOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const touchStartX = useRef<number | null>(null);
-  const touchStartY = useRef<number | null>(null);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
 
   useEffect(() => {
     document.body.classList.add('hide-footer');
@@ -96,21 +96,22 @@ export default function CommunityClient({
     return () => { document.body.style.overflow = ''; };
   }, [panelOpen]);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
+  const handleFeedTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
   };
 
-  const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartX.current === null || touchStartY.current === null) return;
-    const dx = e.changedTouches[0].clientX - touchStartX.current;
-    const dy = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
-    touchStartX.current = null;
-    touchStartY.current = null;
-    // Ignore if primarily a vertical scroll gesture
-    if (dy > 30) return;
-    if (!panelOpen && dx > 50) setPanelOpen(true);
-    if (panelOpen && dx < -50) setPanelOpen(false);
+  const handleFeedTouchEnd = (e: React.TouchEvent) => {
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
+
+    if (deltaY > 30) return;
+
+    if (!panelOpen && deltaX > 50) {
+      setPanelOpen(true);
+    } else if (panelOpen && deltaX < -50) {
+      setPanelOpen(false);
+    }
   };
 
   const tabs: { key: Tab; label: string }[] = [
@@ -420,8 +421,8 @@ export default function CommunityClient({
 
         {/* Feed — slides right to reveal panel */}
         <div
-          onTouchStart={handleTouchStart}
-          onTouchEnd={handleTouchEnd}
+          onTouchStart={handleFeedTouchStart}
+          onTouchEnd={handleFeedTouchEnd}
           style={{
             position: 'relative',
             zIndex: 60,
@@ -429,29 +430,19 @@ export default function CommunityClient({
             transition: 'transform 0.3s ease',
             background: '#FAF7F2',
             minHeight: 'calc(100vh - 52px)',
-            padding: '20px 16px 80px',
             overflow: panelOpen ? 'hidden' : 'auto',
             boxShadow: '-8px 0 16px rgba(0,0,0,0.15)',
           }}
         >
-          {feedContent}
-        </div>
-
-        {/* Backdrop — visible 15% strip when panel open, tap to close */}
-        {panelOpen && (
           <div
-            onClick={() => setPanelOpen(false)}
             style={{
-              position: 'fixed',
-              top: PANEL_TOP,
-              left: '85%',
-              right: 0,
-              bottom: 0,
-              background: 'rgba(0,0,0,0.35)',
-              zIndex: 70,
+              padding: '20px 16px 80px',
+              pointerEvents: panelOpen ? 'none' : 'auto',
             }}
-          />
-        )}
+          >
+            {feedContent}
+          </div>
+        </div>
       </div>
     );
   }
