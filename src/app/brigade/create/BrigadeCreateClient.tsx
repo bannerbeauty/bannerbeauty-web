@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import { APIProvider } from '@vis.gl/react-google-maps';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 import CityAutocomplete from '@/components/CityAutocomplete';
 
@@ -197,6 +198,7 @@ export default function BrigadeCreateClient({ neighborId }: Props) {
   };
 
   return (
+    <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!} libraries={['places']}>
     <div style={{ background: '#FAF7F2', minHeight: '80vh', padding: '60px 24px 80px' }}>
       <div style={{ maxWidth: 680, margin: '0 auto' }}>
 
@@ -436,5 +438,6 @@ export default function BrigadeCreateClient({ neighborId }: Props) {
         </div>
       </div>
     </div>
+    </APIProvider>
   );
 }
