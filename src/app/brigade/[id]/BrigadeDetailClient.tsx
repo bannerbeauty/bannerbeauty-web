@@ -198,23 +198,41 @@ export default function BrigadeDetailClient({
             {/* Action buttons */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, flexShrink: 0 }}>
               {isOwner || isAdmin ? (
-                <Link
-                  href={`/brigade/${brigade.brigadeId}/edit`}
-                  style={{
-                    display: 'inline-block',
-                    padding: '10px 20px',
-                    background: 'rgba(255,255,255,0.1)',
-                    color: '#FFFFFF',
-                    borderRadius: 4,
-                    fontFamily: 'Trebuchet MS, sans-serif',
-                    fontSize: '0.85rem',
-                    fontWeight: 700,
-                    textDecoration: 'none',
-                    border: '1px solid rgba(255,255,255,0.3)',
-                  }}
-                >
-                  ✏️ Edit Brigade
-                </Link>
+                <>
+                  <Link
+                    href={`/brigade/${brigade.brigadeId}/edit`}
+                    style={{
+                      display: 'inline-block',
+                      padding: '10px 20px',
+                      background: 'rgba(255,255,255,0.1)',
+                      color: '#FFFFFF',
+                      borderRadius: 4,
+                      fontFamily: 'Trebuchet MS, sans-serif',
+                      fontSize: '0.85rem',
+                      fontWeight: 700,
+                      textDecoration: 'none',
+                      border: '1px solid rgba(255,255,255,0.3)',
+                    }}
+                  >
+                    ✏️ Edit Brigade
+                  </Link>
+                  <Link
+                    href={`/blitz/create?brigadeId=${brigade.brigadeId}`}
+                    style={{
+                      display: 'inline-block',
+                      padding: '10px 20px',
+                      background: '#C5A028',
+                      color: '#1B2A4A',
+                      borderRadius: 4,
+                      fontFamily: 'Trebuchet MS, sans-serif',
+                      fontSize: '0.85rem',
+                      fontWeight: 700,
+                      textDecoration: 'none',
+                    }}
+                  >
+                    ⚡ Create a Blitz
+                  </Link>
+                </>
               ) : isMember ? (
                 <div style={{
                   padding: '10px 20px',
