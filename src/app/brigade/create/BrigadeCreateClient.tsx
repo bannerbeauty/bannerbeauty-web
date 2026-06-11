@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
+import CityAutocomplete from '@/components/CityAutocomplete';
 
 const BRIGADE_TYPES = [
   { label: 'Law Enforcement', value: 121120000 },
@@ -56,8 +57,8 @@ const US_STATES = [
 
 interface County {
   bb_countyid: string;
-  bb_CountyName: string;
-  bb_CountyNameFull: string;
+  bb_countyname: string;
+  bb_countynamefull: string;
 }
 
 interface Props {
@@ -322,7 +323,7 @@ export default function BrigadeCreateClient({ neighborId }: Props) {
               >
                 <option value="">{counties.length === 0 ? 'Loading counties...' : 'Select a county...'}</option>
                 {counties.map(c => (
-                  <option key={c.bb_countyid} value={c.bb_countyid}>{c.bb_CountyName}</option>
+                  <option key={c.bb_countyid} value={c.bb_countyid}>{c.bb_countynamefull}</option>
                 ))}
               </select>
             </div>
@@ -332,19 +333,15 @@ export default function BrigadeCreateClient({ neighborId }: Props) {
           {showCity && (
             <div style={fieldStyle}>
               <label style={labelStyle}>City *</label>
-              <AddressAutocomplete
+              <CityAutocomplete
                 value={brigadeCity}
                 onChange={setBrigadeCity}
-                onSelect={(place) => {
-                  const cityComponent = place.address_components?.find((c: any) => c.types.includes('locality'));
-                  const stateComponent = place.address_components?.find((c: any) => c.types.includes('administrative_area_level_1'));
-                  const countyComponent = place.address_components?.find((c: any) => c.types.includes('administrative_area_level_2'));
-                  if (cityComponent) setBrigadeCity(cityComponent.long_name);
-                  if (stateComponent) setBrigadeState(stateComponent.short_name);
-                  if (countyComponent) setBrigadeCounty(countyComponent.long_name.replace(' County', ''));
+                onSelect={(data) => {
+                  setBrigadeCity(data.city);
+                  setBrigadeState(data.state);
+                  setBrigadeCounty(data.county);
                 }}
                 placeholder="Start typing a city..."
-                types={['(cities)']}
               />
             </div>
           )}
