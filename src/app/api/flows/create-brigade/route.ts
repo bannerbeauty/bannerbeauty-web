@@ -26,7 +26,9 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: 'Flow request failed' }, { status: 502 });
   }
 
+  console.log('Brigade flow response status:', flowRes.status);
   const responseText = await flowRes.text();
+  console.log('Brigade flow response body:', responseText);
 
   let data: unknown;
   try {

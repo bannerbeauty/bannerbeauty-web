@@ -179,7 +179,7 @@ export default function BrigadeCreateClient({ neighborId }: Props) {
           description: description.trim(),
           brigadeScope,
           brigadeState,
-          brigadeCountyId,
+          ...(brigadeCountyId ? { brigadeCountyId } : {}),
           brigadeCity,
           brigadeScopeDescription: brigadeScopeDescription.trim(),
           imageUrl,
