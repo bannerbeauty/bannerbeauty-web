@@ -74,6 +74,7 @@ export default function CommunityClient({
   const [isMobile, setIsMobile] = useState(false);
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
+  const captureDivRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     document.body.classList.add('hide-footer');
@@ -94,6 +95,27 @@ export default function CommunityClient({
       document.body.style.overflow = '';
     }
     return () => { document.body.style.overflow = ''; };
+  }, [panelOpen]);
+
+  const handleCaptureTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleCaptureTouchEnd = (e: React.TouchEvent) => {
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
+    if (deltaY > 30) return;
+    if (deltaX < -50) setPanelOpen(false);
+  };
+
+  useEffect(() => {
+    if (!panelOpen) return;
+    const el = captureDivRef.current;
+    if (!el) return;
+    const handler = (e: TouchEvent) => e.preventDefault();
+    el.addEventListener('touchmove', handler, { passive: false });
+    return () => el.removeEventListener('touchmove', handler);
   }, [panelOpen]);
 
   const handleFeedTouchStart = (e: React.TouchEvent) => {
@@ -418,6 +440,24 @@ export default function CommunityClient({
             ))}
           </div>
         </div>
+
+        {/* Touch capture overlay — intercepts all touches when panel is open */}
+        {panelOpen && (
+          <div
+            ref={captureDivRef}
+            onTouchStart={handleCaptureTouchStart}
+            onTouchEnd={handleCaptureTouchEnd}
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              zIndex: 45,
+              background: 'transparent',
+            }}
+          />
+        )}
 
         {/* Feed — slides right to reveal panel */}
         <div
