@@ -3,7 +3,6 @@
 import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { APIProvider } from '@vis.gl/react-google-maps';
-import AddressAutocomplete from '@/components/AddressAutocomplete';
 import CityAutocomplete from '@/components/CityAutocomplete';
 
 const BRIGADE_TYPES = [

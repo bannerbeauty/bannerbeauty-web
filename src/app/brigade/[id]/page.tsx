@@ -138,7 +138,6 @@ export default async function BrigadeDetailPage({
     const ownerRes = await dataverse.get<{ value: any[] }>(
       `bb_neighbors?$filter=bb_neighborid eq '${b._bb_owner_value}'&$select=bb_neighborid,bb_firstname,bb_lastname,bb_profileimageurl&$top=1`
     );
-    console.log('Owner result:', JSON.stringify(ownerRes.value?.[0]));
     const owner = ownerRes.value?.[0];
 
     let countyNameFull = '';
