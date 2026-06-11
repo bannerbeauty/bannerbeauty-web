@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { APIProvider } from '@vis.gl/react-google-maps';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 
@@ -20,6 +20,7 @@ interface ProfileClientProps {
   smsOptin: boolean;
   displayName: string;
   handle: string;
+  profileImageUrl: string | null;
 }
 
 const US_STATES = [
@@ -50,6 +51,20 @@ const US_STATES = [
   { value: 'WV', label: 'West Virginia' }, { value: 'WI', label: 'Wisconsin' },
   { value: 'WY', label: 'Wyoming' },
 ];
+
+const DEFAULT_AVATARS = [
+  'https://bannerbeautystorage.blob.core.windows.net/profile-images/default-eagle.png',
+  'https://bannerbeautystorage.blob.core.windows.net/profile-images/default-star.png',
+  'https://bannerbeautystorage.blob.core.windows.net/profile-images/default-house.png',
+  'https://bannerbeautystorage.blob.core.windows.net/profile-images/default-medal.png',
+  'https://bannerbeautystorage.blob.core.windows.net/profile-images/default-shield.png',
+  'https://bannerbeautystorage.blob.core.windows.net/profile-images/default-silhouette.png',
+];
+
+function getDefaultAvatar(neighborId: string): string {
+  const index = neighborId.charCodeAt(0) % DEFAULT_AVATARS.length;
+  return DEFAULT_AVATARS[index];
+}
 
 const inputStyle: React.CSSProperties = {
   width: '100%', padding: '10px 14px', border: '1.5px solid #DDDDDD',
@@ -99,6 +114,7 @@ export default function ProfileClient({
   smsOptin: initialSmsOptin,
   displayName: initialDisplayName,
   handle: initialHandle,
+  profileImageUrl: initialProfileImageUrl,
 }: ProfileClientProps) {
   const [firstName, setFirstName] = useState(initialFirstName);
   const [lastName, setLastName] = useState(initialLastName);
@@ -115,6 +131,9 @@ export default function ProfileClient({
   const [smsOptin, setSmsOptin] = useState(initialSmsOptin);
   const [displayName, setDisplayName] = useState(initialDisplayName ?? '');
   const [handle, setHandle] = useState(initialHandle ?? '');
+  const [profileImageUrl, setProfileImageUrl] = useState(initialProfileImageUrl ?? '');
+  const [imageUploading, setImageUploading] = useState(false);
+  const profileImageRef = useRef<HTMLInputElement>(null);
 
   const [handleStatus, setHandleStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
 
@@ -137,6 +156,25 @@ export default function ProfileClient({
     }, 500);
     return () => clearTimeout(timer);
   }, [handle, initialHandle, neighborId]);
+
+  const handleProfileImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageUploading(true);
+    try {
+      const res = await fetch('/api/profile/upload-image', {
+        method: 'POST',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      });
+      const data = await res.json();
+      if (data.url) setProfileImageUrl(data.url);
+    } catch {
+      console.error('Profile image upload failed');
+    } finally {
+      setImageUploading(false);
+    }
+  };
 
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -170,6 +208,7 @@ export default function ProfileClient({
             lng,
             displayName,
             handle,
+            profileImageUrl,
           }),
         }),
       });
@@ -261,6 +300,78 @@ export default function ProfileClient({
                 placeholder="(555) 555-5555"
                 maxLength={14}
               />
+            </div>
+          </section>
+
+          {/* Profile Image */}
+          <section style={{
+            background: '#FFFFFF', borderRadius: 8, padding: 28,
+            marginBottom: 20, boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+          }}>
+            <div style={{ marginBottom: 32, display: 'flex', alignItems: 'center', gap: 24 }}>
+              <div style={{ position: 'relative', flexShrink: 0 }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={profileImageUrl || getDefaultAvatar(neighborId ?? '')}
+                  alt="Profile"
+                  style={{
+                    width: 100,
+                    height: 100,
+                    borderRadius: '50%',
+                    objectFit: 'cover',
+                    border: '3px solid #C5A028',
+                  }}
+                />
+                {imageUploading && (
+                  <div style={{
+                    position: 'absolute',
+                    inset: 0,
+                    borderRadius: '50%',
+                    background: 'rgba(27,42,74,0.6)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: '#FFFFFF',
+                    fontSize: '0.75rem',
+                    fontFamily: 'Trebuchet MS, sans-serif',
+                  }}>
+                    Uploading...
+                  </div>
+                )}
+              </div>
+              <div>
+                <div style={{ fontFamily: 'Georgia, serif', fontSize: '1.1rem', fontWeight: 700, color: '#1B2A4A', marginBottom: 8 }}>
+                  {displayName || `${firstName} ${lastName}`.trim() || 'Your Name'}
+                </div>
+                {handle && (
+                  <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#888888', marginBottom: 12 }}>
+                    @{handle}
+                  </div>
+                )}
+                <input
+                  ref={profileImageRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleProfileImageChange}
+                  style={{ display: 'none' }}
+                />
+                <button
+                  onClick={() => profileImageRef.current?.click()}
+                  style={{
+                    padding: '8px 16px',
+                    background: '#FFFFFF',
+                    border: '1.5px solid #1B2A4A',
+                    borderRadius: 4,
+                    fontFamily: 'Trebuchet MS, sans-serif',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    color: '#1B2A4A',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {profileImageUrl ? 'Change Photo' : 'Upload Photo'}
+                </button>
+              </div>
             </div>
           </section>
 
