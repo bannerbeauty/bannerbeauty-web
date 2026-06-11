@@ -438,7 +438,7 @@ export default function CommunityClient({
           </div>
         </div>
 
-        {/* Touch capture overlay — intercepts all touches when panel is open */}
+        {/* Touch capture overlay — covers only the visible 15% strip when panel open */}
         {panelOpen && (
           <div
             ref={captureDivRef}
@@ -446,8 +446,8 @@ export default function CommunityClient({
             onTouchEnd={handleCaptureTouchEnd}
             style={{
               position: 'fixed',
-              top: 0,
-              left: 0,
+              top: PANEL_TOP,
+              left: '85%',
               right: 0,
               bottom: 0,
               zIndex: 65,
@@ -456,23 +456,25 @@ export default function CommunityClient({
           />
         )}
 
-        {/* Feed — slides right to reveal panel */}
+        {/* Feed — fixed, slides right to reveal panel */}
         <div
-          onTouchStart={handleFeedTouchStart}
-          onTouchEnd={handleFeedTouchEnd}
           style={{
-            position: 'relative',
+            position: 'fixed',
+            top: PANEL_TOP,
+            left: 0,
+            right: 0,
+            bottom: 0,
             zIndex: 60,
             transform: panelOpen ? 'translateX(85%)' : 'translateX(0)',
             transition: 'transform 0.3s ease',
             background: '#FAF7F2',
-            minHeight: '100vh',
-            paddingTop: TAB_BAR_H,
-            overflow: panelOpen ? 'hidden' : 'auto',
+            overflowY: panelOpen ? 'hidden' : 'auto',
             boxShadow: '-8px 0 16px rgba(0,0,0,0.15)',
           }}
         >
           <div
+            onTouchStart={handleFeedTouchStart}
+            onTouchEnd={handleFeedTouchEnd}
             style={{
               padding: '20px 16px 80px',
               pointerEvents: panelOpen ? 'none' : 'auto',
