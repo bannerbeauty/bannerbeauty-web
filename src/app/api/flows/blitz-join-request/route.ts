@@ -1,7 +1,7 @@
 import type { NextRequest } from 'next/server';
 
 const FLOW_URL =
-  'BLITZ_JOIN_REQUEST_FLOW_URL_PLACEHOLDER';
+  'https://2e1e3024670eed439dc2d049ff5827.18.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/e5ec8f3c8a90437eb44a0e28c191f8a3/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=U153tozpDSn4EFoFDStqkuQYR-ag5KQGaWmcXbjrgTM';
 
 export async function POST(req: NextRequest) {
   let body: unknown;
