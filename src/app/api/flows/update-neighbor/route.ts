@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 
-const FLOW_URL = 'UPDATE_NEIGHBOR_FLOW_URL_PLACEHOLDER';
+const FLOW_URL = 'https://2e1e3024670eed439dc2d049ff5827.18.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/4b51199086214e0abd1c0c402e3d71d7/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=ncgZPgchgQX_uw5IFFu4mAInDRzauKTqUUgpdR79-bg';
 
 export async function POST(req: NextRequest) {
   let body: unknown;
