@@ -211,7 +211,7 @@ export default function CommunityLayout({ sidebarData, children, tabBar, hideAva
       )}
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: threeColumn ? '260px 1fr 280px' : '260px 1fr', gap: 24 }}>
         {/* Left sidebar */}
-        <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', marginTop: 24, alignSelf: 'start', position: 'sticky', top: 80 }}>
+        <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', marginTop: 24, position: 'sticky', top: 128, alignSelf: 'start', maxHeight: 'calc(100vh - 128px)', overflowY: 'auto' }}>
           <CommunitySidebar data={sidebarData} />
         </div>
         {/* Main content */}
@@ -220,7 +220,7 @@ export default function CommunityLayout({ sidebarData, children, tabBar, hideAva
         </div>
         {/* Right panel (three-column layout) */}
         {threeColumn && rightPanel && (
-          <div style={{ paddingTop: 24, paddingBottom: 80 }}>
+          <div style={{ paddingTop: 24, position: 'sticky', top: 128, alignSelf: 'start', maxHeight: 'calc(100vh - 128px)', overflowY: 'auto' }}>
             {rightPanel}
           </div>
         )}
