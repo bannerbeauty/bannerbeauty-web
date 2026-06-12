@@ -5,14 +5,21 @@ import { useSession, signIn, signOut } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
 
-const NAV_LINKS = [
+const NAV_LINKS_LOGGED_OUT = [
   { label: 'Home', href: '/' },
+  { label: 'Banner Bump', href: '/submit-banner' },
+  { label: 'Store', href: '/store' },
+];
+
+const NAV_LINKS_LOGGED_IN = [
+  { label: 'Community', href: '/community' },
   { label: 'Banner Bump', href: '/submit-banner' },
   { label: 'Store', href: '/store' },
 ];
 
 export default function Header() {
   const { data: session } = useSession();
+  const NAV_LINKS = session ? NAV_LINKS_LOGGED_IN : NAV_LINKS_LOGGED_OUT;
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);

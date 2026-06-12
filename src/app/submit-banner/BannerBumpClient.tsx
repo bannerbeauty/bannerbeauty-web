@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { APIProvider } from '@vis.gl/react-google-maps';
 import StripePaymentElement from '@/components/StripePaymentElement';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
+import type { ActiveBlitz } from './page';
 
 // ── Exported types (consumed by page.tsx) ────────────────────────────────────
 
@@ -57,6 +58,7 @@ interface BannerBumpClientProps {
   flagProducts: FlagProduct[];
   gcProducts: GcProduct[];
   letterPrice: number;
+  activeBlitzes: ActiveBlitz[];
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -203,7 +205,7 @@ function ToggleCard({
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function BannerBumpClient({
-  userEmail, userFirstName, userLastName, neighbor, letterTemplates, flagProducts, gcProducts, letterPrice,
+  userEmail, userFirstName, userLastName, neighbor, letterTemplates, flagProducts, gcProducts, letterPrice, activeBlitzes,
 }: BannerBumpClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -254,6 +256,10 @@ export default function BannerBumpClient({
   const [selectedTemplateId,  setSelectedTemplateId]  = useState('');
   const [personalNote,        setPersonalNote]        = useState('');
   const [isPublicNoteIn,      setIsPublicNoteIn]      = useState(false);
+
+  // Blitz association
+  const [selectedBlitzId,       setSelectedBlitzId]       = useState('');
+  const [selectedBlitzBrigadeId, setSelectedBlitzBrigadeId] = useState('');
 
   // Step 7: GC + Payment
   const [gcInput,      setGcInput]      = useState('');
@@ -429,6 +435,8 @@ export default function BannerBumpClient({
           appliedGCs,
           recipientLat,
           recipientLng,
+          blitzId: selectedBlitzId,
+          brigadeId: selectedBlitzBrigadeId,
         }),
       });
       orderData = await res.json();
@@ -447,6 +455,8 @@ export default function BannerBumpClient({
       subtotal, total: amountDue,
       qrToken: orderData.qrToken ?? '',
       orderId: orderData.orderId ?? '',
+      blitzId: selectedBlitzId,
+      brigadeId: selectedBlitzBrigadeId,
     };
 
     try {
@@ -512,6 +522,33 @@ export default function BannerBumpClient({
               <label style={labelStyle}>Email Address *</label>
               <input style={{ ...inputStyle, fontSize: '16px' }} type="email" value={inEmail} onChange={(e) => setInEmail(e.target.value)} />
             </div>
+            {activeBlitzes.length > 0 && (
+              <div style={{ marginTop: 20 }}>
+                <label style={labelStyle}>Are you Banner Bumping as part of a group activity? (optional)</label>
+                <select
+                  value={selectedBlitzId}
+                  onChange={e => {
+                    const blitzId = e.target.value;
+                    setSelectedBlitzId(blitzId);
+                    const blitz = activeBlitzes.find(b => b.blitzId === blitzId);
+                    setSelectedBlitzBrigadeId(blitz?.brigadeId ?? '');
+                  }}
+                  style={{ ...inputStyle, fontSize: '16px', marginTop: 6 }}
+                >
+                  <option value="">No — this is a personal Banner Bump</option>
+                  {activeBlitzes.map(blitz => (
+                    <option key={blitz.blitzId} value={blitz.blitzId}>
+                      {blitz.blitzName} — {blitz.brigadeName}
+                    </option>
+                  ))}
+                </select>
+                {selectedBlitzId && (
+                  <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#1B7A3E', marginTop: 6 }}>
+                    ⚡ This bump will count toward {activeBlitzes.find(b => b.blitzId === selectedBlitzId)?.blitzName}!
+                  </p>
+                )}
+              </div>
+            )}
             {stepError && <p style={{ color: '#B22234', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', marginTop: 12 }}>{stepError}</p>}
             <NavButtons showBack={false} onNext={handleNext} nextLabel="Next: Recipient Info →" />
           </div>

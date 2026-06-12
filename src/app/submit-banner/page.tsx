@@ -9,6 +9,65 @@ import BannerBumpClient, {
   type GcProduct,
 } from './BannerBumpClient';
 
+export interface ActiveBlitz {
+  blitzId: string;
+  blitzName: string;
+  brigadeId: string;
+  brigadeName: string;
+}
+
+async function getNeighborActiveBlitzes(neighborId: string): Promise<ActiveBlitz[]> {
+  try {
+    const [ownedRes, adminRes] = await Promise.all([
+      dataverse.get<{ value: any[] }>(
+        `bb_brigades?$filter=_bb_owner_value eq '${neighborId}' and statecode eq 0&$select=bb_brigadeid,bb_name`
+      ),
+      dataverse.get<{ value: any[] }>(
+        `bb_brigadeneighbors?$filter=_bb_neighbor_value eq '${neighborId}' and bb_isadmin eq true and statecode eq 0 and statuscode eq 121120001&$select=_bb_brigade_value`
+      ),
+    ]);
+
+    const brigadeIds = [
+      ...(ownedRes.value ?? []).map((b: any) => ({ id: b.bb_brigadeid, name: b.bb_name })),
+    ];
+
+    const adminBrigadeIds = (adminRes.value ?? []).map((bn: any) => bn._bb_brigade_value).filter(Boolean);
+    if (adminBrigadeIds.length > 0) {
+      const adminBrigadesRes = await dataverse.get<{ value: any[] }>(
+        `bb_brigades?$filter=${adminBrigadeIds.map((id: string) => `bb_brigadeid eq '${id}'`).join(' or ')}&$select=bb_brigadeid,bb_name`
+      );
+      brigadeIds.push(...(adminBrigadesRes.value ?? []).map((b: any) => ({ id: b.bb_brigadeid, name: b.bb_name })));
+    }
+
+    if (brigadeIds.length === 0) return [];
+
+    const blitzBrigadeRes = await dataverse.get<{ value: any[] }>(
+      `bb_blitzbrigades?$filter=${brigadeIds.map(b => `_bb_brigade_value eq '${b.id}'`).join(' or ')} and statuscode eq 121120002 and statecode eq 0&$select=_bb_blitz_value,_bb_brigade_value`
+    );
+
+    const blitzIds = [...new Set((blitzBrigadeRes.value ?? []).map((bb: any) => bb._bb_blitz_value).filter(Boolean))];
+    if (blitzIds.length === 0) return [];
+
+    const blitzRes = await dataverse.get<{ value: any[] }>(
+      `bb_blitzs?$filter=${blitzIds.map(id => `bb_blitzid eq '${id}'`).join(' or ')} and statuscode eq 121120001 and statecode eq 0&$select=bb_blitzid,bb_name`
+    );
+
+    return (blitzRes.value ?? []).map((bl: any) => {
+      const bb = blitzBrigadeRes.value?.find((bb: any) => bb._bb_blitz_value === bl.bb_blitzid);
+      const brigade = brigadeIds.find(b => b.id === bb?._bb_brigade_value);
+      return {
+        blitzId: bl.bb_blitzid,
+        blitzName: bl.bb_name,
+        brigadeId: brigade?.id ?? '',
+        brigadeName: brigade?.name ?? '',
+      };
+    });
+  } catch (err) {
+    console.error('getNeighborActiveBlitzes failed:', err);
+    return [];
+  }
+}
+
 interface DvNeighbor {
   bb_neighborid: string;
   bb_firstname?: string;
@@ -134,6 +193,8 @@ export default async function SubmitBannerPage() {
         }))
       : [];
 
+  const activeBlitzes = neighbor?.neighborId ? await getNeighborActiveBlitzes(neighbor.neighborId) : [];
+
   return (
     <Suspense fallback={<div style={{ minHeight: '60vh', background: '#FAF7F2' }} />}>
       <BannerBumpClient
@@ -145,6 +206,7 @@ export default async function SubmitBannerPage() {
         flagProducts={flagProducts}
         gcProducts={gcProducts}
         letterPrice={letterPrice}
+        activeBlitzes={activeBlitzes}
       />
     </Suspense>
   );
