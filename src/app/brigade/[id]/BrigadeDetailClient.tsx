@@ -2,10 +2,8 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
-import CommunityLayout from '@/components/CommunityLayout';
 import FeedItemCard from '@/components/FeedItem';
 import type { FeedItem } from '@/app/api/feed/route';
-import type { SidebarData } from '@/lib/community-sidebar';
 import type { BrigadeDetail, BrigadeMember, BrigadeBlitz, BrigadeBump } from './page';
 
 const DEFAULT_AVATARS = [
@@ -35,7 +33,6 @@ interface Props {
   neighborId: string | null;
   bannerOptionLabels: Record<number, string>;
   pendingBrigades?: BrigadeMember[];
-  sidebarData: SidebarData | null;
 }
 
 export default function BrigadeDetailClient({
@@ -47,7 +44,6 @@ export default function BrigadeDetailClient({
   neighborId,
   bannerOptionLabels,
   pendingBrigades,
-  sidebarData,
 }: Props) {
   const [requestSent, setRequestSent] = useState(false);
   const [requesting, setRequesting] = useState(false);
@@ -136,11 +132,30 @@ export default function BrigadeDetailClient({
     ? brigade.countyNameFull
     : [brigade.brigadeCity, brigade.brigadeState, brigade.brigadeScopeDescription].filter(Boolean).join(', ');
 
-  const brigadeContent = (
+  return (
     <div style={{ background: '#FFFFFF', minHeight: '80vh' }}>
 
       {/* Banner image — full width, cropped */}
       <div style={{ position: 'relative', width: '100%', height: 200, background: '#1B2A4A', overflow: 'hidden' }}>
+        {/* Back arrow */}
+        <Link href="/community" style={{
+          position: 'absolute',
+          top: 12,
+          left: 12,
+          zIndex: 10,
+          background: 'rgba(0,0,0,0.5)',
+          borderRadius: '50%',
+          width: 36,
+          height: 36,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: '#FFFFFF',
+          textDecoration: 'none',
+          fontSize: '1.1rem',
+        }}>
+          ←
+        </Link>
         {brigade.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={brigade.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
@@ -151,16 +166,16 @@ export default function BrigadeDetailClient({
 
       {/* Profile section */}
       <div style={{ padding: '0 20px', background: '#FFFFFF' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: -40, marginBottom: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: -80, marginBottom: 12 }}>
           {/* Profile image — overlaps banner */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={brigade.profileImageUrl || getDefaultAvatar(brigade.brigadeId)}
             alt={brigade.name}
-            style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '4px solid #FFFFFF', flexShrink: 0, position: 'relative', zIndex: 2 }}
+            style={{ width: 160, height: 160, borderRadius: '50%', objectFit: 'cover', border: '6px solid #FFFFFF', flexShrink: 0, position: 'relative', zIndex: 2 }}
           />
           {/* Action button */}
-          <div style={{ marginTop: 20, alignSelf: 'flex-end' }}>
+          <div style={{ alignSelf: 'flex-end', marginBottom: -8 }}>
             {isOwner || isAdmin ? (
               <div style={{ display: 'flex', gap: 8 }}>
                 <Link
@@ -438,13 +453,4 @@ export default function BrigadeDetailClient({
       </div>
     </div>
   );
-
-  if (sidebarData) {
-    return (
-      <CommunityLayout sidebarData={sidebarData}>
-        {brigadeContent}
-      </CommunityLayout>
-    );
-  }
-  return brigadeContent;
 }
