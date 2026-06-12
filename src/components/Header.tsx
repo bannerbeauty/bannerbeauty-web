@@ -36,7 +36,7 @@ export default function Header() {
 
   return (
     <>
-      <header style={{ background: '#1B2A4A', position: 'relative', zIndex: 100 }}>
+      <header style={{ background: '#1B2A4A', position: 'sticky', top: 0, zIndex: 100 }}>
         <div style={{
           maxWidth: 1200,
           margin: '0 auto',
