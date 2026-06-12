@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import CommunityLayout from '@/components/CommunityLayout';
 import FeedItemCard from '@/components/FeedItem';
@@ -50,6 +51,7 @@ export default function CommunityClient({
   recentBumps: _recentBumps,
   bannerOptionLabels: _bannerOptionLabels,
 }: Props) {
+  const pathname = usePathname();
   const [activeTab, setActiveTab] = useState<Tab>('all');
 
   const [feedItems, setFeedItems] = useState<(FeedItem & { relativeTime: string; bannerOptionLabel: string })[]>([]);
@@ -75,6 +77,7 @@ export default function CommunityClient({
         blitzIds,
       });
       if (before) params.set('before', before);
+      console.log('loadFeed params:', params.toString());
       const res = await fetch(`/api/feed?${params}`);
       const data = await res.json();
       setFeedItems(prev => before ? [...prev, ...data.items] : data.items);
@@ -91,11 +94,8 @@ export default function CommunityClient({
     setFeedItems([]);
     setFeedHasMore(true);
     loadFeed();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => {
-    loadFeed();
-  }, [loadFeed]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   useEffect(() => {
     if (!bottomRef.current) return;

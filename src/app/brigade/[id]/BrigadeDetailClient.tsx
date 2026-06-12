@@ -76,6 +76,7 @@ export default function BrigadeDetailClient({
         top: '20',
         neighborId: neighborId ?? '',
         brigadeIds: brigade.brigadeId,
+        filterByBrigade: 'true',
       });
       if (before) params.set('before', before);
       const res = await fetch(`/api/feed?${params}`);
