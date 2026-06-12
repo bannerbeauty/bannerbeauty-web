@@ -86,13 +86,15 @@ export default function CommunityLayout({ sidebarData, children, tabBar, hideAva
 
   // ── MOBILE ────────────────────────────────────────────────────────────────
   if (isMobile) {
+    const effectivePanelTop = hideAvatarBar ? HEADER_H : PANEL_TOP;
+
     return (
       <div style={{ background: '#FAF7F2', minHeight: '100vh', position: 'relative' }}>
 
         {/* Fixed left panel */}
         <div style={{
           position: 'fixed',
-          top: PANEL_TOP,
+          top: effectivePanelTop,
           left: 0,
           bottom: 0,
           width: '85%',
@@ -116,18 +118,7 @@ export default function CommunityLayout({ sidebarData, children, tabBar, hideAva
           }}>
             {tabBar}
           </div>
-        ) : hideAvatarBar ? (
-          /* 1px spacer — page has its own back nav, no panel toggle needed */
-          <div style={{
-            position: 'fixed',
-            top: HEADER_H,
-            left: 0,
-            right: 0,
-            height: 1,
-            background: '#1B2A4A',
-            zIndex: 90,
-          }} />
-        ) : (
+        ) : !hideAvatarBar && (
           /* Simple avatar bar for non-feed pages */
           <div style={{
             position: 'fixed',
@@ -163,7 +154,7 @@ export default function CommunityLayout({ sidebarData, children, tabBar, hideAva
             onTouchEnd={handleCaptureTouchEnd}
             style={{
               position: 'fixed',
-              top: PANEL_TOP,
+              top: effectivePanelTop,
               left: '85%',
               right: 0,
               bottom: 0,
@@ -179,7 +170,7 @@ export default function CommunityLayout({ sidebarData, children, tabBar, hideAva
           onTouchEnd={handleFeedTouchEnd}
           style={{
             position: 'fixed',
-            top: PANEL_TOP,
+            top: effectivePanelTop,
             left: 0,
             right: 0,
             bottom: 0,
@@ -200,6 +191,9 @@ export default function CommunityLayout({ sidebarData, children, tabBar, hideAva
   }
 
   // ── DESKTOP ───────────────────────────────────────────────────────────────
+  const stickyTop = tabBar ? HEADER_H + TAB_BAR_H : HEADER_H;
+  const stickyTopOffset = stickyTop + 12;
+
   return (
     <div style={{ background: '#FAF7F2', minHeight: '100vh' }}>
       {tabBar && (
@@ -211,7 +205,7 @@ export default function CommunityLayout({ sidebarData, children, tabBar, hideAva
       )}
       <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: threeColumn ? '260px 1fr 280px' : '260px 1fr', gap: 24 }}>
         {/* Left sidebar */}
-        <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', marginTop: 24, position: 'sticky', top: 128, alignSelf: 'start', maxHeight: 'calc(100vh - 128px)', overflowY: 'auto' }}>
+        <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', marginTop: 24, position: 'sticky', top: stickyTopOffset, alignSelf: 'start', maxHeight: `calc(100vh - ${stickyTopOffset}px)`, overflowY: 'auto' }}>
           <CommunitySidebar data={sidebarData} />
         </div>
         {/* Main content */}
@@ -220,7 +214,7 @@ export default function CommunityLayout({ sidebarData, children, tabBar, hideAva
         </div>
         {/* Right panel (three-column layout) */}
         {threeColumn && rightPanel && (
-          <div style={{ paddingTop: 24, position: 'sticky', top: 128, alignSelf: 'start', maxHeight: 'calc(100vh - 128px)', overflowY: 'auto' }}>
+          <div style={{ marginTop: 24, position: 'sticky', top: stickyTopOffset, alignSelf: 'start', maxHeight: `calc(100vh - ${stickyTopOffset}px)`, overflowY: 'auto' }}>
             {rightPanel}
           </div>
         )}
