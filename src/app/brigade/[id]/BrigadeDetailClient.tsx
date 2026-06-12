@@ -1,8 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import CommunityLayout from '@/components/CommunityLayout';
+import FeedItemCard from '@/components/FeedItem';
+import type { FeedItem } from '@/app/api/feed/route';
 import type { SidebarData } from '@/lib/community-sidebar';
 import type { BrigadeDetail, BrigadeMember, BrigadeBlitz, BrigadeBump } from './page';
 
@@ -59,6 +61,52 @@ export default function BrigadeDetailClient({
     return () => window.removeEventListener('resize', check);
   }, []);
 
+  const [feedItems, setFeedItems] = useState<(FeedItem & { relativeTime: string; bannerOptionLabel: string })[]>([]);
+  const [feedLoading, setFeedLoading] = useState(true);
+  const [feedHasMore, setFeedHasMore] = useState(true);
+  const loadingRef = useRef(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const loadFeed = useCallback(async (before?: string) => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+    setFeedLoading(true);
+    try {
+      const params = new URLSearchParams({
+        top: '20',
+        neighborId: neighborId ?? '',
+        brigadeIds: brigade.brigadeId,
+      });
+      if (before) params.set('before', before);
+      const res = await fetch(`/api/feed?${params}`);
+      const data = await res.json();
+      setFeedItems(prev => before ? [...prev, ...data.items] : data.items);
+      setFeedHasMore(data.hasMore);
+    } catch {
+      console.error('Brigade feed load failed');
+    } finally {
+      setFeedLoading(false);
+      loadingRef.current = false;
+    }
+  }, [brigade.brigadeId, neighborId]);
+
+  useEffect(() => { loadFeed(); }, [loadFeed]);
+
+  useEffect(() => {
+    if (!bottomRef.current) return;
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && feedHasMore && !loadingRef.current) {
+          const lastItem = feedItems[feedItems.length - 1];
+          if (lastItem) loadFeed(lastItem.createdOn);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(bottomRef.current);
+    return () => observer.disconnect();
+  }, [feedItems, feedHasMore, loadFeed]);
+
   const isOwner = neighborId === brigade.ownerNeighborId;
   const isAdmin = membershipStatus?.isAdmin ?? false;
   const isMember = membershipStatus?.statuscode === 121120001;
@@ -91,18 +139,6 @@ export default function BrigadeDetailClient({
   const brigadeContent = (
     <div style={{ background: '#FFFFFF', minHeight: '80vh' }}>
 
-      {/* Back link */}
-      <div style={{ padding: '12px 20px', background: '#FFFFFF' }}>
-        <Link href="/brigades" style={{
-          fontFamily: 'Trebuchet MS, sans-serif',
-          fontSize: '0.82rem',
-          color: '#888888',
-          textDecoration: 'none',
-        }}>
-          ← All Brigades
-        </Link>
-      </div>
-
       {/* Banner image — full width, cropped */}
       <div style={{ position: 'relative', width: '100%', height: 200, background: '#1B2A4A', overflow: 'hidden' }}>
         {brigade.imageUrl ? (
@@ -115,16 +151,16 @@ export default function BrigadeDetailClient({
 
       {/* Profile section */}
       <div style={{ padding: '0 20px', background: '#FFFFFF' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: -40, marginBottom: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginTop: -40, marginBottom: 12 }}>
           {/* Profile image — overlaps banner */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={brigade.profileImageUrl || getDefaultAvatar(brigade.brigadeId)}
             alt={brigade.name}
-            style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '4px solid #FFFFFF', flexShrink: 0 }}
+            style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '4px solid #FFFFFF', flexShrink: 0, position: 'relative', zIndex: 2 }}
           />
           {/* Action button */}
-          <div style={{ marginBottom: 4 }}>
+          <div style={{ marginTop: 20, alignSelf: 'flex-end' }}>
             {isOwner || isAdmin ? (
               <div style={{ display: 'flex', gap: 8 }}>
                 <Link
@@ -289,27 +325,25 @@ export default function BrigadeDetailClient({
         {/* Bumps tab */}
         {activeTab === 'bumps' && (
           <div>
-            {recentBumps.length === 0 ? (
+            {feedItems.length === 0 && !feedLoading && (
               <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#AAAAAA', textAlign: 'center', padding: '40px 0' }}>
                 No Banner Bumps yet. Be the first!
               </p>
-            ) : (
-              recentBumps.map(bump => (
-                <div key={bump.bannerId} style={{ padding: '14px 0', borderBottom: '1px solid #F5F5F5', display: 'flex', justifyContent: 'space-between' }}>
-                  <div>
-                    <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#333333' }}>
-                      {bannerOptionLabels[bump.bannerOption] ?? 'Letter'} · {bump.recipientCity}, {bump.recipientState}
-                    </div>
-                    <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#AAAAAA', marginTop: 2 }}>
-                      {bump.bannerNumber}
-                    </div>
-                  </div>
-                  <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#AAAAAA', flexShrink: 0 }}>
-                    {formatDate(bump.createdOn)}
-                  </div>
-                </div>
-              ))
             )}
+            {feedItems.map(item => (
+              <FeedItemCard key={item.id} item={item} />
+            ))}
+            {feedLoading && (
+              <div style={{ textAlign: 'center', padding: '20px', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#AAAAAA' }}>
+                Loading...
+              </div>
+            )}
+            {!feedHasMore && feedItems.length > 0 && (
+              <div style={{ textAlign: 'center', padding: '20px', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#AAAAAA' }}>
+                ★ All caught up! ★
+              </div>
+            )}
+            <div ref={bottomRef} style={{ height: 1 }} />
           </div>
         )}
 

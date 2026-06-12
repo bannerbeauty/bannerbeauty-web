@@ -78,6 +78,9 @@ export async function GET(req: NextRequest) {
     // Build filter
     let filter = 'statecode eq 0 and statuscode ne 121120002';
     if (before) filter += ` and createdon lt ${before}`;
+    if (brigadeIds.length > 0) {
+      filter += ` and (${brigadeIds.map(id => `_bb_brigade_value eq '${id}'`).join(' or ')})`;
+    }
 
     // Fetch banners — get enough to expand into multiple feed items
     const bannersRes = await dataverse.get<{ value: any[] }>(
