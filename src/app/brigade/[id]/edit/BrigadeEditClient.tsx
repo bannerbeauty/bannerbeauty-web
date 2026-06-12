@@ -3,8 +3,23 @@
 import { useState, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { APIProvider } from '@vis.gl/react-google-maps';
 import CommunityLayout from '@/components/CommunityLayout';
+import CityAutocomplete from '@/components/CityAutocomplete';
 import type { SidebarData } from '@/lib/community-sidebar';
+
+const DEFAULT_AVATARS = [
+  'https://bannerbeautystorage.blob.core.windows.net/profile-images/default-eagle.png',
+  'https://bannerbeautystorage.blob.core.windows.net/profile-images/default-star.png',
+  'https://bannerbeautystorage.blob.core.windows.net/profile-images/default-house.png',
+  'https://bannerbeautystorage.blob.core.windows.net/profile-images/default-medal.png',
+  'https://bannerbeautystorage.blob.core.windows.net/profile-images/default-shield.png',
+  'https://bannerbeautystorage.blob.core.windows.net/profile-images/default-silhouette.png',
+];
+
+function getDefaultAvatar(id: string): string {
+  return DEFAULT_AVATARS[(id?.charCodeAt(0) ?? 0) % DEFAULT_AVATARS.length];
+}
 
 const BRIGADE_TYPES = [
   { label: 'Law Enforcement', value: 121120000 },
@@ -190,6 +205,7 @@ export default function BrigadeEditClient({ brigade, sidebarData }: Props) {
   };
 
   const editContent = (
+    <APIProvider apiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!} libraries={['places']}>
     <div style={{ background: '#FAF7F2', minHeight: '80vh', padding: '40px 24px 80px' }}>
       <div style={{ maxWidth: 680, margin: '0 auto' }}>
 
@@ -209,7 +225,7 @@ export default function BrigadeEditClient({ brigade, sidebarData }: Props) {
             <label style={labelStyle}>Profile Image</label>
             <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 8 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={profileImageUrl || ''} alt="Profile" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid #C5A028' }} />
+              <img src={profileImageUrl || getDefaultAvatar(brigade.brigadeId)} alt="Profile" style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid #C5A028' }} />
               <div>
                 <input ref={profileImageRef} type="file" accept="image/*" onChange={handleProfileImageChange} style={{ display: 'none' }} />
                 <button onClick={() => profileImageRef.current?.click()} disabled={profileUploading}
@@ -295,7 +311,15 @@ export default function BrigadeEditClient({ brigade, sidebarData }: Props) {
           {showCity && (
             <div style={fieldStyle}>
               <label style={labelStyle}>City</label>
-              <input type="text" value={brigadeCity} onChange={e => setBrigadeCity(e.target.value)} style={inputStyle} />
+              <CityAutocomplete
+                value={brigadeCity}
+                onChange={setBrigadeCity}
+                onSelect={(data) => {
+                  setBrigadeCity(data.city);
+                  setBrigadeState(data.state);
+                }}
+                placeholder="Start typing a city..."
+              />
             </div>
           )}
 
@@ -320,6 +344,7 @@ export default function BrigadeEditClient({ brigade, sidebarData }: Props) {
         </div>
       </div>
     </div>
+    </APIProvider>
   );
 
   if (sidebarData) {
