@@ -2,14 +2,11 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import CommunityLayout from '@/components/CommunityLayout';
 import FeedItemCard from '@/components/FeedItem';
 import type { FeedItem } from '@/app/api/feed/route';
-import type {
-  CommunityBrigade,
-  CommunityBlitz,
-  CommunityBump,
-  NeighborProfile,
-} from './page';
+import type { SidebarData } from '@/lib/community-sidebar';
+import type { CommunityBump, NeighborProfile } from './page';
 
 const DEFAULT_AVATARS = [
   'https://bannerbeautystorage.blob.core.windows.net/profile-images/default-eagle.png',
@@ -40,43 +37,20 @@ type Tab = 'all' | 'brigades' | 'blitzes';
 
 interface Props {
   neighbor: NeighborProfile;
-  myBrigades: CommunityBrigade[];
-  myBlitzes: CommunityBlitz[];
+  sidebarData: SidebarData;
   recentBumps: CommunityBump[];
-  suggestedBrigades: CommunityBrigade[];
-  activeBlitzes: CommunityBlitz[];
   bannerOptionLabels: Record<number, string>;
 }
 
-const sectionLabelStyle: React.CSSProperties = {
-  fontFamily: 'Trebuchet MS, sans-serif',
-  fontSize: '0.72rem',
-  letterSpacing: '2px',
-  textTransform: 'uppercase',
-  color: '#B22234',
-  marginBottom: 12,
-  fontWeight: 700,
-};
-
-const HEADER_H = 64;
 const TAB_BAR_H = 52;
-const PANEL_TOP = HEADER_H + TAB_BAR_H;
 
 export default function CommunityClient({
-  neighbor,
-  myBrigades,
-  myBlitzes,
-  recentBumps,
-  suggestedBrigades,
-  activeBlitzes,
-  bannerOptionLabels,
+  neighbor: _neighbor,
+  sidebarData,
+  recentBumps: _recentBumps,
+  bannerOptionLabels: _bannerOptionLabels,
 }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>('all');
-  const [panelOpen, setPanelOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const touchStartX = useRef(0);
-  const touchStartY = useRef(0);
-  const captureDivRef = useRef<HTMLDivElement>(null);
 
   const [feedItems, setFeedItems] = useState<(FeedItem & { relativeTime: string; bannerOptionLabel: string })[]>([]);
   const [feedLoading, setFeedLoading] = useState(true);
@@ -85,60 +59,8 @@ export default function CommunityClient({
   const loadingRef = useRef(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    document.body.classList.add('hide-footer');
-    return () => document.body.classList.remove('hide-footer');
-  }, []);
-
-  useEffect(() => {
-    const check = () => setIsMobile(window.innerWidth <= 768);
-    check();
-    window.addEventListener('resize', check);
-    return () => window.removeEventListener('resize', check);
-  }, []);
-
-  useEffect(() => {
-    if (panelOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
-  }, [panelOpen]);
-
-  const handleCaptureTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleCaptureTouchEnd = (e: React.TouchEvent) => {
-    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-    const deltaY = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
-    if (deltaY > 30) return;
-    if (deltaX < -50) setPanelOpen(false);
-  };
-
-  useEffect(() => {
-    if (!panelOpen) return;
-    const el = captureDivRef.current;
-    if (!el) return;
-    const handler = (e: TouchEvent) => e.preventDefault();
-    el.addEventListener('touchmove', handler, { passive: false });
-    return () => el.removeEventListener('touchmove', handler);
-  }, [panelOpen]);
-
-  const handleFeedTouchStart = (e: React.TouchEvent) => {
-    touchStartX.current = e.touches[0].clientX;
-    touchStartY.current = e.touches[0].clientY;
-  };
-
-  const handleFeedTouchEnd = (e: React.TouchEvent) => {
-    if (panelOpen) return; // capture div handles this
-    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-    const deltaY = Math.abs(e.changedTouches[0].clientY - touchStartY.current);
-    if (deltaY > 30) return;
-    if (deltaX > 50) setPanelOpen(true);
-  };
+  const brigadeIds = sidebarData.myBrigades.map(b => b.brigadeId).join(',');
+  const blitzIds = sidebarData.myBlitzes.map(b => b.blitzId).join(',');
 
   const loadFeed = useCallback(async (before?: string) => {
     if (loadingRef.current) return;
@@ -147,10 +69,10 @@ export default function CommunityClient({
     try {
       const params = new URLSearchParams({
         top: '20',
-        neighborId: neighbor.neighborId,
-        state: neighbor.state ?? '',
-        brigadeIds: myBrigades.map(b => b.brigadeId).join(','),
-        blitzIds: myBlitzes.map(b => b.blitzId).join(','),
+        neighborId: sidebarData.neighbor.neighborId,
+        state: sidebarData.neighbor.state ?? '',
+        brigadeIds,
+        blitzIds,
       });
       if (before) params.set('before', before);
       const res = await fetch(`/api/feed?${params}`);
@@ -163,7 +85,7 @@ export default function CommunityClient({
       setFeedLoading(false);
       loadingRef.current = false;
     }
-  }, [neighbor.neighborId, neighbor.state, myBrigades, myBlitzes]);
+  }, [sidebarData.neighbor.neighborId, sidebarData.neighbor.state, brigadeIds, blitzIds]);
 
   useEffect(() => {
     loadFeed();
@@ -186,15 +108,42 @@ export default function CommunityClient({
 
   const tabs: { key: Tab; label: string }[] = [
     { key: 'all', label: 'All Activity' },
-    { key: 'brigades', label: `Brigades (${myBrigades.length})` },
-    { key: 'blitzes', label: `Blitzes (${myBlitzes.length})` },
+    { key: 'brigades', label: `Brigades (${sidebarData.myBrigades.length})` },
+    { key: 'blitzes', label: `Blitzes (${sidebarData.myBlitzes.length})` },
   ];
+
+  const tabBar = (
+    <div style={{ display: 'flex', alignItems: 'center', height: TAB_BAR_H, background: '#1B2A4A', padding: '0 8px' }}>
+      {tabs.map(tab => (
+        <button
+          key={tab.key}
+          onClick={() => setActiveTab(tab.key)}
+          style={{
+            padding: '0 14px',
+            height: TAB_BAR_H,
+            background: 'none',
+            border: 'none',
+            borderBottom: activeTab === tab.key ? '3px solid #C5A028' : '3px solid transparent',
+            fontFamily: 'Trebuchet MS, sans-serif',
+            fontSize: '0.85rem',
+            fontWeight: activeTab === tab.key ? 700 : 400,
+            color: activeTab === tab.key ? '#C5A028' : 'rgba(255,255,255,0.6)',
+            cursor: 'pointer',
+            whiteSpace: 'nowrap',
+            flexShrink: 0,
+          }}
+        >
+          {tab.label}
+        </button>
+      ))}
+    </div>
+  );
 
   const feedContent = (
     <>
       {activeTab === 'all' && (
         <>
-          {myBrigades.length === 0 && (
+          {sidebarData.myBrigades.length === 0 && (
             <div style={{ background: '#1B2A4A', borderRadius: 8, padding: 28, marginBottom: 20, textAlign: 'center' }}>
               <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.1rem', fontWeight: 700, color: '#FFFFFF', margin: '0 0 8px' }}>
                 Welcome to the Community! 🇺🇸
@@ -237,16 +186,17 @@ export default function CommunityClient({
 
       {activeTab === 'brigades' && (
         <div>
-          {myBrigades.length === 0 ? (
+          {sidebarData.myBrigades.length === 0 ? (
             <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: '48px 24px', textAlign: 'center' }}>
               <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.95rem', color: '#888888', margin: '0 0 16px' }}>You haven&apos;t joined any Brigades yet.</p>
               <Link href="/brigades" style={{ display: 'inline-block', padding: '12px 24px', background: '#1B2A4A', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Georgia, serif', fontSize: '0.9rem', fontWeight: 700, textDecoration: 'none' }}>Find a Brigade</Link>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {myBrigades.map(brigade => (
+              {sidebarData.myBrigades.map(brigade => (
                 <Link key={brigade.brigadeId} href={`/brigade/${brigade.brigadeId}`} style={{ textDecoration: 'none' }}>
-                  <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }}
+                  <div
+                    style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: '16px 20px', display: 'flex', alignItems: 'center', gap: 16, cursor: 'pointer' }}
                     onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(27,42,74,0.1)'; }}
                     onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; }}
                   >
@@ -273,16 +223,17 @@ export default function CommunityClient({
 
       {activeTab === 'blitzes' && (
         <div>
-          {myBlitzes.length === 0 ? (
+          {sidebarData.myBlitzes.length === 0 ? (
             <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: '48px 24px', textAlign: 'center' }}>
               <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.95rem', color: '#888888', margin: '0 0 16px' }}>Your Brigades aren&apos;t participating in any Blitzes yet.</p>
               <Link href="/blitzes" style={{ display: 'inline-block', padding: '12px 24px', background: '#1B2A4A', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Georgia, serif', fontSize: '0.9rem', fontWeight: 700, textDecoration: 'none' }}>Browse Blitzes</Link>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {myBlitzes.map(blitz => (
+              {sidebarData.myBlitzes.map(blitz => (
                 <Link key={blitz.blitzId} href={`/blitz/${blitz.blitzId}`} style={{ textDecoration: 'none' }}>
-                  <div style={{ background: '#FFFFFF', borderRadius: 8, border: `1px solid ${blitz.statusCode === 121120001 ? '#1B7A3E' : '#EEEEEE'}`, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
+                  <div
+                    style={{ background: '#FFFFFF', borderRadius: 8, border: `1px solid ${blitz.statusCode === 121120001 ? '#1B7A3E' : '#EEEEEE'}`, padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}
                     onMouseEnter={e => { e.currentTarget.style.boxShadow = '0 4px 16px rgba(27,42,74,0.1)'; }}
                     onMouseLeave={e => { e.currentTarget.style.boxShadow = 'none'; }}
                   >
@@ -306,278 +257,11 @@ export default function CommunityClient({
     </>
   );
 
-  const leftPanelContents = (isMobile: boolean) => (
-    <div style={{ padding: isMobile ? '20px 16px 48px' : undefined }}>
-      {/* Profile card */}
-      <div style={{ textAlign: 'center', marginBottom: 20, paddingBottom: 16, borderBottom: '1px solid #EEEEEE' }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={neighbor.profileImageUrl || getDefaultAvatar(neighbor.neighborId)} alt="Profile" style={{ width: 64, height: 64, borderRadius: '50%', objectFit: 'cover', border: '3px solid #C5A028', marginBottom: 8 }} />
-        <div style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem', fontWeight: 700, color: '#1B2A4A' }}>
-          {neighbor.displayName || `${neighbor.firstName} ${neighbor.lastName}`.trim()}
-        </div>
-        {neighbor.handle && <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#888888', marginTop: 2 }}>@{neighbor.handle}</div>}
-        <div style={{ display: 'flex', justifyContent: 'center', gap: 24, marginTop: 12 }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontFamily: 'Georgia, serif', fontSize: '1.1rem', fontWeight: 700, color: '#1B2A4A' }}>{myBrigades.length}</div>
-            <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.65rem', color: '#888888', textTransform: 'uppercase', letterSpacing: '1px' }}>Brigades</div>
-          </div>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontFamily: 'Georgia, serif', fontSize: '1.1rem', fontWeight: 700, color: '#1B2A4A' }}>{myBlitzes.length}</div>
-            <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.65rem', color: '#888888', textTransform: 'uppercase', letterSpacing: '1px' }}>Blitzes</div>
-          </div>
-        </div>
-      </div>
-
-      {/* Action buttons */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 20 }}>
-        <Link href="/submit-banner" onClick={() => isMobile && setPanelOpen(false)} style={{ display: 'block', padding: '11px', background: '#B22234', borderRadius: 4, fontFamily: 'Georgia, serif', fontSize: '0.88rem', fontWeight: 700, color: '#FFFFFF', textDecoration: 'none', textAlign: 'center' }}>★ Banner Bump</Link>
-        <Link href="/store" onClick={() => isMobile && setPanelOpen(false)} style={{ display: 'block', padding: '9px', background: '#FAF7F2', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', color: '#1B2A4A', textDecoration: 'none', textAlign: 'center' }}>Visit Store</Link>
-        <Link href="/brigade/create" onClick={() => isMobile && setPanelOpen(false)} style={{ display: 'block', padding: '9px', background: '#FAF7F2', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', color: '#1B2A4A', textDecoration: 'none', textAlign: 'center' }}>Create a Brigade</Link>
-        <Link href="/profile" onClick={() => isMobile && setPanelOpen(false)} style={{ display: 'block', padding: '9px', background: '#FAF7F2', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', color: '#1B2A4A', textDecoration: 'none', textAlign: 'center' }}>Edit Profile</Link>
-      </div>
-
-      {/* My Brigades */}
-      {myBrigades.length > 0 && (
-        <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid #EEEEEE' }}>
-          <div style={sectionLabelStyle}>My Brigades</div>
-          {myBrigades.map(brigade => (
-            <Link key={brigade.brigadeId} href={`/brigade/${brigade.brigadeId}`} onClick={() => isMobile && setPanelOpen(false)} style={{ textDecoration: 'none' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={brigade.profileImageUrl || getDefaultAvatar(brigade.brigadeId)} alt={brigade.name} style={{ width: 32, height: 32, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', color: '#1B2A4A', fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{brigade.name}</div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {/* My Blitzes */}
-      {myBlitzes.length > 0 && (
-        <div style={{ marginBottom: 20, paddingBottom: 20, borderBottom: '1px solid #EEEEEE' }}>
-          <div style={sectionLabelStyle}>My Blitzes</div>
-          {myBlitzes.map(blitz => (
-            <Link key={blitz.blitzId} href={`/blitz/${blitz.blitzId}`} onClick={() => isMobile && setPanelOpen(false)} style={{ textDecoration: 'none' }}>
-              <div style={{ marginBottom: 10 }}>
-                <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', color: '#1B2A4A', fontWeight: 600 }}>{blitz.name}</div>
-                {blitz.statusCode === 121120001 && <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#B22234' }}>{daysRemaining(blitz.dateEnd)} days left</div>}
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {/* Suggested Brigades */}
-      {suggestedBrigades.length > 0 && (
-        <div style={{ marginBottom: 16 }}>
-          <div style={sectionLabelStyle}>★ Suggested Brigades</div>
-          {suggestedBrigades.map(brigade => (
-            <Link key={brigade.brigadeId} href={`/brigade/${brigade.brigadeId}`} onClick={() => isMobile && setPanelOpen(false)} style={{ textDecoration: 'none' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={brigade.profileImageUrl || getDefaultAvatar(brigade.brigadeId)} alt={brigade.name} style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', fontWeight: 700, color: '#1B2A4A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{brigade.name}</div>
-                  <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.7rem', color: '#888888' }}>{brigade.typeLabel}</div>
-                </div>
-              </div>
-            </Link>
-          ))}
-        </div>
-      )}
-
-      {/* Browse links */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-        <Link href="/brigades" onClick={() => isMobile && setPanelOpen(false)} style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#C5A028', textDecoration: 'none' }}>Browse all Brigades →</Link>
-        <Link href="/blitzes" onClick={() => isMobile && setPanelOpen(false)} style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#C5A028', textDecoration: 'none' }}>Browse all Blitzes →</Link>
-      </div>
-    </div>
-  );
-
-  const desktopRightPanel = (
-    <div>
-      {activeBlitzes.length > 0 && (
-        <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: 16, marginBottom: 16 }}>
-          <div style={sectionLabelStyle}>⚡ Active Blitzes</div>
-          {activeBlitzes.map(blitz => (
-            <Link key={blitz.blitzId} href={`/blitz/${blitz.blitzId}`} style={{ textDecoration: 'none' }}>
-              <div style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #F5F5F5' }}>
-                <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', fontWeight: 700, color: '#1B2A4A', marginBottom: 2 }}>{blitz.name}</div>
-                <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#B22234' }}>{daysRemaining(blitz.dateEnd)} days left</div>
-              </div>
-            </Link>
-          ))}
-          <Link href="/blitzes" style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#C5A028', textDecoration: 'none' }}>See all Blitzes →</Link>
-        </div>
-      )}
-      <div style={{ background: '#1B2A4A', borderRadius: 8, padding: 16 }}>
-        <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#C5A028', marginBottom: 12, fontWeight: 700 }}>Quick Actions</div>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-          <Link href="/submit-banner" style={{ display: 'block', padding: '10px 14px', background: '#B22234', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Georgia, serif', fontSize: '0.88rem', fontWeight: 700, textDecoration: 'none', textAlign: 'center' }}>★ Banner Bump</Link>
-          <Link href="/store" style={{ display: 'block', padding: '10px 14px', background: 'rgba(255,255,255,0.1)', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', textDecoration: 'none', textAlign: 'center' }}>Visit Store</Link>
-          <Link href="/brigade/create" style={{ display: 'block', padding: '10px 14px', background: 'rgba(255,255,255,0.1)', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', textDecoration: 'none', textAlign: 'center' }}>Create a Brigade</Link>
-        </div>
-      </div>
-    </div>
-  );
-
-  // ── MOBILE ──────────────────────────────────────────────────────────────────
-  if (isMobile) {
-    return (
-      <div style={{ background: '#FAF7F2', minHeight: '100vh', position: 'relative' }}>
-
-        {/* Fixed left panel — always rendered, sits behind feed */}
-        <div style={{
-          position: 'fixed',
-          top: PANEL_TOP,
-          left: 0,
-          bottom: 0,
-          width: '85%',
-          background: '#FFFFFF',
-          borderRight: '1px solid #EEEEEE',
-          overflowY: 'auto',
-          zIndex: 50,
-        }}>
-          {leftPanelContents(true)}
-        </div>
-
-        {/* Tab bar — fixed so it's never affected by feed transform */}
-        <div style={{
-          position: 'fixed',
-          top: HEADER_H,
-          left: 0,
-          right: 0,
-          height: TAB_BAR_H,
-          background: '#1B2A4A',
-          zIndex: 90,
-          display: 'flex',
-          alignItems: 'center',
-          padding: '0 8px',
-        }}>
-          {/* Avatar — taps to toggle panel */}
-          <button
-            onClick={() => setPanelOpen(v => !v)}
-            style={{ background: 'none', border: 'none', padding: '8px', cursor: 'pointer', flexShrink: 0 }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={neighbor.profileImageUrl || getDefaultAvatar(neighbor.neighborId)}
-              alt="Menu"
-              style={{ width: 34, height: 34, borderRadius: '50%', objectFit: 'cover', border: `2px solid ${panelOpen ? '#C5A028' : 'rgba(197,160,40,0.5)'}`, display: 'block' }}
-            />
-          </button>
-
-          {/* Scrollable tabs */}
-          <div style={{ display: 'flex', flex: 1, overflowX: 'auto', msOverflowStyle: 'none' as React.CSSProperties['msOverflowStyle'] }}>
-            {tabs.map(tab => (
-              <button
-                key={tab.key}
-                onClick={() => setActiveTab(tab.key)}
-                style={{
-                  padding: '0 14px',
-                  height: TAB_BAR_H,
-                  background: 'none',
-                  border: 'none',
-                  borderBottom: activeTab === tab.key ? '3px solid #C5A028' : '3px solid transparent',
-                  fontFamily: 'Trebuchet MS, sans-serif',
-                  fontSize: '0.8rem',
-                  fontWeight: activeTab === tab.key ? 700 : 400,
-                  color: activeTab === tab.key ? '#C5A028' : 'rgba(255,255,255,0.6)',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0,
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Touch capture overlay — covers only the visible 15% strip when panel open */}
-        {panelOpen && (
-          <div
-            ref={captureDivRef}
-            onTouchStart={handleCaptureTouchStart}
-            onTouchEnd={handleCaptureTouchEnd}
-            style={{
-              position: 'fixed',
-              top: PANEL_TOP,
-              left: '85%',
-              right: 0,
-              bottom: 0,
-              zIndex: 65,
-              background: 'transparent',
-            }}
-          />
-        )}
-
-        {/* Feed — fixed, slides right to reveal panel */}
-        <div
-          style={{
-            position: 'fixed',
-            top: PANEL_TOP,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            zIndex: 60,
-            transform: panelOpen ? 'translateX(85%)' : 'translateX(0)',
-            transition: 'transform 0.3s ease',
-            background: '#FAF7F2',
-            overflowY: panelOpen ? 'hidden' : 'auto',
-            boxShadow: '-8px 0 16px rgba(0,0,0,0.15)',
-          }}
-        >
-          <div
-            onTouchStart={handleFeedTouchStart}
-            onTouchEnd={handleFeedTouchEnd}
-            style={{
-              padding: '20px 16px 80px',
-              pointerEvents: panelOpen ? 'none' : 'auto',
-            }}
-          >
-            {feedContent}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // ── DESKTOP ─────────────────────────────────────────────────────────────────
   return (
-    <div style={{ background: '#FAF7F2', minHeight: '100vh' }}>
-      <div style={{ background: '#1B2A4A', padding: '0 24px' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', alignItems: 'center' }}>
-          {tabs.map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              style={{
-                padding: '14px 20px',
-                background: 'none',
-                border: 'none',
-                borderBottom: activeTab === tab.key ? '3px solid #C5A028' : '3px solid transparent',
-                fontFamily: 'Trebuchet MS, sans-serif',
-                fontSize: '0.85rem',
-                fontWeight: activeTab === tab.key ? 700 : 400,
-                color: activeTab === tab.key ? '#C5A028' : 'rgba(255,255,255,0.6)',
-                cursor: 'pointer',
-                transition: 'all 0.15s',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
+    <CommunityLayout sidebarData={sidebarData} tabBar={tabBar}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+        {feedContent}
       </div>
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '32px 24px 80px', display: 'grid', gridTemplateColumns: '260px 1fr 280px', gap: 24 }}>
-        <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: 20 }}>
-          {leftPanelContents(false)}
-        </div>
-        <div>{feedContent}</div>
-        {desktopRightPanel}
-      </div>
-    </div>
+    </CommunityLayout>
   );
 }

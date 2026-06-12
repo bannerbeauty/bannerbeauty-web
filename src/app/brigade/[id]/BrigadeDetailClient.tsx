@@ -2,6 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import CommunityLayout from '@/components/CommunityLayout';
+import type { SidebarData } from '@/lib/community-sidebar';
 import type { BrigadeDetail, BrigadeMember, BrigadeBlitz, BrigadeBump } from './page';
 
 const DEFAULT_AVATARS = [
@@ -31,6 +33,7 @@ interface Props {
   neighborId: string | null;
   bannerOptionLabels: Record<number, string>;
   pendingBrigades?: BrigadeMember[];
+  sidebarData: SidebarData | null;
 }
 
 export default function BrigadeDetailClient({
@@ -42,6 +45,7 @@ export default function BrigadeDetailClient({
   neighborId,
   bannerOptionLabels,
   pendingBrigades,
+  sidebarData,
 }: Props) {
   const [requestSent, setRequestSent] = useState(false);
   const [requesting, setRequesting] = useState(false);
@@ -84,7 +88,7 @@ export default function BrigadeDetailClient({
     ? brigade.countyNameFull
     : [brigade.brigadeCity, brigade.brigadeState, brigade.brigadeScopeDescription].filter(Boolean).join(', ');
 
-  return (
+  const brigadeContent = (
     <div style={{ background: '#FFFFFF', minHeight: '80vh' }}>
 
       {/* Back link */}
@@ -400,4 +404,13 @@ export default function BrigadeDetailClient({
       </div>
     </div>
   );
+
+  if (sidebarData) {
+    return (
+      <CommunityLayout sidebarData={sidebarData}>
+        {brigadeContent}
+      </CommunityLayout>
+    );
+  }
+  return brigadeContent;
 }

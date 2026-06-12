@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { dataverse } from '@/lib/dataverse';
+import { getSidebarData } from '@/lib/community-sidebar';
 import Link from 'next/link';
 import BrigadeDetailClient from './BrigadeDetailClient';
 
@@ -92,6 +93,8 @@ export default async function BrigadeDetailPage({
 
   const session = await auth();
   const userEmail = session?.user?.email ?? null;
+
+  const sidebarData = userEmail ? await getSidebarData(userEmail) : null;
 
   let neighborId: string | null = null;
   if (userEmail) {
@@ -231,6 +234,7 @@ export default async function BrigadeDetailPage({
       membershipStatus={membershipStatus}
       neighborId={neighborId}
       bannerOptionLabels={BANNER_OPTION_LABELS}
+      sidebarData={sidebarData}
     />
   );
 }
