@@ -18,14 +18,6 @@ export interface CommunityBrigade {
   typeLabel: string;
 }
 
-export interface CommunityBlitz {
-  blitzId: string;
-  name: string;
-  dateEnd: string;
-  statusCode: number;
-  brigadeCount: number;
-}
-
 export interface CommunityBump {
   bannerId: string;
   bannerNumber: string;
@@ -64,40 +56,19 @@ export default async function CommunityPage() {
   const sidebarData = await getSidebarData(userEmail);
   if (!sidebarData) redirect('/profile');
 
-  const neighborId = sidebarData.neighbor.neighborId;
-
   const neighbor: NeighborProfile = {
     ...sidebarData.neighbor,
     brigadeCount: sidebarData.myBrigades.length,
   };
 
   let recentBumps: CommunityBump[] = [];
-  let activeBlitzes: CommunityBlitz[] = [];
 
   try {
-    const [activeBlitzesRes, recentBumpsRes] = await Promise.all([
-      // Active blitzes
-      dataverse.get<{ value: any[] }>(
-        `bb_blitzs?$filter=statecode eq 0 and statuscode eq 121120001` +
-        `&$select=bb_blitzid,bb_name,bb_dateend,statuscode` +
-        `&$orderby=bb_dateend asc&$top=5`
-      ),
-      // Recent community bumps
-      dataverse.get<{ value: any[] }>(
-        `bb_banners?$filter=statuscode ne 121120002 and bb_isfeatureable eq true` +
-        `&$select=bb_bannerid,bb_bannernumber,bb_banneroption,bb_recipientcity,bb_recipientstate,createdon,_bb_brigade_value` +
-        `&$orderby=createdon desc&$top=20`
-      ),
-    ]);
-
-    // Active blitzes
-    activeBlitzes = (activeBlitzesRes.value ?? []).map((bl: any) => ({
-      blitzId: bl.bb_blitzid,
-      name: bl.bb_name,
-      dateEnd: bl.bb_dateend ?? '',
-      statusCode: bl.statuscode,
-      brigadeCount: 0,
-    }));
+    const recentBumpsRes = await dataverse.get<{ value: any[] }>(
+      `bb_banners?$filter=statuscode ne 121120002 and bb_isfeatureable eq true` +
+      `&$select=bb_bannerid,bb_bannernumber,bb_banneroption,bb_recipientcity,bb_recipientstate,createdon,_bb_brigade_value` +
+      `&$orderby=createdon desc&$top=20`
+    );
 
     // Recent bumps with brigade names
     const bumpBrigadeIds = [...new Set((recentBumpsRes.value ?? []).map((b: any) => b._bb_brigade_value).filter(Boolean))];
@@ -130,7 +101,6 @@ export default async function CommunityPage() {
       neighbor={neighbor}
       sidebarData={sidebarData}
       recentBumps={recentBumps}
-      activeBlitzes={activeBlitzes}
       bannerOptionLabels={BANNER_OPTION_LABELS}
     />
   );
