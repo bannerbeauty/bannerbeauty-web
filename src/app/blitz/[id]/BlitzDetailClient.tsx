@@ -152,17 +152,29 @@ export default function BlitzDetailClient({
       </div>
 
       {/* Profile section */}
-      <div style={{ padding: '0 20px', background: '#FFFFFF' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: -80, marginBottom: 12 }}>
-          {/* Organizer profile image */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={blitz.ownerProfileImageUrl || getDefaultAvatar(blitz.ownerNeighborId)}
-            alt="Organizer"
-            style={{ width: 160, height: 160, borderRadius: '50%', objectFit: 'cover', border: '6px solid #FFFFFF', flexShrink: 0, position: 'relative', zIndex: 2 }}
-          />
+      <div style={{ padding: '16px 20px 0', background: '#FFFFFF' }}>
+
+        {/* Name + status + action button */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12, marginBottom: 4 }}>
+          <div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+              <span style={{ fontFamily: 'Georgia, serif', fontSize: '1.2rem', fontWeight: 700, color: '#1B2A4A' }}>{blitz.name}</span>
+              <span style={{ background: blitz.statusColor, color: '#FFFFFF', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.7rem', fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>
+                {blitz.statusLabel}
+              </span>
+            </div>
+            <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', color: '#888888', marginTop: 2 }}>
+              {formatDate(blitz.dateStart)} — {formatDate(blitz.dateEnd)}
+              {' · '}Organized by {blitz.ownerFirstName} {blitz.ownerLastName}
+            </div>
+            {blitz.description && (
+              <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#444444', lineHeight: 1.6, margin: '8px 0' }}>
+                {blitz.description}
+              </p>
+            )}
+          </div>
           {/* Action button */}
-          <div style={{ alignSelf: 'flex-end', paddingBottom: 18 }}>
+          <div style={{ flexShrink: 0 }}>
             {isOwner ? (
               <span style={{ padding: '8px 16px', background: 'rgba(197,160,40,0.15)', color: '#C5A028', borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', fontWeight: 700, border: '1px solid #C5A028' }}>
                 ★ Organizer
@@ -191,25 +203,6 @@ export default function BlitzDetailClient({
               </span>
             ) : null}
           </div>
-        </div>
-
-        {/* Name + status */}
-        <div style={{ marginBottom: 4 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
-            <span style={{ fontFamily: 'Georgia, serif', fontSize: '1.2rem', fontWeight: 700, color: '#1B2A4A' }}>{blitz.name}</span>
-            <span style={{ background: blitz.statusColor, color: '#FFFFFF', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.7rem', fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>
-              {blitz.statusLabel}
-            </span>
-          </div>
-          <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', color: '#888888', marginTop: 2 }}>
-            {formatDate(blitz.dateStart)} — {formatDate(blitz.dateEnd)}
-            {' · '}Organized by {blitz.ownerFirstName} {blitz.ownerLastName}
-          </div>
-          {blitz.description && (
-            <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#444444', lineHeight: 1.6, margin: '8px 0' }}>
-              {blitz.description}
-            </p>
-          )}
         </div>
 
         {/* Stats */}
