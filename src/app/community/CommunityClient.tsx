@@ -1,7 +1,9 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import FeedItemCard from '@/components/FeedItem';
+import type { FeedItem } from '@/app/api/feed/route';
 import type {
   CommunityBrigade,
   CommunityBlitz,
@@ -76,6 +78,13 @@ export default function CommunityClient({
   const touchStartY = useRef(0);
   const captureDivRef = useRef<HTMLDivElement>(null);
 
+  const [feedItems, setFeedItems] = useState<(FeedItem & { relativeTime: string; bannerOptionLabel: string })[]>([]);
+  const [feedLoading, setFeedLoading] = useState(true);
+  const [feedHasMore, setFeedHasMore] = useState(true);
+  const [feedError, setFeedError] = useState(false);
+  const loadingRef = useRef(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     document.body.classList.add('hide-footer');
     return () => document.body.classList.remove('hide-footer');
@@ -131,6 +140,50 @@ export default function CommunityClient({
     if (deltaX > 50) setPanelOpen(true);
   };
 
+  const loadFeed = useCallback(async (before?: string) => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+    setFeedLoading(true);
+    try {
+      const params = new URLSearchParams({
+        top: '20',
+        neighborId: neighbor.neighborId,
+        state: neighbor.state ?? '',
+        brigadeIds: myBrigades.map(b => b.brigadeId).join(','),
+        blitzIds: myBlitzes.map(b => b.blitzId).join(','),
+      });
+      if (before) params.set('before', before);
+      const res = await fetch(`/api/feed?${params}`);
+      const data = await res.json();
+      setFeedItems(prev => before ? [...prev, ...data.items] : data.items);
+      setFeedHasMore(data.hasMore);
+    } catch {
+      setFeedError(true);
+    } finally {
+      setFeedLoading(false);
+      loadingRef.current = false;
+    }
+  }, [neighbor.neighborId, neighbor.state, myBrigades, myBlitzes]);
+
+  useEffect(() => {
+    loadFeed();
+  }, [loadFeed]);
+
+  useEffect(() => {
+    if (!bottomRef.current) return;
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && feedHasMore && !loadingRef.current) {
+          const lastItem = feedItems[feedItems.length - 1];
+          if (lastItem) loadFeed(lastItem.createdOn);
+        }
+      },
+      { threshold: 0.1 }
+    );
+    observer.observe(bottomRef.current);
+    return () => observer.disconnect();
+  }, [feedItems, feedHasMore, loadFeed]);
+
   const tabs: { key: Tab; label: string }[] = [
     { key: 'all', label: 'All Activity' },
     { key: 'brigades', label: `Brigades (${myBrigades.length})` },
@@ -155,27 +208,30 @@ export default function CommunityClient({
               </div>
             </div>
           )}
-          <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: 24, marginBottom: 20 }}>
-            <div style={sectionLabelStyle}>★ Recent Banner Bumps</div>
-            {recentBumps.length === 0 ? (
-              <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#AAAAAA', margin: 0 }}>No recent activity.</p>
-            ) : (
-              recentBumps.map(bump => (
-                <div key={bump.bannerId} style={{ padding: '12px 0', borderBottom: '1px solid #F5F5F5', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 12 }}>
-                  <div style={{ flex: 1 }}>
-                    <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#333333', marginBottom: 2 }}>
-                      {bannerOptionLabels[bump.bannerOption] ?? 'Letter'} sent to {bump.recipientCity}, {bump.recipientState}
-                    </div>
-                    <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#AAAAAA' }}>
-                      {bump.bannerNumber}
-                      {bump.brigadeName && <span style={{ marginLeft: 6, color: '#C5A028' }}>· {bump.brigadeName}</span>}
-                    </div>
-                  </div>
-                  <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#AAAAAA', flexShrink: 0 }}>{formatDate(bump.createdOn)}</div>
-                </div>
-              ))
-            )}
-          </div>
+
+          {feedItems.map(item => (
+            <FeedItemCard key={item.id} item={item} />
+          ))}
+
+          {feedLoading && (
+            <div style={{ textAlign: 'center', padding: '20px', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#AAAAAA' }}>
+              Loading...
+            </div>
+          )}
+
+          {!feedHasMore && feedItems.length > 0 && (
+            <div style={{ textAlign: 'center', padding: '20px', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#AAAAAA' }}>
+              ★ You&apos;re all caught up! ★
+            </div>
+          )}
+
+          {feedError && (
+            <div style={{ textAlign: 'center', padding: '20px', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#B22234' }}>
+              Failed to load feed. Please refresh.
+            </div>
+          )}
+
+          <div ref={bottomRef} style={{ height: 1 }} />
         </>
       )}
 

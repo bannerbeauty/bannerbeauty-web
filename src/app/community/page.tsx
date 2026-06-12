@@ -43,6 +43,7 @@ export interface NeighborProfile {
   handle: string;
   profileImageUrl: string;
   brigadeCount: number;
+  state: string;
 }
 
 const BRIGADE_TYPE_LABELS: Record<number, string> = {
@@ -89,6 +90,7 @@ export default async function CommunityPage() {
         handle: n.bb_handle ?? '',
         profileImageUrl: n.bb_profileimageurl ?? '',
         brigadeCount: 0,
+        state: n.bb_state ?? '',
       };
     }
   } catch (err) {
