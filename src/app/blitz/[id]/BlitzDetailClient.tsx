@@ -59,7 +59,7 @@ export default function BlitzDetailClient({
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState<'bumps' | 'brigades' | 'pending'>('bumps');
 
-  const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
+  const [feedItems, setFeedItems] = useState<(FeedItem & { relativeTime: string; bannerOptionLabel: string })[]>([]);
   const [feedLoading, setFeedLoading] = useState(false);
   const [feedHasMore, setFeedHasMore] = useState(true);
   const loadingRef = useRef(false);
