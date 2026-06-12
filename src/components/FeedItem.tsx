@@ -248,9 +248,32 @@ export default function FeedItemCard({ item }: Props) {
 
   // ── RN NOTE ─────────────────────────────────────────────────────────────────
   if (item.type === 'note_rn') {
+    const rnName = item.rnDisplayName || item.rnFirstName || 'A Grateful Patriot';
+    const rnAvatar = item.rnProfileImageUrl || getDefaultAvatar(item.rnNeighborId);
+    const rnHeader = (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={rnAvatar} alt={rnName} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #EEEEEE' }} />
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', fontWeight: 700, color: '#1B2A4A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 140 }}>
+            {rnName}
+          </span>
+          {item.rnIsVerified && <span style={{ color: '#C5A028', fontSize: '0.85rem', flexShrink: 0 }} title="Verified">✓</span>}
+          {item.rnHandle && (
+            <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#AAAAAA', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 100 }}>
+              @{item.rnHandle}
+            </span>
+          )}
+        </div>
+        <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#AAAAAA', flexShrink: 0, marginLeft: 'auto' }}>
+          {item.relativeTime}
+        </span>
+      </div>
+    );
+
     return (
       <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: '16px 20px', marginBottom: 12 }}>
-        {header}
+        {rnHeader}
         <p style={{
           fontFamily: 'Georgia, serif',
           fontSize: 'clamp(0.95rem, 2vw, 1.1rem)',

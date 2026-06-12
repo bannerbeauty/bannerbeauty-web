@@ -19,6 +19,11 @@ export interface FeedItem {
   isVerified: boolean;
   // RN data
   rnFirstName: string;
+  rnNeighborId: string;
+  rnDisplayName: string;
+  rnHandle: string;
+  rnProfileImageUrl: string;
+  rnIsVerified: boolean;
   // Dedication
   attributionType: number;
   attributionName: string;
@@ -79,7 +84,7 @@ export async function GET(req: NextRequest) {
       `bb_isfeatureable,bb_ispublicattribution,bb_ispublicnotein,bb_ispublicnotern,` +
       `bb_attributiontype,bb_attributionname,bb_attributiontext,` +
       `bb_notein,bb_notern,bb_sharename,bb_infirstname,bb_rnfirstname,` +
-      `_bb_initiatingneighbor_value,_bb_brigade_value,_bb_blitz_value,createdon` +
+      `_bb_initiatingneighbor_value,_bb_recipientneighbor_value,_bb_brigade_value,_bb_blitz_value,createdon` +
       `&$orderby=createdon desc&$top=50`
     );
 
@@ -87,11 +92,16 @@ export async function GET(req: NextRequest) {
 
     // Collect unique IDs for batch fetching
     const neighborIds = [...new Set(banners.map((b: any) => b._bb_initiatingneighbor_value).filter(Boolean))];
+    const rnNeighborIds = [...new Set(banners
+      .filter((b: any) => b.bb_ispublicnotern && b.bb_notern && b._bb_recipientneighbor_value)
+      .map((b: any) => b._bb_recipientneighbor_value)
+      .filter(Boolean)
+    )];
     const allBrigadeIds = [...new Set(banners.map((b: any) => b._bb_brigade_value).filter(Boolean))];
     const allBlitzIds = [...new Set(banners.map((b: any) => b._bb_blitz_value).filter(Boolean))];
 
-    // Batch fetch neighbors, brigades, blitzes
-    const [neighborsRes, brigadesRes, blitzesRes] = await Promise.all([
+    // Batch fetch neighbors, brigades, blitzes, RN neighbors
+    const [neighborsRes, brigadesRes, blitzesRes, rnNeighborsRes] = await Promise.all([
       neighborIds.length > 0
         ? dataverse.get<{ value: any[] }>(
             `bb_neighbors?$filter=${neighborIds.map(id => `bb_neighborid eq '${id}'`).join(' or ')}` +
@@ -110,11 +120,20 @@ export async function GET(req: NextRequest) {
             `&$select=bb_blitzid,bb_name`
           )
         : Promise.resolve({ value: [] }),
+      rnNeighborIds.length > 0
+        ? dataverse.get<{ value: any[] }>(
+            `bb_neighbors?$filter=${rnNeighborIds.map(id => `bb_neighborid eq '${id}'`).join(' or ')}` +
+            `&$select=bb_neighborid,bb_displayname,bb_handle,bb_profileimageurl,bb_isverified`
+          )
+        : Promise.resolve({ value: [] }),
     ]);
 
     // Build lookup maps
     const neighborMap = Object.fromEntries(
       (neighborsRes.value ?? []).map((n: any) => [n.bb_neighborid, n])
+    );
+    const rnNeighborMap = Object.fromEntries(
+      (rnNeighborsRes.value ?? []).map((n: any) => [n.bb_neighborid, n])
     );
     const brigadeMap = Object.fromEntries(
       (brigadesRes.value ?? []).map((b: any) => [b.bb_brigadeid, b])
@@ -143,6 +162,11 @@ export async function GET(req: NextRequest) {
         profileImageUrl: neighbor.bb_profileimageurl ?? '',
         isVerified: neighbor.bb_isverified ?? false,
         rnFirstName: b.bb_rnfirstname ?? '',
+        rnNeighborId: b._bb_recipientneighbor_value ?? '',
+        rnDisplayName: rnNeighborMap[b._bb_recipientneighbor_value]?.bb_displayname ?? '',
+        rnHandle: rnNeighborMap[b._bb_recipientneighbor_value]?.bb_handle ?? '',
+        rnProfileImageUrl: rnNeighborMap[b._bb_recipientneighbor_value]?.bb_profileimageurl ?? '',
+        rnIsVerified: rnNeighborMap[b._bb_recipientneighbor_value]?.bb_isverified ?? false,
         attributionType: b.bb_attributiontype ?? 0,
         attributionName: b.bb_attributionname ?? '',
         attributionText: b.bb_attributiontext ?? '',
