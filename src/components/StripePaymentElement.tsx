@@ -22,6 +22,7 @@ export default function StripePaymentElement({ clientSecret, onReady, onInit }: 
     if (!clientSecret || !containerRef.current) return;
 
     let active = true;
+    let pollInterval: ReturnType<typeof setInterval> | null = null;
 
     function init() {
       if (!active || !containerRef.current) return;
@@ -39,29 +40,36 @@ export default function StripePaymentElement({ clientSecret, onReady, onInit }: 
       onReady();
     }
 
-    const existing = document.querySelector('script[src="https://js.stripe.com/v3/"]');
-    if (existing) {
+    function waitForStripe() {
       // @ts-expect-error Stripe global
       if (window.Stripe) {
+        if (pollInterval) clearInterval(pollInterval);
         init();
-      } else {
-        existing.addEventListener('load', init);
-        return () => {
-          active = false;
-          existing.removeEventListener('load', init);
-          paymentElementRef.current?.destroy();
-          paymentElementRef.current = null;
-        };
+        return;
       }
+      pollInterval = setInterval(() => {
+        // @ts-expect-error Stripe global
+        if (window.Stripe) {
+          clearInterval(pollInterval!);
+          pollInterval = null;
+          if (active) init();
+        }
+      }, 100);
+    }
+
+    const existing = document.querySelector('script[src="https://js.stripe.com/v3/"]');
+    if (existing) {
+      waitForStripe();
     } else {
       const script = document.createElement('script');
       script.src = 'https://js.stripe.com/v3/';
-      script.onload = init;
+      script.onload = waitForStripe;
       document.head.appendChild(script);
     }
 
     return () => {
       active = false;
+      if (pollInterval) clearInterval(pollInterval);
       paymentElementRef.current?.destroy();
       paymentElementRef.current = null;
     };

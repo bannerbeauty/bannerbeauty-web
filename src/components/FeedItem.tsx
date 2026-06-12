@@ -133,9 +133,25 @@ export default function FeedItemCard({ item }: Props) {
 
   // ── BRIGADE BUMP ─────────────────────────────────────────────────────────────
   if (item.type === 'brigade_bump') {
+    const brigadeAvatar = item.brigadeProfileImageUrl || getDefaultAvatar(item.brigadeId);
+    const brigadeHeader = (
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={brigadeAvatar} alt={item.brigadeName} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #EEEEEE' }} />
+        <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+          <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', fontWeight: 700, color: '#1B2A4A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 140 }}>
+            {item.brigadeName}
+          </span>
+          {item.isVerified && <span style={{ color: '#C5A028', fontSize: '0.85rem', flexShrink: 0 }} title="Verified">✓</span>}
+        </div>
+        <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#AAAAAA', flexShrink: 0, marginLeft: 'auto' }}>
+          {item.relativeTime}
+        </span>
+      </div>
+    );
     return (
       <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #C5A028', padding: '16px 20px', marginBottom: 12 }}>
-        {header}
+        {brigadeHeader}
         <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#333333', marginBottom: 4 }}>
           <span style={{ color: '#C5A028', fontWeight: 700 }}>⚡ Blitz Bump</span> —{' '}
           <strong>{item.brigadeName}</strong> bumped a neighbor in{' '}
@@ -144,6 +160,11 @@ export default function FeedItemCard({ item }: Props) {
         <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#AAAAAA' }}>
           {item.blitzName && <span style={{ color: '#1B7A3E' }}>{item.blitzName}</span>}
         </div>
+        {item.blitzBumpCount > 0 && (
+          <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#1B7A3E', marginTop: 4 }}>
+            This is Bump #{item.blitzBumpCount} in {item.blitzName}
+          </div>
+        )}
       </div>
     );
   }

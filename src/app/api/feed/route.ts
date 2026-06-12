@@ -36,8 +36,10 @@ export interface FeedItem {
   // Brigade/Blitz
   brigadeId: string;
   brigadeName: string;
+  brigadeProfileImageUrl: string;
   blitzId: string;
   blitzName: string;
+  blitzBumpCount: number;
 }
 
 const BANNER_OPTION_LABELS: Record<number, string> = {
@@ -111,7 +113,7 @@ export async function GET(req: NextRequest) {
       allBrigadeIds.length > 0
         ? dataverse.get<{ value: any[] }>(
             `bb_brigades?$filter=${allBrigadeIds.map(id => `bb_brigadeid eq '${id}'`).join(' or ')}` +
-            `&$select=bb_brigadeid,bb_name,bb_isverified`
+            `&$select=bb_brigadeid,bb_name,bb_isverified,bb_profileimageurl`
           )
         : Promise.resolve({ value: [] }),
       allBlitzIds.length > 0
@@ -176,6 +178,7 @@ export async function GET(req: NextRequest) {
         inFirstName: b.bb_infirstname ?? '',
         brigadeId: b._bb_brigade_value ?? '',
         brigadeName: brigade.bb_name ?? '',
+        brigadeProfileImageUrl: brigade.bb_profileimageurl ?? '',
         blitzId: b._bb_blitz_value ?? '',
         blitzName: blitz.bb_name ?? '',
         createdOn: b.createdon ?? '',
@@ -234,6 +237,19 @@ export async function GET(req: NextRequest) {
         } as any);
       }
     }
+
+    // Compute blitz bump counts for brigade_bump cards
+    const blitzBumpCounts: Record<string, number> = {};
+    feedItems.forEach((item: any) => {
+      if ((item.type === 'bump' || item.type === 'brigade_bump') && item.blitzId) {
+        blitzBumpCounts[item.blitzId] = (blitzBumpCounts[item.blitzId] ?? 0) + 1;
+      }
+    });
+    feedItems.forEach((item: any) => {
+      if (item.type === 'brigade_bump') {
+        item.blitzBumpCount = blitzBumpCounts[item.blitzId] ?? 0;
+      }
+    });
 
     // Sort by tier then by date
     feedItems.sort((a: any, b: any) => {
