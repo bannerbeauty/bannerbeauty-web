@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -44,6 +44,16 @@ export default function BlitzCreateClient({ brigadeId, brigadeName, neighborId }
   const [dateEnd, setDateEnd] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImageFile(file);
+    setImagePreview(URL.createObjectURL(file));
+  };
 
   const handleSubmit = async () => {
     if (!name.trim()) { setError('Blitz name is required.'); return; }
@@ -55,6 +65,18 @@ export default function BlitzCreateClient({ brigadeId, brigadeName, neighborId }
     setError('');
 
     try {
+      let imageUrl = '';
+      if (imageFile) {
+        const uploadRes = await fetch('/api/brigade/upload-image', {
+          method: 'POST',
+          headers: { 'Content-Type': imageFile.type },
+          body: imageFile,
+        });
+        const uploadData = await uploadRes.json();
+        if (!uploadRes.ok) throw new Error(uploadData.error ?? 'Image upload failed');
+        imageUrl = uploadData.url;
+      }
+
       const res = await fetch('/api/flows/create-blitz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -65,6 +87,7 @@ export default function BlitzCreateClient({ brigadeId, brigadeName, neighborId }
           dateEnd,
           brigadeId,
           ownerNeighborId: neighborId,
+          imageUrl,
         }),
       });
 
@@ -190,6 +213,34 @@ export default function BlitzCreateClient({ brigadeId, brigadeName, neighborId }
             color: '#555555',
           }}>
             <strong style={{ color: '#1B2A4A' }}>Creating Brigade:</strong> {brigadeName} — this Brigade will be automatically enrolled in the Blitz. Other Brigades can request to join.
+          </div>
+
+          {/* Image Upload */}
+          <div style={fieldStyle}>
+            <label style={labelStyle}>Blitz Image (optional)</label>
+            {imagePreview && (
+              <div style={{ marginBottom: 12 }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={imagePreview} alt="Preview" style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: '1px solid #EEEEEE' }} />
+              </div>
+            )}
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} style={{ display: 'none' }} />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              style={{
+                padding: '10px 20px',
+                background: '#FFFFFF',
+                border: '1.5px solid #1B2A4A',
+                borderRadius: 4,
+                fontFamily: 'Trebuchet MS, sans-serif',
+                fontSize: '0.85rem',
+                fontWeight: 700,
+                color: '#1B2A4A',
+                cursor: 'pointer',
+              }}
+            >
+              {imageFile ? '📷 Change Image' : '📷 Upload Image'}
+            </button>
           </div>
 
           {/* Error */}
