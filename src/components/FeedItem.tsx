@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import type { FeedItem } from '@/app/api/feed/route';
 
 const DEFAULT_AVATARS = [
@@ -49,19 +50,15 @@ export default function FeedItemCard({ item }: Props) {
       marginBottom: 10,
     }}>
       {/* Avatar */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={avatar}
-        alt={name}
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: '50%',
-          objectFit: 'cover',
-          flexShrink: 0,
-          border: '2px solid #EEEEEE',
-        }}
-      />
+      {item.neighborId ? (
+        <Link href={`/profile/${item.neighborId}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={avatar} alt={name} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #EEEEEE', display: 'block' }} />
+        </Link>
+      ) : (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={avatar} alt={name} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #EEEEEE' }} />
+      )}
 
       {/* Name + handle + time */}
       <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
@@ -124,7 +121,11 @@ export default function FeedItemCard({ item }: Props) {
         </div>
         <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#AAAAAA' }}>
           {item.bannerOptionLabel}
-          {item.brigadeName && <span style={{ marginLeft: 6, color: '#C5A028' }}>· {item.brigadeName}</span>}
+          {item.brigadeName && item.brigadeId && (
+            <Link href={`/brigade/${item.brigadeId}`} style={{ color: '#C5A028', textDecoration: 'none', marginLeft: 6 }}>
+              · {item.brigadeName}
+            </Link>
+          )}
           {item.blitzName && <span style={{ marginLeft: 6, color: '#1B7A3E' }}>· {item.blitzName}</span>}
         </div>
       </div>
@@ -136,12 +137,14 @@ export default function FeedItemCard({ item }: Props) {
     const brigadeAvatar = item.brigadeProfileImageUrl || getDefaultAvatar(item.brigadeId);
     const brigadeHeader = (
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={brigadeAvatar} alt={item.brigadeName} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #EEEEEE' }} />
+        <Link href={`/brigade/${item.brigadeId}`}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={brigadeAvatar} alt={item.brigadeName} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #EEEEEE', display: 'block' }} />
+        </Link>
         <div style={{ flex: 1, minWidth: 0, display: 'flex', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
-          <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', fontWeight: 700, color: '#1B2A4A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 140 }}>
+          <Link href={`/brigade/${item.brigadeId}`} style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', fontWeight: 700, color: '#1B2A4A', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 140, textDecoration: 'none' }}>
             {item.brigadeName}
-          </span>
+          </Link>
           {item.isVerified && <span style={{ color: '#C5A028', fontSize: '0.85rem', flexShrink: 0 }} title="Verified">✓</span>}
         </div>
         <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#AAAAAA', flexShrink: 0, marginLeft: 'auto' }}>
@@ -157,12 +160,12 @@ export default function FeedItemCard({ item }: Props) {
           <strong>{item.brigadeName}</strong> bumped a neighbor in{' '}
           <strong>{item.recipientCity}, {item.recipientState}</strong>
         </div>
-        <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#AAAAAA' }}>
-          {item.blitzName && <span style={{ color: '#1B7A3E' }}>{item.blitzName}</span>}
-        </div>
-        {item.blitzBumpCount > 0 && (
-          <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#1B7A3E', marginTop: 4 }}>
-            This is Bump #{item.blitzBumpCount} in {item.blitzName}
+        {item.blitzBumpCount > 0 && item.blitzId && (
+          <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', marginTop: 4 }}>
+            <span style={{ color: '#333333' }}>This is Bump #{item.blitzBumpCount} in </span>
+            <Link href={`/blitz/${item.blitzId}`} style={{ color: '#1B7A3E', textDecoration: 'none', fontWeight: 700 }}>
+              {item.blitzName}
+            </Link>
           </div>
         )}
       </div>
