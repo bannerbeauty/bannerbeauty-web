@@ -176,9 +176,23 @@ export default function BlitzDetailClient({
           {/* Action button */}
           <div style={{ flexShrink: 0 }}>
             {isOwner ? (
-              <span style={{ padding: '8px 16px', background: 'rgba(197,160,40,0.15)', color: '#C5A028', borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', fontWeight: 700, border: '1px solid #C5A028' }}>
-                ★ Organizer
-              </span>
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ padding: '8px 16px', background: 'rgba(197,160,40,0.15)', color: '#C5A028', borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', fontWeight: 700, border: '1px solid #C5A028' }}>
+                  ★ Organizer
+                </span>
+                <Link
+                  href={`/blitz/${blitz.blitzId}/edit`}
+                  style={{
+                    display: 'inline-block', padding: '8px 16px',
+                    background: 'transparent', color: '#1B2A4A',
+                    borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif',
+                    fontSize: '0.82rem', fontWeight: 700, textDecoration: 'none',
+                    border: '1px solid #CCCCCC', marginLeft: 8,
+                  }}
+                >
+                  Edit
+                </Link>
+              </div>
             ) : eligibleBrigades.length > 0 && !requestSent ? (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <select
