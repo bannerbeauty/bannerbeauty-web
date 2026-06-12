@@ -13,9 +13,11 @@ interface Props {
   children: React.ReactNode;
   // Optional tab bar for pages that need it (community feed)
   tabBar?: React.ReactNode;
+  // Suppress the avatar panel-toggle bar on mobile (e.g. brigade detail has its own back nav)
+  hideAvatarBar?: boolean;
 }
 
-export default function CommunityLayout({ sidebarData, children, tabBar }: Props) {
+export default function CommunityLayout({ sidebarData, children, tabBar, hideAvatarBar }: Props) {
   const [panelOpen, setPanelOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const touchStartX = useRef(0);
@@ -111,6 +113,17 @@ export default function CommunityLayout({ sidebarData, children, tabBar }: Props
           }}>
             {tabBar}
           </div>
+        ) : hideAvatarBar ? (
+          /* Plain navy spacer — no panel toggle, page has its own nav */
+          <div style={{
+            position: 'fixed',
+            top: HEADER_H,
+            left: 0,
+            right: 0,
+            height: TAB_BAR_H,
+            background: '#1B2A4A',
+            zIndex: 90,
+          }} />
         ) : (
           /* Simple avatar bar for non-feed pages */
           <div style={{
