@@ -1,8 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
+import CommunityLayout from '@/components/CommunityLayout';
+import FeedItemCard from '@/components/FeedItem';
+import type { FeedItem } from '@/app/api/feed/route';
 import type { BlitzDetail, BlitzBrigadeItem, BlitzBump, UserBrigade } from './page';
+import type { SidebarData } from '@/lib/community-sidebar';
 
 const DEFAULT_AVATARS = [
   'https://bannerbeautystorage.blob.core.windows.net/profile-images/default-eagle.png',
@@ -22,15 +26,11 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
-const sectionLabelStyle: React.CSSProperties = {
-  fontFamily: 'Trebuchet MS, sans-serif',
-  fontSize: '0.72rem',
-  letterSpacing: '2px',
-  textTransform: 'uppercase',
-  color: '#B22234',
-  marginBottom: 16,
-  fontWeight: 700,
-};
+function daysRemaining(dateEnd: string): number {
+  if (!dateEnd) return 0;
+  const diff = new Date(dateEnd).getTime() - Date.now();
+  return Math.max(0, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+}
 
 interface Props {
   blitz: BlitzDetail;
@@ -40,6 +40,7 @@ interface Props {
   userBrigades: UserBrigade[];
   neighborId: string | null;
   bannerOptionLabels: Record<number, string>;
+  sidebarData: SidebarData | null;
 }
 
 export default function BlitzDetailClient({
@@ -50,18 +51,68 @@ export default function BlitzDetailClient({
   userBrigades,
   neighborId,
   bannerOptionLabels,
+  sidebarData,
 }: Props) {
   const [selectedBrigadeId, setSelectedBrigadeId] = useState('');
   const [requesting, setRequesting] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [error, setError] = useState('');
+  const [activeTab, setActiveTab] = useState<'bumps' | 'brigades' | 'pending'>('bumps');
+
+  const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
+  const [feedLoading, setFeedLoading] = useState(false);
+  const [feedHasMore, setFeedHasMore] = useState(true);
+  const loadingRef = useRef(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
 
   const isOwner = neighborId === blitz.ownerNeighborId;
 
-  // Which of user's brigades are already participating or pending
   const participatingIds = new Set(participatingBrigades.map(b => b.brigadeId));
   const pendingIds = new Set(pendingBrigades.map(b => b.brigadeId));
   const eligibleBrigades = userBrigades.filter(b => !participatingIds.has(b.brigadeId) && !pendingIds.has(b.brigadeId));
+
+  const loadFeed = useCallback(async (before?: string) => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+    setFeedLoading(true);
+    try {
+      const params = new URLSearchParams({
+        top: '20',
+        neighborId: neighborId ?? '',
+        blitzIds: blitz.blitzId,
+        filterByBrigade: 'true',
+      });
+      if (before) params.set('before', before);
+      const res = await fetch(`/api/feed?${params}`);
+      const data = await res.json();
+      setFeedItems(prev => before ? [...prev, ...data.items] : data.items);
+      setFeedHasMore(data.hasMore);
+    } catch {
+      console.error('Blitz feed load failed');
+    } finally {
+      setFeedLoading(false);
+      loadingRef.current = false;
+    }
+  }, [blitz.blitzId, neighborId]);
+
+  useEffect(() => {
+    setFeedItems([]);
+    setFeedHasMore(true);
+    loadFeed();
+  }, []);
+
+  useEffect(() => {
+    const el = bottomRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && feedHasMore && !loadingRef.current) {
+        const last = feedItems[feedItems.length - 1];
+        if (last) loadFeed(last.createdOn);
+      }
+    }, { threshold: 0.1 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [feedItems, feedHasMore, loadFeed]);
 
   const handleJoinRequest = async () => {
     if (!selectedBrigadeId) { setError('Please select a Brigade.'); return; }
@@ -71,10 +122,7 @@ export default function BlitzDetailClient({
       await fetch('/api/flows/blitz-join-request', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          blitzId: blitz.blitzId,
-          brigadeId: selectedBrigadeId,
-        }),
+        body: JSON.stringify({ blitzId: blitz.blitzId, brigadeId: selectedBrigadeId }),
       });
       setRequestSent(true);
     } catch {
@@ -84,386 +132,208 @@ export default function BlitzDetailClient({
     }
   };
 
-  console.log('participatingIds:', Array.from(participatingIds));
-  console.log('userBrigades:', userBrigades.map(b => b.brigadeId));
-  console.log('eligibleBrigades:', eligibleBrigades.map(b => b.brigadeId));
+  const blitzContent = (
+    <div style={{ background: '#FFFFFF', minHeight: '80vh' }}>
 
-  return (
-    <div style={{ background: '#FAF7F2', minHeight: '80vh' }}>
+      {/* Banner image */}
+      <div style={{ position: 'relative', width: '100%', height: 200, background: '#1B2A4A', overflow: 'hidden' }}>
+        {blitz.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={blitz.imageUrl} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+        ) : (
+          <div style={{ width: '100%', height: '100%', background: 'linear-gradient(135deg, #1B2A4A 0%, #2d4a7a 100%)' }} />
+        )}
+        <Link href="/community" style={{
+          position: 'absolute', top: 12, left: 12, zIndex: 10,
+          background: 'rgba(197,160,40,0.75)', borderRadius: '50%',
+          width: 36, height: 36, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          color: '#1B2A4A', textDecoration: 'none', fontSize: '1.4rem', fontWeight: 700, lineHeight: 1,
+        }}>❮</Link>
+      </div>
 
-      {/* Hero */}
-      <section style={{ background: '#1B2A4A', padding: '48px 24px' }}>
-        <div style={{ maxWidth: 900, margin: '0 auto' }}>
-          <Link href="/blitzes" style={{
-            fontFamily: 'Trebuchet MS, sans-serif',
-            fontSize: '0.82rem',
-            color: 'rgba(255,255,255,0.6)',
-            textDecoration: 'none',
-            display: 'inline-block',
-            marginBottom: 24,
-          }}>
-            ← All Blitzes
-          </Link>
-
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: 16 }}>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 8, flexWrap: 'wrap' }}>
-                <h1 style={{
-                  fontFamily: 'Georgia, serif',
-                  fontSize: 'clamp(1.4rem, 4vw, 2rem)',
-                  fontWeight: 700,
-                  color: '#FFFFFF',
-                  margin: 0,
-                }}>
-                  {blitz.name}
-                </h1>
-                <span style={{
-                  background: blitz.statusColor,
-                  color: '#FFFFFF',
-                  fontFamily: 'Trebuchet MS, sans-serif',
-                  fontSize: '0.7rem',
-                  fontWeight: 700,
-                  padding: '3px 10px',
-                  borderRadius: 20,
-                  letterSpacing: '0.5px',
-                }}>
-                  {blitz.statusLabel}
-                </span>
-              </div>
-
-              <div style={{
-                fontFamily: 'Trebuchet MS, sans-serif',
-                fontSize: '0.85rem',
-                color: '#C5A028',
-                marginBottom: 12,
-              }}>
-                {formatDate(blitz.dateStart)} — {formatDate(blitz.dateEnd)}
-              </div>
-
-              {blitz.description && (
-                <p style={{
-                  fontFamily: 'Trebuchet MS, sans-serif',
-                  fontSize: '0.9rem',
-                  color: 'rgba(255,255,255,0.75)',
-                  lineHeight: 1.6,
-                  margin: '0 0 16px',
-                  maxWidth: 600,
-                }}>
-                  {blitz.description}
-                </p>
-              )}
-
-              <div style={{ display: 'flex', gap: 24 }}>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '1.4rem', fontWeight: 700, color: '#FFFFFF' }}>
-                    {participatingBrigades.length}
-                  </div>
-                  <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                    Brigade{participatingBrigades.length !== 1 ? 's' : ''}
-                  </div>
-                </div>
-                <div style={{ textAlign: 'center' }}>
-                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '1.4rem', fontWeight: 700, color: '#FFFFFF' }}>
-                    {recentBumps.length === 20 ? '20+' : recentBumps.length}
-                  </div>
-                  <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                    Bumps
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Owner */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={blitz.ownerProfileImageUrl || getDefaultAvatar(blitz.ownerNeighborId)}
-                alt="Owner"
-                style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', border: '2px solid #C5A028' }}
-              />
-              <div>
-                <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: 'rgba(255,255,255,0.5)', letterSpacing: '1px', textTransform: 'uppercase' }}>
-                  Organized by
-                </div>
-                <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#FFFFFF', fontWeight: 700 }}>
-                  {blitz.ownerFirstName} {blitz.ownerLastName}
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Content */}
-      <div style={{ maxWidth: 900, margin: '0 auto', padding: '40px 24px 80px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 24 }}>
-
-          {/* Left — Leaderboard + Bumps */}
-          <div>
-
-            {/* Leaderboard */}
-            <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: 24, marginBottom: 24 }}>
-              <div style={sectionLabelStyle}>★ Brigade Leaderboard</div>
-              {participatingBrigades.length === 0 ? (
-                <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#AAAAAA', margin: 0 }}>
-                  No Brigades participating yet.
-                </p>
-              ) : (
-                participatingBrigades.map((brigade, index) => (
-                  <Link key={brigade.brigadeId} href={`/brigade/${brigade.brigadeId}`} style={{ textDecoration: 'none' }}>
-                    <div style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 12,
-                      padding: '10px 0',
-                      borderBottom: '1px solid #F5F5F5',
-                    }}>
-                      <div style={{
-                        width: 28,
-                        height: 28,
-                        borderRadius: '50%',
-                        background: index === 0 ? '#C5A028' : index === 1 ? '#AAAAAA' : index === 2 ? '#B87333' : '#EEEEEE',
-                        color: index < 3 ? '#FFFFFF' : '#888888',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        fontFamily: 'Georgia, serif',
-                        fontSize: '0.82rem',
-                        fontWeight: 700,
-                        flexShrink: 0,
-                      }}>
-                        {index + 1}
-                      </div>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={brigade.brigadeProfileImageUrl || getDefaultAvatar(brigade.brigadeId)}
-                        alt={brigade.brigadeName}
-                        style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
-                      />
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', fontWeight: 700, color: '#1B2A4A' }}>
-                          {brigade.brigadeName}
-                        </div>
-                      </div>
-                      <div style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', fontWeight: 700, color: '#B22234', flexShrink: 0 }}>
-                        {brigade.bumpCount} {brigade.bumpCount === 1 ? 'Bump' : 'Bumps'}
-                      </div>
-                    </div>
-                  </Link>
-                ))
-              )}
-            </div>
-
-            {/* Recent Bumps */}
-            <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: 24 }}>
-              <div style={sectionLabelStyle}>★ Recent Banner Bumps</div>
-              {recentBumps.length === 0 ? (
-                <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#AAAAAA', margin: 0 }}>
-                  No Banner Bumps yet. Be the first!
-                </p>
-              ) : (
-                recentBumps.map(bump => (
-                  <div key={bump.bannerId} style={{
-                    padding: '10px 0',
-                    borderBottom: '1px solid #F5F5F5',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                  }}>
-                    <div>
-                      <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#333333' }}>
-                        {bannerOptionLabels[bump.bannerOption] ?? 'Letter'} · {bump.recipientCity}, {bump.recipientState}
-                      </div>
-                      <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#AAAAAA', marginTop: 2 }}>
-                        {bump.bannerNumber}
-                        {bump.brigadeId && participatingBrigades.find(b => b.brigadeId === bump.brigadeId) && (
-                          <span style={{ marginLeft: 6, color: '#C5A028' }}>
-                            · {participatingBrigades.find(b => b.brigadeId === bump.brigadeId)?.brigadeName}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                    <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#AAAAAA', flexShrink: 0 }}>
-                      {formatDate(bump.createdOn)}
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
-          </div>
-
-          {/* Right — Join Request + Pending */}
-          <div>
-
-            {/* Join Request */}
-            {neighborId && eligibleBrigades.length > 0 && !requestSent && (
-              <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: 24, marginBottom: 24 }}>
-                <div style={sectionLabelStyle}>★ Join This Blitz</div>
-                <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#555555', lineHeight: 1.6, margin: '0 0 16px' }}>
-                  Request to join this Blitz with one of your Brigades.
-                </p>
+      {/* Profile section */}
+      <div style={{ padding: '0 20px', background: '#FFFFFF' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: -80, marginBottom: 12 }}>
+          {/* Organizer profile image */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={blitz.ownerProfileImageUrl || getDefaultAvatar(blitz.ownerNeighborId)}
+            alt="Organizer"
+            style={{ width: 160, height: 160, borderRadius: '50%', objectFit: 'cover', border: '6px solid #FFFFFF', flexShrink: 0, position: 'relative', zIndex: 2 }}
+          />
+          {/* Action button */}
+          <div style={{ alignSelf: 'flex-end', paddingBottom: 18 }}>
+            {isOwner ? (
+              <span style={{ padding: '8px 16px', background: 'rgba(197,160,40,0.15)', color: '#C5A028', borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', fontWeight: 700, border: '1px solid #C5A028' }}>
+                ★ Organizer
+              </span>
+            ) : eligibleBrigades.length > 0 && !requestSent ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <select
                   value={selectedBrigadeId}
                   onChange={e => setSelectedBrigadeId(e.target.value)}
-                  style={{
-                    width: '100%',
-                    padding: '10px 12px',
-                    fontFamily: 'Trebuchet MS, sans-serif',
-                    fontSize: '0.85rem',
-                    border: '1.5px solid #DDDDDD',
-                    borderRadius: 4,
-                    marginBottom: 12,
-                    color: '#333333',
-                  }}
+                  style={{ padding: '8px 12px', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', border: '1.5px solid #DDDDDD', borderRadius: 20 }}
                 >
-                  <option value="">Select a Brigade...</option>
-                  {eligibleBrigades.map(b => (
-                    <option key={b.brigadeId} value={b.brigadeId}>{b.brigadeName}</option>
-                  ))}
+                  <option value="">Select Brigade...</option>
+                  {eligibleBrigades.map(b => <option key={b.brigadeId} value={b.brigadeId}>{b.brigadeName}</option>)}
                 </select>
-                {error && (
-                  <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', color: '#B22234', marginBottom: 8 }}>
-                    {error}
-                  </div>
-                )}
                 <button
                   onClick={handleJoinRequest}
                   disabled={requesting}
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    background: requesting ? '#AAAAAA' : '#B22234',
-                    color: '#FFFFFF',
-                    fontFamily: 'Georgia, serif',
-                    fontSize: '0.95rem',
-                    fontWeight: 700,
-                    border: 'none',
-                    borderRadius: 4,
-                    cursor: requesting ? 'not-allowed' : 'pointer',
-                  }}
+                  style={{ padding: '8px 16px', background: '#B22234', color: '#FFFFFF', borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', fontWeight: 700, border: 'none', cursor: 'pointer' }}
                 >
                   {requesting ? 'Requesting...' : '★ Request to Join'}
                 </button>
               </div>
-            )}
-
-            {requestSent && (
-              <div style={{ background: '#F0FBF4', border: '1px solid #1B7A3E', borderRadius: 8, padding: 20, marginBottom: 24 }}>
-                <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#1B7A3E', margin: 0 }}>
-                  ✓ Your join request has been sent! The Blitz organizer will review it shortly.
-                </p>
-              </div>
-            )}
-
-            {/* Pending Requests (owner only) */}
-            {isOwner && pendingBrigades.length > 0 && (
-              <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #C5A028', padding: 24, marginBottom: 24 }}>
-                <div style={{ ...sectionLabelStyle, color: '#C5A028' }}>★ Pending Requests ({pendingBrigades.length})</div>
-                {pendingBrigades.map(brigade => (
-                  <div key={brigade.blitzbrigadeid} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 10,
-                    padding: '10px 0',
-                    borderBottom: '1px solid #F5F5F5',
-                  }}>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={brigade.brigadeProfileImageUrl || getDefaultAvatar(brigade.brigadeId)}
-                      alt={brigade.brigadeName}
-                      style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
-                    />
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', fontWeight: 700, color: '#1B2A4A' }}>
-                        {brigade.brigadeName}
-                      </div>
-                    </div>
-                    <div style={{ display: 'flex', gap: 6 }}>
-                      <button
-                        onClick={async () => {
-                          await fetch('/api/flows/blitz-approve-brigade', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ blitzbrigadeid: brigade.blitzbrigadeid, action: 'approve' }),
-                          });
-                          window.location.reload();
-                        }}
-                        style={{
-                          padding: '4px 10px',
-                          background: '#1B7A3E',
-                          color: '#FFFFFF',
-                          border: 'none',
-                          borderRadius: 4,
-                          fontFamily: 'Trebuchet MS, sans-serif',
-                          fontSize: '0.75rem',
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        ✓ Approve
-                      </button>
-                      <button
-                        onClick={async () => {
-                          await fetch('/api/flows/blitz-approve-brigade', {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ blitzbrigadeid: brigade.blitzbrigadeid, action: 'deny' }),
-                          });
-                          window.location.reload();
-                        }}
-                        style={{
-                          padding: '4px 10px',
-                          background: '#B22234',
-                          color: '#FFFFFF',
-                          border: 'none',
-                          borderRadius: 4,
-                          fontFamily: 'Trebuchet MS, sans-serif',
-                          fontSize: '0.75rem',
-                          fontWeight: 700,
-                          cursor: 'pointer',
-                        }}
-                      >
-                        ✗ Deny
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Participating Brigades summary */}
-            <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: 24 }}>
-              <div style={sectionLabelStyle}>★ Participating Brigades</div>
-              {participatingBrigades.length === 0 ? (
-                <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', color: '#AAAAAA', margin: 0 }}>
-                  No Brigades yet.
-                </p>
-              ) : (
-                participatingBrigades.map(brigade => (
-                  <Link key={brigade.brigadeId} href={`/brigade/${brigade.brigadeId}`} style={{ textDecoration: 'none' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={brigade.brigadeProfileImageUrl || getDefaultAvatar(brigade.brigadeId)}
-                        alt={brigade.brigadeName}
-                        style={{ width: 36, height: 36, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
-                      />
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', fontWeight: 700, color: '#1B2A4A' }}>
-                          {brigade.brigadeName}
-                        </div>
-                        {brigade.brigadeIsVerified && (
-                          <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.65rem', color: '#C5A028' }}>✓ VERIFIED</div>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                ))
-              )}
-            </div>
-
+            ) : requestSent ? (
+              <span style={{ padding: '8px 16px', background: 'rgba(255,255,255,0.05)', color: '#888888', borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', border: '1px solid #DDDDDD' }}>
+                ⏳ Request Pending
+              </span>
+            ) : null}
           </div>
         </div>
+
+        {/* Name + status */}
+        <div style={{ marginBottom: 4 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}>
+            <span style={{ fontFamily: 'Georgia, serif', fontSize: '1.2rem', fontWeight: 700, color: '#1B2A4A' }}>{blitz.name}</span>
+            <span style={{ background: blitz.statusColor, color: '#FFFFFF', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.7rem', fontWeight: 700, padding: '3px 10px', borderRadius: 20 }}>
+              {blitz.statusLabel}
+            </span>
+          </div>
+          <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', color: '#888888', marginTop: 2 }}>
+            {formatDate(blitz.dateStart)} — {formatDate(blitz.dateEnd)}
+            {' · '}Organized by {blitz.ownerFirstName} {blitz.ownerLastName}
+          </div>
+          {blitz.description && (
+            <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#444444', lineHeight: 1.6, margin: '8px 0' }}>
+              {blitz.description}
+            </p>
+          )}
+        </div>
+
+        {/* Stats */}
+        <div style={{ display: 'flex', gap: 20, marginBottom: 12 }}>
+          <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#555555' }}>
+            <strong style={{ color: '#1B2A4A' }}>{participatingBrigades.length}</strong> Brigade{participatingBrigades.length !== 1 ? 's' : ''}
+          </span>
+          <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#555555' }}>
+            <strong style={{ color: '#1B2A4A' }}>{recentBumps.length === 20 ? '20+' : recentBumps.length}</strong> Bumps
+          </span>
+          {blitz.statusCode === 121120001 && (
+            <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#B22234' }}>
+              <strong>{daysRemaining(blitz.dateEnd)}</strong> days left
+            </span>
+          )}
+        </div>
+      </div>
+
+      {/* Tabs */}
+      <div style={{ display: 'flex', borderBottom: '1px solid #EEEEEE', background: '#FFFFFF', position: 'sticky', top: 64, zIndex: 10 }}>
+        {(['bumps', 'brigades', ...(isOwner && pendingBrigades.length > 0 ? ['pending'] : [])] as const).map(tab => (
+          <button
+            key={tab}
+            onClick={() => setActiveTab(tab as 'bumps' | 'brigades' | 'pending')}
+            style={{
+              flex: 1, padding: '14px 0', background: 'none', border: 'none',
+              borderBottom: activeTab === tab ? '3px solid #B22234' : '3px solid transparent',
+              fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem',
+              fontWeight: activeTab === tab ? 700 : 400,
+              color: activeTab === tab ? '#B22234' : '#888888',
+              cursor: 'pointer',
+            }}
+          >
+            {tab === 'bumps' ? 'Bumps' : tab === 'brigades' ? `Brigades (${participatingBrigades.length})` : `Pending (${pendingBrigades.length})`}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      <div style={{ maxWidth: 680, margin: '0 auto', padding: '16px 16px 80px' }}>
+
+        {/* Bumps tab */}
+        {activeTab === 'bumps' && (
+          <div>
+            {feedItems.map(item => <FeedItemCard key={item.id} item={item} />)}
+            {feedLoading && <div style={{ textAlign: 'center', padding: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#AAAAAA' }}>Loading...</div>}
+            {!feedHasMore && feedItems.length > 0 && <div style={{ textAlign: 'center', padding: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#AAAAAA' }}>★ All caught up! ★</div>}
+            {feedItems.length === 0 && !feedLoading && <p style={{ textAlign: 'center', padding: '40px 0', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#AAAAAA' }}>No bumps yet!</p>}
+            <div ref={bottomRef} style={{ height: 1 }} />
+          </div>
+        )}
+
+        {/* Brigades tab — leaderboard */}
+        {activeTab === 'brigades' && (
+          <div>
+            {participatingBrigades.map((brigade, index) => (
+              <Link key={brigade.brigadeId} href={`/brigade/${brigade.brigadeId}`} style={{ textDecoration: 'none' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid #F5F5F5' }}>
+                  <div style={{
+                    width: 28, height: 28, borderRadius: '50%', flexShrink: 0,
+                    background: index === 0 ? '#C5A028' : index === 1 ? '#AAAAAA' : index === 2 ? '#B87333' : '#EEEEEE',
+                    color: index < 3 ? '#FFFFFF' : '#888888',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontFamily: 'Georgia, serif', fontSize: '0.82rem', fontWeight: 700,
+                  }}>
+                    {index + 1}
+                  </div>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={brigade.brigadeProfileImageUrl || getDefaultAvatar(brigade.brigadeId)} alt={brigade.brigadeName}
+                    style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', fontWeight: 700, color: '#1B2A4A' }}>{brigade.brigadeName}</div>
+                  </div>
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', fontWeight: 700, color: '#B22234', flexShrink: 0 }}>
+                    {brigade.bumpCount} {brigade.bumpCount === 1 ? 'Bump' : 'Bumps'}
+                  </div>
+                </div>
+              </Link>
+            ))}
+            {participatingBrigades.length === 0 && (
+              <p style={{ textAlign: 'center', padding: '40px 0', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#AAAAAA' }}>No Brigades participating yet.</p>
+            )}
+          </div>
+        )}
+
+        {/* Pending tab — owner only */}
+        {activeTab === 'pending' && isOwner && (
+          <div>
+            {pendingBrigades.map(brigade => (
+              <div key={brigade.blitzbrigadeid} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid #F5F5F5' }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={brigade.brigadeProfileImageUrl || getDefaultAvatar(brigade.brigadeId)} alt={brigade.brigadeName}
+                  style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }} />
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', fontWeight: 700, color: '#1B2A4A' }}>{brigade.brigadeName}</div>
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button onClick={async () => {
+                    await fetch('/api/flows/blitz-approve-brigade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ blitzbrigadeid: brigade.blitzbrigadeid, action: 'approve' }) });
+                    window.location.reload();
+                  }} style={{ padding: '6px 12px', background: '#1B7A3E', color: '#FFFFFF', border: 'none', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
+                    ✓ Approve
+                  </button>
+                  <button onClick={async () => {
+                    await fetch('/api/flows/blitz-approve-brigade', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ blitzbrigadeid: brigade.blitzbrigadeid, action: 'deny' }) });
+                    window.location.reload();
+                  }} style={{ padding: '6px 12px', background: '#B22234', color: '#FFFFFF', border: 'none', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', fontWeight: 700, cursor: 'pointer' }}>
+                    ✗ Deny
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
+
+  if (sidebarData) {
+    return (
+      <CommunityLayout sidebarData={sidebarData} hideAvatarBar={true}>
+        {blitzContent}
+      </CommunityLayout>
+    );
+  }
+  return blitzContent;
 }

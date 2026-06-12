@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { auth } from '@/lib/auth';
 import { dataverse } from '@/lib/dataverse';
+import { getSidebarData } from '@/lib/community-sidebar';
 import BlitzDetailClient from './BlitzDetailClient';
 
 const BANNER_OPTION_LABELS: Record<number, string> = {
@@ -49,6 +50,7 @@ export interface BlitzDetail {
   ownerFirstName: string;
   ownerLastName: string;
   ownerProfileImageUrl: string;
+  imageUrl: string;
 }
 
 export interface UserBrigade {
@@ -68,6 +70,8 @@ export default async function BlitzDetailPage({
 
   const session = await auth();
   const userEmail = session?.user?.email ?? null;
+
+  const sidebarData = userEmail ? await getSidebarData(userEmail) : null;
 
   let neighborId: string | null = null;
   if (userEmail) {
@@ -89,7 +93,7 @@ export default async function BlitzDetailPage({
     // Fetch blitz record
     const blitzRes = await dataverse.get<{ value: any[] }>(
       `bb_blitzs?$filter=bb_blitzid eq '${id}'` +
-      `&$select=bb_blitzid,bb_blitznumber,bb_name,bb_description,bb_datestart,bb_dateend,statuscode,_bb_owner_value` +
+      `&$select=bb_blitzid,bb_blitznumber,bb_name,bb_description,bb_datestart,bb_dateend,statuscode,_bb_owner_value,bb_imageurl` +
       `&$top=1`
     );
 
@@ -118,6 +122,7 @@ export default async function BlitzDetailPage({
       ownerFirstName: owner?.bb_firstname ?? '',
       ownerLastName: owner?.bb_lastname ?? '',
       ownerProfileImageUrl: owner?.bb_profileimageurl ?? '',
+      imageUrl: b.bb_imageurl ?? '',
     };
 
     // Fetch participating brigades
@@ -251,6 +256,7 @@ export default async function BlitzDetailPage({
       userBrigades={userBrigades}
       neighborId={neighborId}
       bannerOptionLabels={BANNER_OPTION_LABELS}
+      sidebarData={sidebarData}
     />
   );
 }

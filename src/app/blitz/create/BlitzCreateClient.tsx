@@ -67,7 +67,7 @@ export default function BlitzCreateClient({ brigadeId, brigadeName, neighborId }
     try {
       let imageUrl = '';
       if (imageFile) {
-        const uploadRes = await fetch('/api/brigade/upload-image', {
+        const uploadRes = await fetch('/api/blitz/upload-image', {
           method: 'POST',
           headers: { 'Content-Type': imageFile.type },
           body: imageFile,

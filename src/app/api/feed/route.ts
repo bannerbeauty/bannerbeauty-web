@@ -79,8 +79,11 @@ export async function GET(req: NextRequest) {
     let filter = 'statecode eq 0 and statuscode ne 121120002';
     if (before) filter += ` and createdon lt ${before}`;
     const filterByBrigade = searchParams.get('filterByBrigade') === 'true';
-    if (filterByBrigade && brigadeIds.length > 0) {
-      filter += ` and (${brigadeIds.map(id => `_bb_brigade_value eq '${id}'`).join(' or ')})`;
+    if (filterByBrigade) {
+      const conditions = [];
+      if (brigadeIds.length > 0) conditions.push(`(${brigadeIds.map(id => `_bb_brigade_value eq '${id}'`).join(' or ')})`);
+      if (blitzIds.length > 0) conditions.push(`(${blitzIds.map(id => `_bb_blitz_value eq '${id}'`).join(' or ')})`);
+      if (conditions.length > 0) filter += ` and (${conditions.join(' or ')})`;
     }
     console.log('Feed filter:', filter);
     console.log('brigadeIds filter:', brigadeIds);
