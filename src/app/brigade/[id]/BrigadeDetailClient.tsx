@@ -374,34 +374,38 @@ export default function BrigadeDetailClient({
           <div>
             {/* Owner first */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid #F5F5F5' }}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={brigade.ownerProfileImageUrl || getDefaultAvatar(brigade.ownerNeighborId)}
-                alt="Owner"
-                style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', border: '2px solid #C5A028' }}
-              />
-              <div style={{ flex: 1 }}>
-                <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', fontWeight: 700, color: '#1B2A4A' }}>
-                  {brigade.ownerFirstName} {brigade.ownerLastName}
-                </div>
-                <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.7rem', color: '#C5A028', letterSpacing: '0.5px' }}>OWNER</div>
-              </div>
-            </div>
-            {members.map(member => (
-              <div key={member.brigadeneighborid} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid #F5F5F5' }}>
+              <Link href={`/neighbor/${brigade.ownerNeighborId}`} style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, textDecoration: 'none' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
-                  src={member.profileImageUrl || getDefaultAvatar(member.neighborId)}
-                  alt={member.firstName}
-                  style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover' }}
+                  src={brigade.ownerProfileImageUrl || getDefaultAvatar(brigade.ownerNeighborId)}
+                  alt="Owner"
+                  style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', border: '2px solid #C5A028', flexShrink: 0 }}
                 />
                 <div style={{ flex: 1 }}>
                   <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', fontWeight: 700, color: '#1B2A4A' }}>
-                    {member.displayName || `${member.firstName} ${member.lastName}`.trim()}
+                    {brigade.ownerFirstName} {brigade.ownerLastName}
                   </div>
-                  {member.handle && <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#888888' }}>@{member.handle}</div>}
-                  {member.isAdmin && <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.65rem', color: '#C5A028', fontWeight: 700 }}>ADMIN</div>}
+                  <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.7rem', color: '#C5A028', letterSpacing: '0.5px' }}>OWNER</div>
                 </div>
+              </Link>
+            </div>
+            {members.map(member => (
+              <div key={member.brigadeneighborid} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid #F5F5F5' }}>
+                <Link href={`/neighbor/${member.neighborId}`} style={{ display: 'flex', alignItems: 'center', gap: 12, flex: 1, textDecoration: 'none' }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={member.profileImageUrl || getDefaultAvatar(member.neighborId)}
+                    alt={member.firstName}
+                    style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+                  />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', fontWeight: 700, color: '#1B2A4A' }}>
+                      {member.displayName || `${member.firstName} ${member.lastName}`.trim()}
+                    </div>
+                    {member.handle && <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#888888' }}>@{member.handle}</div>}
+                    {member.isAdmin && <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.65rem', color: '#C5A028', fontWeight: 700 }}>ADMIN</div>}
+                  </div>
+                </Link>
               </div>
             ))}
           </div>

@@ -74,10 +74,13 @@ export async function GET(req: NextRequest) {
   const brigadeIds = searchParams.get('brigadeIds')?.split(',').filter(Boolean) ?? [];
   const blitzIds = searchParams.get('blitzIds')?.split(',').filter(Boolean) ?? [];
 
+  const profileNeighborId = searchParams.get('profileNeighborId') ?? '';
+
   try {
     // Build filter
     let filter = 'statecode eq 0 and statuscode ne 121120002';
     if (before) filter += ` and createdon lt ${before}`;
+    if (profileNeighborId) filter += ` and _bb_initiatingneighbor_value eq '${profileNeighborId}'`;
     const filterByBrigade = searchParams.get('filterByBrigade') === 'true';
     if (filterByBrigade) {
       const conditions = [];

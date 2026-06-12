@@ -51,7 +51,7 @@ export default function FeedItemCard({ item }: Props) {
     }}>
       {/* Avatar */}
       {item.neighborId ? (
-        <Link href={`/profile/${item.neighborId}`}>
+        <Link href={`/neighbor/${item.neighborId}`}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={avatar} alt={name} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #EEEEEE', display: 'block' }} />
         </Link>
