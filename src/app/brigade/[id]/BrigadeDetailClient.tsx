@@ -182,7 +182,7 @@ export default function BrigadeDetailClient({
             style={{ width: 160, height: 160, borderRadius: '50%', objectFit: 'cover', border: '6px solid #FFFFFF', flexShrink: 0, position: 'relative', zIndex: 2 }}
           />
           {/* Action button */}
-          <div style={{ alignSelf: 'flex-end', marginBottom: -8 }}>
+          <div style={{ alignSelf: 'flex-end', marginBottom: 18 }}>
             {isOwner || isAdmin ? (
               <div style={{ display: 'flex', gap: 8 }}>
                 <Link

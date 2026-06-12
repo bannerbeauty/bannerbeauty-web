@@ -15,9 +15,12 @@ interface Props {
   tabBar?: React.ReactNode;
   // Suppress the avatar panel-toggle bar on mobile (e.g. brigade detail has its own back nav)
   hideAvatarBar?: boolean;
+  // Enable three-column desktop layout with an optional right panel
+  threeColumn?: boolean;
+  rightPanel?: React.ReactNode;
 }
 
-export default function CommunityLayout({ sidebarData, children, tabBar, hideAvatarBar }: Props) {
+export default function CommunityLayout({ sidebarData, children, tabBar, hideAvatarBar, threeColumn, rightPanel }: Props) {
   const [panelOpen, setPanelOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const touchStartX = useRef(0);
@@ -114,13 +117,13 @@ export default function CommunityLayout({ sidebarData, children, tabBar, hideAva
             {tabBar}
           </div>
         ) : hideAvatarBar ? (
-          /* Plain navy spacer — no panel toggle, page has its own nav */
+          /* 1px spacer — page has its own back nav, no panel toggle needed */
           <div style={{
             position: 'fixed',
             top: HEADER_H,
             left: 0,
             right: 0,
-            height: TAB_BAR_H,
+            height: 1,
             background: '#1B2A4A',
             zIndex: 90,
           }} />
@@ -200,13 +203,13 @@ export default function CommunityLayout({ sidebarData, children, tabBar, hideAva
   return (
     <div style={{ background: '#FAF7F2', minHeight: '100vh' }}>
       {tabBar && (
-        <div style={{ background: '#1B2A4A' }}>
+        <div style={{ position: 'sticky', top: 64, zIndex: 10, background: '#1B2A4A' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             {tabBar}
           </div>
         </div>
       )}
-      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: '260px 1fr', gap: 24 }}>
+      <div style={{ maxWidth: 1100, margin: '0 auto', padding: '0 24px', display: 'grid', gridTemplateColumns: threeColumn ? '260px 1fr 280px' : '260px 1fr', gap: 24 }}>
         {/* Left sidebar */}
         <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', marginTop: 24, alignSelf: 'start', position: 'sticky', top: 80 }}>
           <CommunitySidebar data={sidebarData} />
@@ -215,6 +218,12 @@ export default function CommunityLayout({ sidebarData, children, tabBar, hideAva
         <div style={{ paddingTop: 24, paddingBottom: 80 }}>
           {children}
         </div>
+        {/* Right panel (three-column layout) */}
+        {threeColumn && rightPanel && (
+          <div style={{ paddingTop: 24, paddingBottom: 80 }}>
+            {rightPanel}
+          </div>
+        )}
       </div>
     </div>
   );

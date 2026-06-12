@@ -263,8 +263,35 @@ export default function CommunityClient({
     </>
   );
 
+  const desktopRightPanel = (
+    <div>
+      {sidebarData.myBlitzes.length > 0 && (
+        <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: 16, marginBottom: 16 }}>
+          <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#B22234', marginBottom: 12, fontWeight: 700 }}>⚡ Active Blitzes</div>
+          {sidebarData.myBlitzes.map(blitz => (
+            <Link key={blitz.blitzId} href={`/blitz/${blitz.blitzId}`} style={{ textDecoration: 'none' }}>
+              <div style={{ marginBottom: 12, paddingBottom: 12, borderBottom: '1px solid #F5F5F5' }}>
+                <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', fontWeight: 700, color: '#1B2A4A', marginBottom: 2 }}>{blitz.name}</div>
+                <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#B22234' }}>{daysRemaining(blitz.dateEnd)} days left</div>
+              </div>
+            </Link>
+          ))}
+          <Link href="/blitzes" style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#C5A028', textDecoration: 'none' }}>See all Blitzes →</Link>
+        </div>
+      )}
+      <div style={{ background: '#1B2A4A', borderRadius: 8, padding: 16 }}>
+        <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#C5A028', marginBottom: 12, fontWeight: 700 }}>Quick Actions</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <Link href="/submit-banner" style={{ display: 'block', padding: '10px 14px', background: '#B22234', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Georgia, serif', fontSize: '0.88rem', fontWeight: 700, textDecoration: 'none', textAlign: 'center' }}>★ Banner Bump</Link>
+          <Link href="/store" style={{ display: 'block', padding: '10px 14px', background: 'rgba(255,255,255,0.1)', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', textDecoration: 'none', textAlign: 'center' }}>Visit Store</Link>
+          <Link href="/brigade/create" style={{ display: 'block', padding: '10px 14px', background: 'rgba(255,255,255,0.1)', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', textDecoration: 'none', textAlign: 'center' }}>Create a Brigade</Link>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <CommunityLayout sidebarData={sidebarData} tabBar={tabBar}>
+    <CommunityLayout sidebarData={sidebarData} tabBar={tabBar} threeColumn rightPanel={desktopRightPanel}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
         {feedContent}
       </div>
