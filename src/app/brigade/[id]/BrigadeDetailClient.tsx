@@ -147,18 +147,20 @@ export default function BrigadeDetailClient({
           top: 12,
           left: 12,
           zIndex: 10,
-          background: 'rgba(0,0,0,0.5)',
+          background: 'rgba(197,160,40,0.75)',
           borderRadius: '50%',
           width: 36,
           height: 36,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: '#FFFFFF',
+          color: '#1B2A4A',
           textDecoration: 'none',
-          fontSize: '1.1rem',
+          fontSize: '1.4rem',
+          fontWeight: 700,
+          lineHeight: 1,
         }}>
-          ←
+          ❮
         </Link>
         {brigade.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -170,7 +172,7 @@ export default function BrigadeDetailClient({
 
       {/* Profile section */}
       <div style={{ padding: '0 20px', background: '#FFFFFF' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: -80, marginBottom: 12 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: -80, marginBottom: 12, paddingTop: 24 }}>
           {/* Profile image — overlaps banner */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img

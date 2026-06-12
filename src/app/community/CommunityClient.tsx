@@ -88,6 +88,12 @@ export default function CommunityClient({
   }, [sidebarData.neighbor.neighborId, sidebarData.neighbor.state, brigadeIds, blitzIds]);
 
   useEffect(() => {
+    setFeedItems([]);
+    setFeedHasMore(true);
+    loadFeed();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     loadFeed();
   }, [loadFeed]);
 
