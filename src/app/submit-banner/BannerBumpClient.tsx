@@ -337,6 +337,12 @@ export default function BannerBumpClient({
     if (step === 1) {
       if (!inFirstName.trim() || !inEmail.trim()) { setStepError('Your name and email are required.'); return false; }
       if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inEmail)) { setStepError('Please enter a valid email address.'); return false; }
+      const selectedBlitz = activeBlitzes.find(b => b.blitzId === selectedBlitzId);
+      const needsBrigadeSelection = selectedBlitz && selectedBlitz.brigades.length > 1;
+      if (selectedBlitzId && needsBrigadeSelection && !selectedBlitzBrigadeId) {
+        setStepError('Please select which Brigade you are representing.');
+        return false;
+      }
     }
     if (step === 2) {
       if (!recipientAddress1.trim() || !recipientCity.trim() || !recipientState || !recipientZipcode.trim()) {
@@ -526,33 +532,56 @@ export default function BannerBumpClient({
               <label style={labelStyle}>Email Address *</label>
               <input style={{ ...inputStyle, fontSize: '16px' }} type="email" value={inEmail} onChange={(e) => setInEmail(e.target.value)} />
             </div>
-            {activeBlitzes.length > 0 && (
-              <div style={{ marginTop: 20 }}>
-                <label style={labelStyle}>Are you Banner Bumping as part of a group activity? (optional)</label>
-                <select
-                  value={selectedBlitzId}
-                  onChange={e => {
-                    const blitzId = e.target.value;
-                    setSelectedBlitzId(blitzId);
-                    const blitz = activeBlitzes.find(b => b.blitzId === blitzId);
-                    setSelectedBlitzBrigadeId(blitz?.brigadeId ?? '');
-                  }}
-                  style={{ ...inputStyle, fontSize: '16px', marginTop: 6 }}
-                >
-                  <option value="">No — this is a personal Banner Bump</option>
-                  {activeBlitzes.map(blitz => (
-                    <option key={blitz.blitzId} value={blitz.blitzId}>
-                      {blitz.blitzName} — {blitz.brigadeName}
-                    </option>
-                  ))}
-                </select>
-                {selectedBlitzId && (
-                  <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#1B7A3E', marginTop: 6 }}>
-                    ⚡ This bump will count toward {activeBlitzes.find(b => b.blitzId === selectedBlitzId)?.blitzName}!
-                  </p>
-                )}
-              </div>
-            )}
+            {activeBlitzes.length > 0 && (() => {
+              const selectedBlitz = activeBlitzes.find(b => b.blitzId === selectedBlitzId);
+              const needsBrigadeSelection = selectedBlitz && selectedBlitz.brigades.length > 1;
+              return (
+                <div style={{ marginTop: 20 }}>
+                  <label style={labelStyle}>Are you Banner Bumping as part of a group activity? (optional)</label>
+                  <select
+                    value={selectedBlitzId}
+                    onChange={e => {
+                      const blitzId = e.target.value;
+                      setSelectedBlitzId(blitzId);
+                      const blitz = activeBlitzes.find(b => b.blitzId === blitzId);
+                      if (blitz?.brigades.length === 1) {
+                        setSelectedBlitzBrigadeId(blitz.brigades[0].brigadeId);
+                      } else {
+                        setSelectedBlitzBrigadeId('');
+                      }
+                    }}
+                    style={{ ...inputStyle, fontSize: '16px', marginTop: 6 }}
+                  >
+                    <option value="">No — this is a personal Banner Bump</option>
+                    {activeBlitzes.map(blitz => (
+                      <option key={blitz.blitzId} value={blitz.blitzId}>
+                        {blitz.blitzName}{blitz.brigades.length === 1 ? ` — ${blitz.brigades[0].brigadeName}` : ' — Multiple Brigades'}
+                      </option>
+                    ))}
+                  </select>
+                  {needsBrigadeSelection && (
+                    <div style={{ marginTop: 12 }}>
+                      <label style={labelStyle}>Which Brigade are you representing? *</label>
+                      <select
+                        value={selectedBlitzBrigadeId}
+                        onChange={e => setSelectedBlitzBrigadeId(e.target.value)}
+                        style={{ ...inputStyle, fontSize: '16px', marginTop: 6 }}
+                      >
+                        <option value="">Select a Brigade...</option>
+                        {selectedBlitz.brigades.map(b => (
+                          <option key={b.brigadeId} value={b.brigadeId}>{b.brigadeName}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                  {selectedBlitzId && (
+                    <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#1B7A3E', marginTop: 6 }}>
+                      ⚡ This bump will count toward {selectedBlitz?.blitzName}!
+                    </p>
+                  )}
+                </div>
+              );
+            })()}
             {stepError && <p style={{ color: '#B22234', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', marginTop: 12 }}>{stepError}</p>}
             <NavButtons showBack={false} onNext={handleNext} nextLabel="Next: Recipient Info →" />
           </div>

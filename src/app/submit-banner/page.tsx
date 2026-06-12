@@ -12,8 +12,7 @@ import BannerBumpClient, {
 export interface ActiveBlitz {
   blitzId: string;
   blitzName: string;
-  brigadeId: string;
-  brigadeName: string;
+  brigades: { brigadeId: string; brigadeName: string }[];
 }
 
 async function getNeighborActiveBlitzes(neighborId: string): Promise<ActiveBlitz[]> {
@@ -52,16 +51,22 @@ async function getNeighborActiveBlitzes(neighborId: string): Promise<ActiveBlitz
       `bb_blitzs?$filter=${blitzIds.map(id => `bb_blitzid eq '${id}'`).join(' or ')} and statuscode eq 121120001 and statecode eq 0&$select=bb_blitzid,bb_name`
     );
 
-    return (blitzRes.value ?? []).map((bl: any) => {
+    const blitzMap = new Map<string, ActiveBlitz>();
+    for (const bl of blitzRes.value ?? []) {
       const bb = blitzBrigadeRes.value?.find((bb: any) => bb._bb_blitz_value === bl.bb_blitzid);
       const brigade = brigadeIds.find(b => b.id === bb?._bb_brigade_value);
-      return {
-        blitzId: bl.bb_blitzid,
-        blitzName: bl.bb_name,
-        brigadeId: brigade?.id ?? '',
-        brigadeName: brigade?.name ?? '',
-      };
-    });
+      if (!brigade) continue;
+      if (blitzMap.has(bl.bb_blitzid)) {
+        blitzMap.get(bl.bb_blitzid)!.brigades.push({ brigadeId: brigade.id, brigadeName: brigade.name });
+      } else {
+        blitzMap.set(bl.bb_blitzid, {
+          blitzId: bl.bb_blitzid,
+          blitzName: bl.bb_name,
+          brigades: [{ brigadeId: brigade.id, brigadeName: brigade.name }],
+        });
+      }
+    }
+    return Array.from(blitzMap.values());
   } catch (err) {
     console.error('getNeighborActiveBlitzes failed:', err);
     return [];
