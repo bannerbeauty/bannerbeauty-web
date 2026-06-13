@@ -109,6 +109,7 @@ export default async function BrigadeDetailPage({
 
   let brigade: BrigadeDetail | null = null;
   let members: BrigadeMember[] = [];
+  let followers: BrigadeMember[] = [];
   let pendingMembers: BrigadeMember[] = [];
   let blitzes: BrigadeBlitz[] = [];
   let recentBumps: BrigadeBump[] = [];
@@ -135,7 +136,9 @@ export default async function BrigadeDetailPage({
         `&$orderby=createdon desc&$top=10`
       ),
       dataverse.get<{ value: any[] }>(
-        `bb_brigadeneighbors?$filter=_bb_brigade_value eq '${id}' and statuscode eq 121120002 and statecode eq 0&$select=bb_brigadeneighborid`
+        `bb_brigadeneighbors?$filter=_bb_brigade_value eq '${id}' and statuscode eq 121120002 and statecode eq 0` +
+        `&$select=bb_brigadeneighborid,bb_joindate` +
+        `&$expand=bb_Neighbor($select=bb_neighborid,bb_firstname,bb_lastname,bb_profileimageurl,bb_displayname,bb_handle)`
       ),
       dataverse.get<{ value: any[] }>(
         `bb_brigadeneighbors?$filter=_bb_brigade_value eq '${id}' and statuscode eq 1 and statecode eq 0` +
@@ -184,6 +187,18 @@ export default async function BrigadeDetailPage({
       countyNameFull,
       followerCount: followersRes.value?.length ?? 0,
     };
+
+    followers = (followersRes.value ?? []).map((m: any) => ({
+      brigadeneighborid: m.bb_brigadeneighborid,
+      isAdmin: false,
+      joinDate: m.bb_joindate ?? '',
+      neighborId: m.bb_Neighbor?.bb_neighborid ?? '',
+      firstName: m.bb_Neighbor?.bb_firstname ?? '',
+      lastName: m.bb_Neighbor?.bb_lastname ?? '',
+      displayName: m.bb_Neighbor?.bb_displayname ?? '',
+      handle: m.bb_Neighbor?.bb_handle ?? '',
+      profileImageUrl: m.bb_Neighbor?.bb_profileimageurl ?? '',
+    }));
 
     members = (membersRes.value ?? []).map((m: any) => ({
       brigadeneighborid: m.bb_brigadeneighborid,
@@ -263,6 +278,7 @@ export default async function BrigadeDetailPage({
       membershipStatus={membershipStatus}
       neighborId={neighborId}
       bannerOptionLabels={BANNER_OPTION_LABELS}
+      followers={followers}
       pendingMembers={pendingMembers}
       sidebarData={sidebarData}
     />

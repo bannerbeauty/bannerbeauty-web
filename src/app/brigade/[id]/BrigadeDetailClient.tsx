@@ -29,6 +29,7 @@ function formatDate(iso: string) {
 interface Props {
   brigade: BrigadeDetail;
   members: BrigadeMember[];
+  followers: BrigadeMember[];
   blitzes: BrigadeBlitz[];
   recentBumps: BrigadeBump[];
   membershipStatus: { brigadeneighborid: string; isAdmin: boolean; statuscode: number } | null;
@@ -41,6 +42,7 @@ interface Props {
 export default function BrigadeDetailClient({
   brigade,
   members,
+  followers,
   blitzes,
   recentBumps,
   membershipStatus,
@@ -53,7 +55,7 @@ export default function BrigadeDetailClient({
   const [requesting, setRequesting] = useState(false);
   const [isFollowing, setIsFollowing] = useState(membershipStatus?.statuscode === 121120002);
   const [followLoading, setFollowLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState<'bumps' | 'members' | 'blitzes'>(
+  const [activeTab, setActiveTab] = useState<'bumps' | 'members' | 'followers' | 'blitzes'>(
     (typeof window !== 'undefined' && sessionStorage.getItem('brigadeActiveTab') as any) || 'bumps'
   );
   const [isMobile, setIsMobile] = useState(false);
@@ -370,7 +372,7 @@ export default function BrigadeDetailClient({
 
       {/* Tabs */}
       <div style={{ display: 'flex', borderBottom: '1px solid #EEEEEE', background: '#FFFFFF', position: 'sticky', top: 0, zIndex: 10 }}>
-        {(['bumps', 'members', 'blitzes'] as const).map(tab => (
+        {(['members', 'followers', 'bumps', 'blitzes'] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
@@ -388,7 +390,7 @@ export default function BrigadeDetailClient({
               textTransform: 'capitalize',
             }}
           >
-            {tab === 'bumps' ? 'Bumps' : tab === 'members' ? `Members (${members.length + 1})` : `Blitzes (${blitzes.length})`}
+            {tab === 'members' ? `Members (${members.length + 1})` : tab === 'followers' ? `Followers (${brigade.followerCount})` : tab === 'bumps' ? 'Bumps' : `Blitzes (${blitzes.length})`}
           </button>
         ))}
       </div>
@@ -525,6 +527,41 @@ export default function BrigadeDetailClient({
                 )}
               </div>
             ))}
+          </div>
+        )}
+
+        {/* Followers tab */}
+        {activeTab === 'followers' && (
+          <div>
+            {followers.length === 0 ? (
+              <p style={{ textAlign: 'center', padding: '40px 0', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#AAAAAA' }}>
+                No followers yet.
+              </p>
+            ) : (
+              followers.map(follower => (
+                <Link key={follower.brigadeneighborid} href={`/neighbor/${follower.neighborId}`} style={{ textDecoration: 'none' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid #F5F5F5' }}>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={follower.profileImageUrl || getDefaultAvatar(follower.neighborId)}
+                      alt={follower.firstName}
+                      style={{ width: 44, height: 44, borderRadius: '50%', objectFit: 'cover', flexShrink: 0 }}
+                    />
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', fontWeight: 700, color: '#1B2A4A' }}>
+                        {follower.displayName || `${follower.firstName} ${follower.lastName}`.trim()}
+                      </div>
+                      {follower.handle && (
+                        <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#888888' }}>
+                          @{follower.handle}
+                        </div>
+                      )}
+                    </div>
+                    <span style={{ color: '#C5A028', fontSize: '0.82rem' }}>View →</span>
+                  </div>
+                </Link>
+              ))
+            )}
           </div>
         )}
 
