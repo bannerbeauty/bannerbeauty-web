@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
@@ -12,6 +12,7 @@ export interface Product {
   bb_producttype: number;
   imageUrl?: string;
   imageAlt?: string;
+  producttypeLabel: string;
   materialLabel?: string | null;
   sizeLabel?: string | null;
 }
@@ -29,14 +30,6 @@ interface CartItem {
 const SIZE_ALL = 'All';
 const MATERIAL_ALL = 'All';
 
-const CATEGORIES = [
-  { label: 'All', value: null },
-  { label: 'Flags', value: 121120000 },
-  { label: 'Poles', value: 121120001 },
-  { label: 'Kits', value: 121120002 },
-  { label: 'Accessories', value: 121120003 },
-  { label: 'Gift Certificates', value: 121120004 },
-];
 
 function formatPrice(price: number) {
   return '$' + price.toFixed(2);
@@ -61,6 +54,13 @@ export default function StoreClient({ products }: { products: Product[] }) {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [cartOpen, setCartOpen] = useState(false);
   const [addedId, setAddedId] = useState<string | null>(null);
+
+  const categories = useMemo(() => [
+    { label: 'All', value: null },
+    ...[...new Map(products.map(p => [p.bb_producttype, p.producttypeLabel])).entries()]
+      .sort((a, b) => a[0] - b[0])
+      .map(([value, label]) => ({ label, value })),
+  ], [products]);
 
   useEffect(() => {
     setCart(getCart());
@@ -127,10 +127,7 @@ export default function StoreClient({ products }: { products: Product[] }) {
     router.push('/checkout');
   }
 
-  const availableCategories = [
-    { label: 'All', value: null },
-    ...CATEGORIES.slice(1).filter(cat => products.some(p => p.bb_producttype === cat.value)),
-  ];
+  const availableCategories = categories;
 
   const categoryFiltered = activeCategory === null
     ? products

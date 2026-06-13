@@ -8,6 +8,7 @@ interface DvProduct {
   bb_productnumber: string;
   bb_price: number;
   bb_producttype: number;
+  'bb_producttype@OData.Community.Display.V1.FormattedValue'?: string;
   bb_productmaterial?: number;
   bb_productsize?: number;
   'bb_productmaterial@OData.Community.Display.V1.FormattedValue'?: string;
@@ -44,6 +45,7 @@ async function getProducts(): Promise<Product[]> {
       ...p,
       imageUrl: img?.bb_imageurl,
       imageAlt: img?.bb_alttext,
+      producttypeLabel: p['bb_producttype@OData.Community.Display.V1.FormattedValue'] ?? '',
       materialLabel: p['bb_productmaterial@OData.Community.Display.V1.FormattedValue'] ?? null,
       sizeLabel: p['bb_productsize@OData.Community.Display.V1.FormattedValue'] ?? null,
     };
