@@ -34,7 +34,7 @@ function daysRemaining(dateEnd: string): number {
   return Math.ceil((end.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
 }
 
-type Tab = 'all' | 'brigades' | 'blitzes';
+type Tab = 'all' | 'brigades' | 'blitzes' | 'buddies';
 
 interface Props {
   neighbor: NeighborProfile;
@@ -63,6 +63,7 @@ export default function CommunityClient({
 
   const brigadeIds = sidebarData.myBrigades.map(b => b.brigadeId).join(',');
   const blitzIds = sidebarData.myBlitzes.map(b => b.blitzId).join(',');
+  const buddyIds = sidebarData.buddyIds?.join(',') ?? '';
 
   const loadFeed = useCallback(async (before?: string) => {
     if (loadingRef.current) return;
@@ -75,6 +76,7 @@ export default function CommunityClient({
         state: sidebarData.neighbor.state ?? '',
         brigadeIds,
         blitzIds,
+        buddyIds,
       });
       if (before) params.set('before', before);
       console.log('loadFeed params:', params.toString());
@@ -88,7 +90,7 @@ export default function CommunityClient({
       setFeedLoading(false);
       loadingRef.current = false;
     }
-  }, [sidebarData.neighbor.neighborId, sidebarData.neighbor.state, brigadeIds, blitzIds]);
+  }, [sidebarData.neighbor.neighborId, sidebarData.neighbor.state, brigadeIds, blitzIds, buddyIds]);
 
   useEffect(() => {
     setFeedItems([]);
@@ -116,6 +118,7 @@ export default function CommunityClient({
     { key: 'all', label: 'All Activity' },
     { key: 'brigades', label: `Brigades (${sidebarData.myBrigades.length})` },
     { key: 'blitzes', label: `Blitzes (${sidebarData.myBlitzes.length})` },
+    { key: 'buddies', label: `Buddies (${sidebarData.buddyIds?.length ?? 0})` },
   ];
 
   const tabBar = (
@@ -257,6 +260,25 @@ export default function CommunityClient({
                 </Link>
               ))}
             </div>
+          )}
+        </div>
+      )}
+
+      {activeTab === 'buddies' && (
+        <div>
+          {sidebarData.buddyIds?.length === 0 ? (
+            <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: '48px 24px', textAlign: 'center' }}>
+              <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.95rem', color: '#888888', margin: '0 0 16px' }}>
+                You aren&apos;t following anyone yet.
+              </p>
+              <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#AAAAAA', margin: 0 }}>
+                Visit a Neighbor&apos;s profile and tap Follow to see their activity here.
+              </p>
+            </div>
+          ) : (
+            feedItems
+              .filter(item => sidebarData.buddyIds?.includes(item.neighborId))
+              .map(item => <FeedItemCard key={item.id} item={item} />)
           )}
         </div>
       )}

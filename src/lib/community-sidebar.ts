@@ -31,6 +31,7 @@ export interface SidebarData {
   myBrigades: SidebarBrigade[];
   myBlitzes: SidebarBlitz[];
   suggestedBrigades: SidebarBrigade[];
+  buddyIds: string[];
 }
 
 const BRIGADE_TYPE_LABELS: Record<number, string> = {
@@ -137,6 +138,12 @@ export async function getSidebarData(userEmail: string): Promise<SidebarData | n
       }
     }
 
+    // Fetch buddy IDs (neighbors this user is following)
+    const buddyRes = await dataverse.get<{ value: any[] }>(
+      `bb_bannerbuddies?$filter=_bb_neighbor_value eq '${neighborId}' and statecode eq 0&$select=_bb_buddy_value&$top=200`
+    );
+    const buddyIds = (buddyRes.value ?? []).map((bb: any) => bb._bb_buddy_value).filter(Boolean);
+
     // Suggested brigades — ones user hasn't joined
     const myBrigadeIds = new Set(myBrigades.map(b => b.brigadeId));
     const suggestedBrigades = (allBrigadesRes.value ?? [])
@@ -151,7 +158,7 @@ export async function getSidebarData(userEmail: string): Promise<SidebarData | n
         typeLabel: BRIGADE_TYPE_LABELS[b.bb_brigadetype] ?? 'Other',
       }));
 
-    return { neighbor, myBrigades, myBlitzes, suggestedBrigades };
+    return { neighbor, myBrigades, myBlitzes, suggestedBrigades, buddyIds };
   } catch (err) {
     console.error('getSidebarData failed:', err);
     return null;

@@ -121,6 +121,24 @@ export default async function NeighborProfilePage({
 
   if (!profile) notFound();
 
+  const [followersRes, followingRes, followStatusRes] = await Promise.all([
+    dataverse.get<{ value: any[] }>(
+      `bb_bannerbuddies?$filter=_bb_buddy_value eq '${id}' and statecode eq 0&$select=bb_bannerbuddyid&$top=1000`
+    ),
+    dataverse.get<{ value: any[] }>(
+      `bb_bannerbuddies?$filter=_bb_neighbor_value eq '${id}' and statecode eq 0&$select=bb_bannerbuddyid&$top=1000`
+    ),
+    loggedInNeighborId && loggedInNeighborId !== id
+      ? dataverse.get<{ value: any[] }>(
+          `bb_bannerbuddies?$filter=_bb_neighbor_value eq '${loggedInNeighborId}' and _bb_buddy_value eq '${id}' and statecode eq 0&$select=bb_bannerbuddyid&$top=1`
+        )
+      : Promise.resolve({ value: [] }),
+  ]);
+
+  const followersCount = followersRes.value?.length ?? 0;
+  const followingCount = followingRes.value?.length ?? 0;
+  const isFollowing = (followStatusRes.value?.length ?? 0) > 0;
+
   const isOwnProfile = loggedInNeighborId === id;
 
   return (
@@ -130,6 +148,9 @@ export default async function NeighborProfilePage({
       sidebarData={sidebarData}
       neighborId={loggedInNeighborId}
       isOwnProfile={isOwnProfile}
+      followersCount={followersCount}
+      followingCount={followingCount}
+      isFollowing={isFollowing}
     />
   );
 }

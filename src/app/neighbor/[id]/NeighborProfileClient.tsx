@@ -32,6 +32,9 @@ interface Props {
   sidebarData: SidebarData | null;
   neighborId: string | null;
   isOwnProfile: boolean;
+  followersCount: number;
+  followingCount: number;
+  isFollowing: boolean;
 }
 
 export default function NeighborProfileClient({
@@ -40,7 +43,12 @@ export default function NeighborProfileClient({
   sidebarData,
   neighborId,
   isOwnProfile,
+  followersCount,
+  followingCount,
+  isFollowing,
 }: Props) {
+  const [following, setFollowing] = useState(isFollowing);
+  const [followLoading, setFollowLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'bumps' | 'brigades'>('bumps');
   const [feedItems, setFeedItems] = useState<(FeedItem & { relativeTime: string; bannerOptionLabel: string })[]>([]);
   const [feedLoading, setFeedLoading] = useState(true);
@@ -87,6 +95,27 @@ export default function NeighborProfileClient({
     observer.observe(bottomRef.current);
     return () => observer.disconnect();
   }, [feedItems, feedHasMore, loadFeed]);
+
+  const handleFollow = async () => {
+    if (!neighborId || isOwnProfile) return;
+    setFollowLoading(true);
+    try {
+      await fetch('/api/flows/bannerbuddy-action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          neighborId,
+          buddyId: profile.neighborId,
+          action: following ? 'unfollow' : 'follow',
+        }),
+      });
+      setFollowing(v => !v);
+    } catch {
+      console.error('Follow action failed');
+    } finally {
+      setFollowLoading(false);
+    }
+  };
 
   const displayName = profile.displayName || `${profile.firstName} ${profile.lastName}`.trim();
 
@@ -136,15 +165,25 @@ export default function NeighborProfileClient({
                 Edit Profile
               </Link>
             ) : (
-              <button
-                style={{
-                  padding: '8px 16px', background: '#1B2A4A', color: '#FFFFFF',
-                  borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif',
-                  fontSize: '0.82rem', fontWeight: 700, border: 'none', cursor: 'pointer',
-                }}
-              >
-                + Follow
-              </button>
+              !isOwnProfile && neighborId && (
+                <button
+                  onClick={handleFollow}
+                  disabled={followLoading}
+                  style={{
+                    padding: '8px 20px',
+                    background: following ? 'transparent' : '#1B2A4A',
+                    color: following ? '#1B2A4A' : '#FFFFFF',
+                    borderRadius: 20,
+                    fontFamily: 'Trebuchet MS, sans-serif',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    border: following ? '1px solid #1B2A4A' : 'none',
+                    cursor: followLoading ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {followLoading ? '...' : following ? 'Following' : '+ Follow'}
+                </button>
+              )
             )}
           </div>
         </div>
@@ -181,6 +220,12 @@ export default function NeighborProfileClient({
 
         {/* Stats */}
         <div style={{ display: 'flex', gap: 20, marginBottom: 12 }}>
+          <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#555555' }}>
+            <strong style={{ color: '#1B2A4A' }}>{followingCount}</strong> Following
+          </span>
+          <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#555555' }}>
+            <strong style={{ color: '#1B2A4A' }}>{followersCount}</strong> Followers
+          </span>
           <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#555555' }}>
             <strong style={{ color: '#1B2A4A' }}>{brigades.length}</strong> Brigade{brigades.length !== 1 ? 's' : ''}
           </span>

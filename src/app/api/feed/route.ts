@@ -73,6 +73,7 @@ export async function GET(req: NextRequest) {
   const state = searchParams.get('state') ?? '';
   const brigadeIds = searchParams.get('brigadeIds')?.split(',').filter(Boolean) ?? [];
   const blitzIds = searchParams.get('blitzIds')?.split(',').filter(Boolean) ?? [];
+  const buddyIds = searchParams.get('buddyIds')?.split(',').filter(Boolean) ?? [];
 
   const profileNeighborId = searchParams.get('profileNeighborId') ?? '';
 
@@ -196,7 +197,8 @@ export async function GET(req: NextRequest) {
         createdOn: b.createdon ?? '',
       };
 
-      // Tier 1 — My Brigades/Blitzes items first
+      // Tier 1 — My Brigades/Blitzes/Buddies items first
+      const isMyBuddy = buddyIds.includes(base.neighborId);
       const isMyBrigade = brigadeIds.includes(base.brigadeId);
       const isMyBlitz = blitzIds.includes(base.blitzId);
       const isMyState = state && b.bb_recipientstate === state;
@@ -206,7 +208,7 @@ export async function GET(req: NextRequest) {
         ...base,
         id: `bump-${b.bb_bannerid}`,
         type: 'bump',
-        _tier: isMyBrigade || isMyBlitz ? 1 : isMyState ? 2 : 3,
+        _tier: isMyBrigade || isMyBlitz || isMyBuddy ? 1 : isMyState ? 2 : 3,
       } as any);
 
       // 2. Dedication post
@@ -215,7 +217,7 @@ export async function GET(req: NextRequest) {
           ...base,
           id: `dedication-${b.bb_bannerid}`,
           type: 'dedication',
-          _tier: isMyBrigade || isMyBlitz ? 1 : isMyState ? 2 : 3,
+          _tier: isMyBrigade || isMyBlitz || isMyBuddy ? 1 : isMyState ? 2 : 3,
         } as any);
       }
 
@@ -225,7 +227,7 @@ export async function GET(req: NextRequest) {
           ...base,
           id: `note_in-${b.bb_bannerid}`,
           type: 'note_in',
-          _tier: isMyBrigade || isMyBlitz ? 1 : isMyState ? 2 : 3,
+          _tier: isMyBrigade || isMyBlitz || isMyBuddy ? 1 : isMyState ? 2 : 3,
         } as any);
       }
 
@@ -235,7 +237,7 @@ export async function GET(req: NextRequest) {
           ...base,
           id: `note_rn-${b.bb_bannerid}`,
           type: 'note_rn',
-          _tier: isMyBrigade || isMyBlitz ? 1 : isMyState ? 2 : 3,
+          _tier: isMyBrigade || isMyBlitz || isMyBuddy ? 1 : isMyState ? 2 : 3,
         } as any);
       }
 
@@ -245,7 +247,7 @@ export async function GET(req: NextRequest) {
           ...base,
           id: `brigade_bump-${b.bb_bannerid}`,
           type: 'brigade_bump',
-          _tier: isMyBrigade || isMyBlitz ? 1 : isMyState ? 2 : 3,
+          _tier: isMyBrigade || isMyBlitz || isMyBuddy ? 1 : isMyState ? 2 : 3,
         } as any);
       }
     }
