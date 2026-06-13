@@ -81,6 +81,7 @@ export interface BrigadeDetail {
   typeLabel: string;
   scopeLabel: string;
   countyNameFull: string;
+  followerCount: number;
 }
 
 export default async function BrigadeDetailPage({
@@ -113,7 +114,7 @@ export default async function BrigadeDetailPage({
   let membershipStatus: { brigadeneighborid: string; isAdmin: boolean; statuscode: number } | null = null;
 
   try {
-    const [brigadeRes, membersRes, blitzesRes, bumpsRes] = await Promise.all([
+    const [brigadeRes, membersRes, blitzesRes, bumpsRes, followersRes] = await Promise.all([
       dataverse.get<{ value: any[] }>(
         `bb_brigades?$filter=bb_brigadeid eq '${id}'` +
         `&$select=bb_brigadeid,bb_brigadenumber,bb_name,bb_brigadetype,bb_brigadescope,bb_brigadestate,bb_brigadecity,bb_brigadescopedescription,bb_description,bb_imageurl,bb_profileimageurl,bb_isverified,_bb_owner_value,_bb_brigadecounty_value` +
@@ -131,6 +132,9 @@ export default async function BrigadeDetailPage({
         `bb_banners?$filter=_bb_brigade_value eq '${id}' and statuscode ne 121120002` +
         `&$select=bb_bannerid,bb_bannernumber,bb_banneroption,bb_recipientcity,bb_recipientstate,createdon` +
         `&$orderby=createdon desc&$top=10`
+      ),
+      dataverse.get<{ value: any[] }>(
+        `bb_brigadeneighbors?$filter=_bb_brigade_value eq '${id}' and statuscode eq 121120002 and statecode eq 0&$select=bb_brigadeneighborid`
       ),
     ]);
 
@@ -172,6 +176,7 @@ export default async function BrigadeDetailPage({
       typeLabel: BRIGADE_TYPE_LABELS[b.bb_brigadetype] ?? 'Other',
       scopeLabel: BRIGADE_SCOPE_LABELS[b.bb_brigadescope] ?? '',
       countyNameFull,
+      followerCount: followersRes.value?.length ?? 0,
     };
 
     members = (membersRes.value ?? []).map((m: any) => ({
