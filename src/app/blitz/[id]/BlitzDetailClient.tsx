@@ -232,6 +232,43 @@ export default function BlitzDetailClient({
               <strong>{daysRemaining(blitz.dateEnd)}</strong> days left
             </span>
           )}
+        {/* Share */}
+        <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
+          <a
+            href={`https://www.facebook.com/sharer/sharer.php?u=https://www.bannerbeauty.com/blitz/${blitz.blitzId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: '#1877F2', color: '#FFFFFF', borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+            Facebook
+          </a>
+          <a
+            href={`https://twitter.com/intent/tweet?text=Join%20our%20Banner%20Blitz!%20%F0%9F%87%BA%F0%9F%87%B8%20We%27re%20Banner%20Bumping%20neighbors%20with%20tattered%20flags.%20Come%20join%20us!%20%23BannerBeauty%20%23PatrioticNeighbors%20%23America250&url=https://www.bannerbeauty.com/blitz/${blitz.blitzId}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: '#000000', color: '#FFFFFF', borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.73-8.835L1.254 2.25H8.08l4.253 5.622 5.911-5.622zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            X
+          </a>
+          <a
+            href={`sms:?body=Join%20our%20Banner%20Blitz!%20%F0%9F%87%BA%F0%9F%87%B8%20https://www.bannerbeauty.com/blitz/${blitz.blitzId}`}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: '#1B7A3E', color: '#FFFFFF', borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', fontWeight: 700, textDecoration: 'none' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+            SMS
+          </a>
+          <button
+            onClick={() => {
+              navigator.clipboard.writeText(`https://www.bannerbeauty.com/blitz/${blitz.blitzId}`);
+              alert('Link copied!');
+            }}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '7px 14px', background: '#C5A028', color: '#FFFFFF', borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', fontWeight: 700, border: 'none', cursor: 'pointer' }}
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="#FFFFFF"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg>
+            Copy Link
+          </button>
         </div>
       </div>
 
