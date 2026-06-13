@@ -11,12 +11,24 @@ function SuccessInner() {
 
   useEffect(() => {
     if (!sessionId || !neighborId) return;
-    // Trigger flow to update Dataverse
-    fetch('/api/flows/patriotsclub-activate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ neighborId, sessionId }),
-    }).catch(err => console.error('PatriotsClub activate error:', err));
+
+    async function activate() {
+      const sessionRes = await fetch(`/api/patriotsclub/session?sessionId=${sessionId}`);
+      const sessionData = await sessionRes.json();
+
+      await fetch('/api/flows/patriotsclub-activate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          neighborId,
+          sessionId,
+          subscriptionId: sessionData.subscriptionId ?? '',
+          isRecurring: sessionData.isRecurring ?? false,
+        }),
+      });
+    }
+
+    activate().catch(err => console.error('PatriotsClub activate error:', err));
   }, [sessionId, neighborId]);
 
   return (
