@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 
-const FLOW_URL = 'PATRIOTS_CLUB_ACTIVATE_FLOW_URL_PLACEHOLDER';
+const FLOW_URL = 'https://2e1e3024670eed439dc2d049ff5827.18.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/98837f1a5f1d49ec8d58afd0baca7730/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=funWw8jxX5EbdXysLwDY0yAC8PBl21g0S0KUYRmafco';
 
 export async function POST(req: NextRequest) {
   let body: unknown;
