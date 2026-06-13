@@ -349,10 +349,10 @@ export default function BrigadeDetailClient({
             <strong style={{ color: '#1B2A4A' }}>{members.length + 1}</strong> Members
           </span>
           <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#555555' }}>
-            <strong style={{ color: '#1B2A4A' }}>{recentBumps.length === 10 ? '10+' : recentBumps.length}</strong> Bumps
+            <strong style={{ color: '#1B2A4A' }}>{brigade.followerCount}</strong> Follower{brigade.followerCount !== 1 ? 's' : ''}
           </span>
           <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#555555' }}>
-            <strong style={{ color: '#1B2A4A' }}>{brigade.followerCount}</strong> Follower{brigade.followerCount !== 1 ? 's' : ''}
+            <strong style={{ color: '#1B2A4A' }}>{recentBumps.length === 10 ? '10+' : recentBumps.length}</strong> Bumps
           </span>
           {blitzes.length > 0 && (
             <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#555555' }}>
