@@ -159,13 +159,14 @@ export default function NeighborProfileClient({
                 right: 8,
                 width: 36,
                 height: 36,
-                background: '#C5A028',
+                background: '#FFFFFF',
                 borderRadius: '50%',
-                border: '3px solid #FFFFFF',
+                border: '1.5px solid #EEEEEE',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '1rem',
+                fontSize: '1.4rem',
+                color: '#C5A028',
               }}>
                 ★
               </div>

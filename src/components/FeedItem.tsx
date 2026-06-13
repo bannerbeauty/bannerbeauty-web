@@ -33,14 +33,15 @@ function NeighborAvatar({ src, neighborId, isPatriotsClub, size = 40 }: { src: s
           right: 0,
           width: Math.round(size * 0.35),
           height: Math.round(size * 0.35),
-          background: '#C5A028',
+          background: '#FFFFFF',
           borderRadius: '50%',
-          border: '2px solid #FFFFFF',
+          border: '1.5px solid #EEEEEE',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontSize: Math.round(size * 0.18),
+          fontSize: Math.round(size * 0.28),
           lineHeight: 1,
+          color: '#C5A028',
         }}>
           ★
         </div>
