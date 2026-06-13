@@ -17,6 +17,7 @@ export interface FeedItem {
   handle: string;
   profileImageUrl: string;
   isVerified: boolean;
+  isPatriotsClub: boolean;
   // RN data
   rnFirstName: string;
   rnNeighborId: string;
@@ -120,7 +121,7 @@ export async function GET(req: NextRequest) {
       neighborIds.length > 0
         ? dataverse.get<{ value: any[] }>(
             `bb_neighbors?$filter=${neighborIds.map(id => `bb_neighborid eq '${id}'`).join(' or ')}` +
-            `&$select=bb_neighborid,bb_displayname,bb_handle,bb_profileimageurl,bb_isprofileimageapproved`
+            `&$select=bb_neighborid,bb_displayname,bb_handle,bb_profileimageurl,bb_isprofileimageapproved,bb_ispatriotsclub`
           )
         : Promise.resolve({ value: [] }),
       allBrigadeIds.length > 0
@@ -176,6 +177,7 @@ export async function GET(req: NextRequest) {
         handle: neighbor.bb_handle ?? '',
         profileImageUrl: neighbor.bb_profileimageurl ?? '',
         isVerified: neighbor.bb_isverified ?? false,
+        isPatriotsClub: neighbor.bb_ispatriotsclub ?? false,
         rnFirstName: b.bb_rnfirstname ?? '',
         rnNeighborId: b._bb_recipientneighbor_value ?? '',
         rnDisplayName: rnNeighborMap[b._bb_recipientneighbor_value]?.bb_displayname ?? '',

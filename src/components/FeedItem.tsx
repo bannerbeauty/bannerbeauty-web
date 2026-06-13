@@ -17,6 +17,38 @@ function getDefaultAvatar(id: string): string {
   return DEFAULT_AVATARS[(id?.charCodeAt(0) ?? 0) % DEFAULT_AVATARS.length];
 }
 
+function NeighborAvatar({ src, neighborId, isPatriotsClub, size = 40 }: { src: string; neighborId: string; isPatriotsClub?: boolean; size?: number }) {
+  return (
+    <div style={{ position: 'relative', width: size, height: size, flexShrink: 0 }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={src || getDefaultAvatar(neighborId)}
+        alt=""
+        style={{ width: size, height: size, borderRadius: '50%', objectFit: 'cover', display: 'block' }}
+      />
+      {isPatriotsClub && (
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          right: 0,
+          width: Math.round(size * 0.35),
+          height: Math.round(size * 0.35),
+          background: '#C5A028',
+          borderRadius: '50%',
+          border: '2px solid #FFFFFF',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: Math.round(size * 0.18),
+          lineHeight: 1,
+        }}>
+          ★
+        </div>
+      )}
+    </div>
+  );
+}
+
 const STATE_NAMES: Record<string, string> = {
   AL:'Alabama',AK:'Alaska',AZ:'Arizona',AR:'Arkansas',CA:'California',
   CO:'Colorado',CT:'Connecticut',DE:'Delaware',FL:'Florida',GA:'Georgia',
@@ -52,12 +84,10 @@ export default function FeedItemCard({ item }: Props) {
       {/* Avatar */}
       {item.neighborId ? (
         <Link href={`/neighbor/${item.neighborId}`}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={avatar} alt={name} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #EEEEEE', display: 'block' }} />
+          <NeighborAvatar src={avatar} neighborId={item.neighborId} isPatriotsClub={item.isPatriotsClub} />
         </Link>
       ) : (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={avatar} alt={name} style={{ width: 40, height: 40, borderRadius: '50%', objectFit: 'cover', flexShrink: 0, border: '2px solid #EEEEEE' }} />
+        <NeighborAvatar src={avatar} neighborId="" />
       )}
 
       {/* Name + handle + time */}

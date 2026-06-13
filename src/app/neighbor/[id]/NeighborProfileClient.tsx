@@ -145,12 +145,32 @@ export default function NeighborProfileClient({
       <div style={{ padding: '0 20px', background: '#FFFFFF' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: -80, marginBottom: 12 }}>
           {/* Profile circle */}
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={profile.profileImageUrl || getDefaultAvatar(profile.neighborId)}
-            alt={displayName}
-            style={{ width: 160, height: 160, borderRadius: '50%', objectFit: 'cover', border: '6px solid #FFFFFF', flexShrink: 0, position: 'relative', zIndex: 2 }}
-          />
+          <div style={{ position: 'relative', width: 160, height: 160, flexShrink: 0, zIndex: 2 }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={profile.profileImageUrl || getDefaultAvatar(profile.neighborId)}
+              alt={displayName}
+              style={{ width: 160, height: 160, borderRadius: '50%', objectFit: 'cover', border: '6px solid #FFFFFF', display: 'block' }}
+            />
+            {profile.isPatriotsClub && (
+              <div style={{
+                position: 'absolute',
+                bottom: 8,
+                right: 8,
+                width: 36,
+                height: 36,
+                background: '#C5A028',
+                borderRadius: '50%',
+                border: '3px solid #FFFFFF',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '1rem',
+              }}>
+                ★
+              </div>
+            )}
+          </div>
           {/* Action button */}
           <div style={{ alignSelf: 'flex-end', paddingBottom: 18 }}>
             {isOwnProfile ? (
