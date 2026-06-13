@@ -51,6 +51,8 @@ export default function BrigadeDetailClient({
 }: Props) {
   const [requestSent, setRequestSent] = useState(false);
   const [requesting, setRequesting] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(membershipStatus?.statuscode === 121120002);
+  const [followLoading, setFollowLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'bumps' | 'members' | 'blitzes'>('bumps');
   const [isMobile, setIsMobile] = useState(false);
 
@@ -130,6 +132,28 @@ export default function BrigadeDetailClient({
       console.error('Join request failed');
     } finally {
       setRequesting(false);
+    }
+  };
+
+  const handleFollow = async () => {
+    if (!neighborId) return;
+    setFollowLoading(true);
+    try {
+      await fetch('/api/flows/brigadeneighbor-action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          neighborId,
+          brigadeId: brigade.brigadeId,
+          brigadeneighborid: membershipStatus?.brigadeneighborid ?? '',
+          action: isFollowing ? 'unfollow' : 'follow',
+        }),
+      });
+      setIsFollowing(v => !v);
+    } catch {
+      console.error('Follow action failed');
+    } finally {
+      setFollowLoading(false);
     }
   };
 
@@ -245,24 +269,43 @@ export default function BrigadeDetailClient({
                 Pending
               </div>
             ) : neighborId ? (
-              <button
-                onClick={handleJoinRequest}
-                disabled={requesting}
-                style={{
-                  padding: '8px 20px',
-                  background: '#1B2A4A',
-                  color: '#FFFFFF',
-                  borderRadius: 20,
-                  fontFamily: 'Trebuchet MS, sans-serif',
-                  fontSize: '0.82rem',
-                  fontWeight: 700,
-                  border: 'none',
-                  cursor: requesting ? 'not-allowed' : 'pointer',
-                  opacity: requesting ? 0.7 : 1,
-                }}
-              >
-                {requesting ? 'Requesting...' : 'Request to Join'}
-              </button>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  onClick={handleJoinRequest}
+                  disabled={requesting}
+                  style={{
+                    padding: '8px 20px',
+                    background: '#1B2A4A',
+                    color: '#FFFFFF',
+                    borderRadius: 20,
+                    fontFamily: 'Trebuchet MS, sans-serif',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    border: 'none',
+                    cursor: requesting ? 'not-allowed' : 'pointer',
+                    opacity: requesting ? 0.7 : 1,
+                  }}
+                >
+                  {requesting ? 'Requesting...' : 'Request to Join'}
+                </button>
+                <button
+                  onClick={handleFollow}
+                  disabled={followLoading}
+                  style={{
+                    padding: '8px 16px',
+                    background: isFollowing ? 'transparent' : 'transparent',
+                    color: '#1B2A4A',
+                    borderRadius: 20,
+                    fontFamily: 'Trebuchet MS, sans-serif',
+                    fontSize: '0.82rem',
+                    fontWeight: 700,
+                    border: '1px solid #CCCCCC',
+                    cursor: followLoading ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {followLoading ? '...' : isFollowing ? '✓ Following' : '+ Follow'}
+                </button>
+              </div>
             ) : (
               <Link
                 href="/api/auth/signin"
@@ -455,6 +498,20 @@ export default function BrigadeDetailClient({
                     {member.displayName || `${member.firstName} ${member.lastName}`.trim()}
                   </div>
                   {member.handle && <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#888888' }}>@{member.handle}</div>}
+                </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  <button
+                    onClick={() => fetch('/api/flows/brigadeneighbor-action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brigadeneighborid: member.brigadeneighborid, action: 'approve' }) })}
+                    style={{ padding: '6px 12px', background: '#1B7A3E', color: '#FFFFFF', border: 'none', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}
+                  >
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => fetch('/api/flows/brigadeneighbor-action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brigadeneighborid: member.brigadeneighborid, action: 'deny' }) })}
+                    style={{ padding: '6px 12px', background: '#B22234', color: '#FFFFFF', border: 'none', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}
+                  >
+                    Deny
+                  </button>
                 </div>
               </div>
             ))}
