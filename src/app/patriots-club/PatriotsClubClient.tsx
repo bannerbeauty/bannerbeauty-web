@@ -5,8 +5,8 @@ import Link from 'next/link';
 import CommunityLayout from '@/components/CommunityLayout';
 import type { SidebarData } from '@/lib/community-sidebar';
 
-const ONE_OFF_PRICE_ID = 'price_1ThuIEJhCCth9fOiTFubdMjA';
-const RECURRING_PRICE_ID = 'price_1ThuH8JhCCth9fOiDstak8So';
+const ONE_OFF_PRICE_ID = process.env.NEXT_PUBLIC_PATRIOTS_CLUB_ONETIME_PRICE_ID ?? 'price_1ThuIEJhCCth9fOiTFubdMjA';
+const RECURRING_PRICE_ID = process.env.NEXT_PUBLIC_PATRIOTS_CLUB_RECURRING_PRICE_ID ?? 'price_1ThuH8JhCCth9fOiDstak8So';
 
 interface Props {
   isLoggedIn: boolean;
