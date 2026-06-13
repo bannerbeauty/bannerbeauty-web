@@ -19,6 +19,7 @@ export interface NeighborData {
   city: string;
   state: string;
   zipcode: string;
+  bumpBalance: number;
 }
 
 export interface LetterTemplate {
@@ -59,6 +60,7 @@ interface BannerBumpClientProps {
   gcProducts: GcProduct[];
   letterPrice: number;
   activeBlitzes: ActiveBlitz[];
+  patriotsClubBalance: number;
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -205,7 +207,7 @@ function ToggleCard({
 // ── Main component ────────────────────────────────────────────────────────────
 
 export default function BannerBumpClient({
-  userEmail, userFirstName, userLastName, neighbor, letterTemplates, flagProducts, gcProducts, letterPrice, activeBlitzes,
+  userEmail, userFirstName, userLastName, neighbor, letterTemplates, flagProducts, gcProducts, letterPrice, activeBlitzes, patriotsClubBalance,
 }: BannerBumpClientProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -272,6 +274,9 @@ export default function BannerBumpClient({
   const [stripeReady,  setStripeReady]  = useState(false);
   const [placing,      setPlacing]      = useState(false);
 
+  // Patriot's Club
+  const [usePatriotsClub, setUsePatriotsClub] = useState(false);
+
   // ── Computed ────────────────────────────────────────────────────────────────
   const includesFlag = bannerOption === '121120002';
   const includesGC   = bannerOption === '121120001';
@@ -281,7 +286,7 @@ export default function BannerBumpClient({
   const cheapestFlag = flagProducts.length > 0 ? Math.min(...flagProducts.map(p => p.price)) : 0;
   const cheapestGC   = gcProducts.length > 0   ? Math.min(...gcProducts.map(p => p.price))   : 0;
   const shipping     = includesFlag ? 5.0 : 0;
-  const amountDue    = Math.max(0, subtotal + shipping - gcTotal);
+  const amountDue = (usePatriotsClub && patriotsClubBalance > 0) ? 0 : Math.max(0, subtotal + shipping - gcTotal);
 
   const hasPhone   = Boolean(neighbor?.phone);
   const hasAddress = Boolean(neighbor?.address1);
@@ -292,6 +297,19 @@ export default function BannerBumpClient({
 
   // ── Effects ─────────────────────────────────────────────────────────────────
   useEffect(() => { setMounted(true); }, []);
+
+  // Auto-enable Patriot's Club if they have balance
+  useEffect(() => {
+    if (patriotsClubBalance > 0) setUsePatriotsClub(true);
+  }, [patriotsClubBalance]);
+
+  // Force Letter + Flag option and specific flag when using Patriot's Club
+  useEffect(() => {
+    if (usePatriotsClub && patriotsClubBalance > 0) {
+      setBannerOption('121120002');
+      setSelectedFlagId('4a439c41-ce62-f111-a826-00224805c083');
+    }
+  }, [usePatriotsClub, patriotsClubBalance]);
 
   // When attribution flips to anonymous, clear sharing
   useEffect(() => {
@@ -447,6 +465,7 @@ export default function BannerBumpClient({
           recipientLng,
           blitzId: selectedBlitzId,
           brigadeId: selectedBlitzBrigadeId,
+          usePatriotsClub: usePatriotsClub && patriotsClubBalance > 0,
         }),
       });
       orderData = await res.json();
@@ -582,6 +601,22 @@ export default function BannerBumpClient({
                 </div>
               );
             })()}
+            {patriotsClubBalance > 0 && (
+              <div style={{ marginTop: 20, padding: '14px 18px', background: '#FFFBEE', border: '1.5px solid #C5A028', borderRadius: 6 }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: 10, cursor: 'pointer' }}>
+                  <input
+                    type="checkbox"
+                    checked={usePatriotsClub}
+                    onChange={(e) => setUsePatriotsClub(e.target.checked)}
+                    style={{ width: 18, height: 18, cursor: 'pointer', accentColor: '#C5A028', flexShrink: 0 }}
+                  />
+                  <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#555555', lineHeight: 1.5 }}>
+                    <span style={{ color: '#C5A028', fontWeight: 700 }}>★ Use a Patriot&apos;s Club Bump</span>
+                    {' '}— use 1 of your {patriotsClubBalance} remaining bump{patriotsClubBalance !== 1 ? 's' : ''} (Letter + Flag, no charge)
+                  </span>
+                </label>
+              </div>
+            )}
             {stepError && <p style={{ color: '#B22234', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', marginTop: 12 }}>{stepError}</p>}
             <NavButtons showBack={false} onNext={handleNext} nextLabel="Next: Recipient Info →" />
           </div>
@@ -722,6 +757,11 @@ export default function BannerBumpClient({
         {step === 4 && (
           <div style={cardStyle}>
             <div style={sectionTitleStyle}>★ Choose a Banner Option</div>
+            {usePatriotsClub && patriotsClubBalance > 0 && (
+              <div style={{ background: '#FFFBEE', border: '1.5px solid #C5A028', borderRadius: 6, padding: '12px 16px', marginBottom: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#7A6010', lineHeight: 1.5 }}>
+                <span style={{ fontWeight: 700 }}>★ Patriot&apos;s Club Bump active</span> — Banner option is locked to <strong>Letter + Flag</strong>. No payment required.
+              </div>
+            )}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginBottom: 24 }}>
               {BANNER_OPTIONS.map((opt) => (
                 <button
@@ -1050,9 +1090,15 @@ export default function BannerBumpClient({
               </div>
             )}
 
-            {amountDue === 0 && gcTotal > 0 && (
+            {amountDue === 0 && gcTotal > 0 && !usePatriotsClub && (
               <div style={{ background: '#E8F5E9', border: '1px solid #1B7A3E', borderRadius: 8, padding: 20, marginBottom: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.9rem', color: '#1B7A3E', fontWeight: 700 }}>
                 ✓ Your Banner Bump is fully covered by gift certificate(s) — no payment needed!
+              </div>
+            )}
+
+            {usePatriotsClub && patriotsClubBalance > 0 && (
+              <div style={{ background: '#FFFBEE', border: '1.5px solid #C5A028', borderRadius: 8, padding: 20, marginBottom: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.9rem', color: '#7A6010' }}>
+                <span style={{ fontWeight: 700 }}>★ Patriot&apos;s Club Bump</span> — 1 bump credit will be used from your balance of {patriotsClubBalance}. No payment required.
               </div>
             )}
 

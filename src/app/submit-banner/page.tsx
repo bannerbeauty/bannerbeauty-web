@@ -86,6 +86,8 @@ interface DvNeighbor {
   bb_city?: string;
   bb_state?: string;
   bb_zipcode?: string;
+  bb_bumpbalance?: number;
+  bb_ispatriotsclub?: boolean;
 }
 
 interface DvTemplate {
@@ -126,7 +128,7 @@ export default async function SubmitBannerPage() {
   const [neighborRes, templatesRes, flagsRes, letterRes, gcProductsRes] = await Promise.allSettled([
     dataverse.get<{ value: DvNeighbor[] }>(
       `bb_neighbors?$filter=bb_email eq '${userEmail}' and statecode eq 0` +
-      `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_phone,bb_addressline1,bb_addressline2,bb_city,bb_state,bb_zipcode&$top=1`
+      `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_phone,bb_addressline1,bb_addressline2,bb_city,bb_state,bb_zipcode,bb_bumpbalance,bb_ispatriotsclub&$top=1`
     ),
     dataverse.get<{ value: DvTemplate[] }>(
       `bb_lettertemplates?$filter=statecode eq 0` +
@@ -163,6 +165,7 @@ export default async function SubmitBannerPage() {
         city: dvNeighbor.bb_city ?? '',
         state: dvNeighbor.bb_state ?? '',
         zipcode: dvNeighbor.bb_zipcode ?? '',
+        bumpBalance: dvNeighbor.bb_bumpbalance ?? 0,
       }
     : null;
 
@@ -201,6 +204,7 @@ export default async function SubmitBannerPage() {
         }))
       : [];
 
+  const patriotsClubBalance = neighbor?.bumpBalance ?? 0;
   const activeBlitzes = neighbor?.neighborId ? await getNeighborActiveBlitzes(neighbor.neighborId) : [];
 
   return (
@@ -215,6 +219,7 @@ export default async function SubmitBannerPage() {
         gcProducts={gcProducts}
         letterPrice={letterPrice}
         activeBlitzes={activeBlitzes}
+        patriotsClubBalance={patriotsClubBalance}
       />
     </Suspense>
   );
