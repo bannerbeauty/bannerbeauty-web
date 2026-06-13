@@ -450,6 +450,68 @@ export default function BrigadeDetailClient({
                     </div>
                     {member.handle && <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#888888' }}>@{member.handle}</div>}
                     {member.isAdmin && <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.65rem', color: '#C5A028', fontWeight: 700 }}>ADMIN</div>}
+                    {isOwner && (
+                      <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+                        {member.isAdmin ? (
+                          <button
+                            onClick={async () => {
+                              await fetch('/api/flows/brigadeneighbor-action', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ brigadeneighborid: member.brigadeneighborid, action: 'revoke-admin' }),
+                              });
+                              window.location.reload();
+                            }}
+                            style={{
+                              padding: '3px 8px', background: 'transparent', color: '#888888',
+                              border: '1px solid #DDDDDD', borderRadius: 4,
+                              fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.65rem',
+                              fontWeight: 700, cursor: 'pointer',
+                            }}
+                          >
+                            Revoke Admin
+                          </button>
+                        ) : (
+                          <button
+                            onClick={async () => {
+                              await fetch('/api/flows/brigadeneighbor-action', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ brigadeneighborid: member.brigadeneighborid, action: 'make-admin' }),
+                              });
+                              window.location.reload();
+                            }}
+                            style={{
+                              padding: '3px 8px', background: 'transparent', color: '#C5A028',
+                              border: '1px solid #C5A028', borderRadius: 4,
+                              fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.65rem',
+                              fontWeight: 700, cursor: 'pointer',
+                            }}
+                          >
+                            Make Admin
+                          </button>
+                        )}
+                        <button
+                          onClick={async () => {
+                            if (!confirm(`Remove ${member.displayName || member.firstName} from the Brigade?`)) return;
+                            await fetch('/api/flows/brigadeneighbor-action', {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ brigadeneighborid: member.brigadeneighborid, action: 'remove' }),
+                            });
+                            window.location.reload();
+                          }}
+                          style={{
+                            padding: '3px 8px', background: 'transparent', color: '#B22234',
+                            border: '1px solid #B22234', borderRadius: 4,
+                            fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.65rem',
+                            fontWeight: 700, cursor: 'pointer',
+                          }}
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </Link>
               </div>
