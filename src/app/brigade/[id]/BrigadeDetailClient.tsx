@@ -566,13 +566,19 @@ export default function BrigadeDetailClient({
                 </div>
                 <div style={{ display: 'flex', gap: 6 }}>
                   <button
-                    onClick={() => fetch('/api/flows/brigadeneighbor-action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brigadeneighborid: member.brigadeneighborid, action: 'approve' }) })}
+                    onClick={async () => {
+                      await fetch('/api/flows/brigadeneighbor-action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brigadeneighborid: member.brigadeneighborid, action: 'approve' }) });
+                      window.location.reload();
+                    }}
                     style={{ padding: '6px 12px', background: '#1B7A3E', color: '#FFFFFF', border: 'none', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}
                   >
                     Approve
                   </button>
                   <button
-                    onClick={() => fetch('/api/flows/brigadeneighbor-action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brigadeneighborid: member.brigadeneighborid, action: 'deny' }) })}
+                    onClick={async () => {
+                      await fetch('/api/flows/brigadeneighbor-action', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ brigadeneighborid: member.brigadeneighborid, action: 'deny' }) });
+                      window.location.reload();
+                    }}
                     style={{ padding: '6px 12px', background: '#B22234', color: '#FFFFFF', border: 'none', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', fontWeight: 700, cursor: 'pointer' }}
                   >
                     Deny
