@@ -35,6 +35,8 @@ interface Props {
   followersCount: number;
   followingCount: number;
   isFollowing: boolean;
+  isPatriotsClub?: boolean;
+  bumpBalance?: number;
 }
 
 export default function NeighborProfileClient({
@@ -197,6 +199,20 @@ export default function NeighborProfileClient({
             {profile.isVerified && (
               <span style={{ color: '#C5A028', fontSize: '0.8rem', fontWeight: 700 }}>✓ VERIFIED</span>
             )}
+            {profile.isPatriotsClub && (
+              <span style={{
+                background: '#C5A028',
+                color: '#1B2A4A',
+                fontFamily: 'Trebuchet MS, sans-serif',
+                fontSize: '0.7rem',
+                fontWeight: 700,
+                padding: '3px 10px',
+                borderRadius: 20,
+                letterSpacing: '0.5px',
+              }}>
+                ★ Patriot&apos;s Club
+              </span>
+            )}
           </div>
           {profile.handle && (
             <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', color: '#888888', marginTop: 2 }}>
@@ -230,6 +246,38 @@ export default function NeighborProfileClient({
             <strong style={{ color: '#1B2A4A' }}>{brigades.length}</strong> Brigade{brigades.length !== 1 ? 's' : ''}
           </span>
         </div>
+
+        {isOwnProfile && profile.isPatriotsClub && (
+          <div style={{
+            background: 'rgba(197,160,40,0.1)',
+            border: '1px solid #C5A028',
+            borderRadius: 6,
+            padding: '10px 16px',
+            marginBottom: 12,
+            fontFamily: 'Trebuchet MS, sans-serif',
+            fontSize: '0.85rem',
+            color: '#1B2A4A',
+          }}>
+            ★ Patriot&apos;s Club — <strong>{profile.bumpBalance}</strong> Banner Bump{profile.bumpBalance !== 1 ? 's' : ''} remaining
+          </div>
+        )}
+
+        {isOwnProfile && !profile.isPatriotsClub && (
+          <Link href="/patriots-club" style={{
+            display: 'inline-block',
+            padding: '8px 16px',
+            background: '#C5A028',
+            color: '#1B2A4A',
+            borderRadius: 20,
+            fontFamily: 'Trebuchet MS, sans-serif',
+            fontSize: '0.82rem',
+            fontWeight: 700,
+            textDecoration: 'none',
+            marginBottom: 12,
+          }}>
+            ★ Join the Patriot&apos;s Club
+          </Link>
+        )}
       </div>
 
       {/* Tabs */}

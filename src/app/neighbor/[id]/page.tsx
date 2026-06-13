@@ -17,6 +17,8 @@ export interface NeighborProfile {
   city: string;
   state: string;
   createdOn: string;
+  isPatriotsClub: boolean;
+  bumpBalance: number;
 }
 
 export interface NeighborBrigade {
@@ -72,7 +74,7 @@ export default async function NeighborProfilePage({
     const [profileRes, brigadeMemberRes] = await Promise.all([
       dataverse.get<{ value: any[] }>(
         `bb_neighbors?$filter=bb_neighborid eq '${id}' and statecode eq 0` +
-        `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_displayname,bb_handle,bb_profileimageurl,bb_imageurl,bb_description,bb_isverified,bb_city,bb_state,createdon` +
+        `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_displayname,bb_handle,bb_profileimageurl,bb_imageurl,bb_description,bb_isverified,bb_city,bb_state,createdon,bb_ispatriotsclub,bb_bumpbalance` +
         `&$top=1`
       ),
       dataverse.get<{ value: any[] }>(
@@ -97,6 +99,8 @@ export default async function NeighborProfilePage({
       city: n.bb_city ?? '',
       state: n.bb_state ?? '',
       createdOn: n.createdon ?? '',
+      isPatriotsClub: n.bb_ispatriotsclub ?? false,
+      bumpBalance: n.bb_bumpbalance ?? 0,
     };
 
     // Get brigade details
