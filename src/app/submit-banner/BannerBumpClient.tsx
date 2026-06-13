@@ -766,12 +766,15 @@ export default function BannerBumpClient({
               {BANNER_OPTIONS.map((opt) => (
                 <button
                   key={opt.value}
+                  disabled={usePatriotsClub && patriotsClubBalance > 0}
                   onClick={() => { setBannerOption(opt.value); setSelectedFlagId(''); setGcProductId(''); setGcAmount(0); }}
                   style={{
                     textAlign: 'left', padding: '16px 20px',
                     border: bannerOption === opt.value ? '2px solid #B22234' : '2px solid #EEEEEE',
                     borderRadius: 6, background: bannerOption === opt.value ? '#FFF5F5' : '#FFFFFF',
-                    cursor: 'pointer', transition: 'border-color 0.15s',
+                    cursor: usePatriotsClub && patriotsClubBalance > 0 ? 'not-allowed' : 'pointer',
+                    opacity: usePatriotsClub && patriotsClubBalance > 0 ? 0.6 : 1,
+                    transition: 'border-color 0.15s',
                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                   }}
                 >
@@ -796,7 +799,11 @@ export default function BannerBumpClient({
             {includesFlag && (
               <div style={{ borderTop: '1px solid #EEEEEE', paddingTop: 20 }}>
                 <div style={sectionTitleStyle}>Select Flag</div>
-                {flagProducts.length === 0 ? (
+                {usePatriotsClub && patriotsClubBalance > 0 ? (
+                  <div style={{ marginTop: 16, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#1B2A4A', background: 'rgba(197,160,40,0.08)', border: '1px solid #C5A028', borderRadius: 6, padding: '12px 16px' }}>
+                    ★ Flag included: <strong>3&apos; x 5&apos; U.S. Flag, Nylon</strong> — included with your Patriot&apos;s Club membership.
+                  </div>
+                ) : flagProducts.length === 0 ? (
                   <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#888888' }}>No flag products are currently available.</p>
                 ) : (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
