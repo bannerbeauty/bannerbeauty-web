@@ -53,19 +53,22 @@ async function getNeighborActiveBlitzes(neighborId: string): Promise<ActiveBlitz
 
     const blitzMap = new Map<string, ActiveBlitz>();
     for (const bl of blitzRes.value ?? []) {
-      const bb = blitzBrigadeRes.value?.find((bb: any) => bb._bb_blitz_value === bl.bb_blitzid);
-      const brigade = brigadeIds.find(b => b.id === bb?._bb_brigade_value);
-      if (!brigade) continue;
-      if (blitzMap.has(bl.bb_blitzid)) {
-        blitzMap.get(bl.bb_blitzid)!.brigades.push({ brigadeId: brigade.id, brigadeName: brigade.name });
-      } else {
-        blitzMap.set(bl.bb_blitzid, {
-          blitzId: bl.bb_blitzid,
-          blitzName: bl.bb_name,
-          brigades: [{ brigadeId: brigade.id, brigadeName: brigade.name }],
-        });
+      const matchingBBs = blitzBrigadeRes.value?.filter((bb: any) => bb._bb_blitz_value === bl.bb_blitzid) ?? [];
+      for (const bb of matchingBBs) {
+        const brigade = brigadeIds.find(b => b.id === bb._bb_brigade_value);
+        if (!brigade) continue;
+        if (blitzMap.has(bl.bb_blitzid)) {
+          blitzMap.get(bl.bb_blitzid)!.brigades.push({ brigadeId: brigade.id, brigadeName: brigade.name });
+        } else {
+          blitzMap.set(bl.bb_blitzid, {
+            blitzId: bl.bb_blitzid,
+            blitzName: bl.bb_name,
+            brigades: [{ brigadeId: brigade.id, brigadeName: brigade.name }],
+          });
+        }
       }
     }
+    console.log('Active blitzes:', JSON.stringify(Array.from(blitzMap.values())));
     return Array.from(blitzMap.values());
   } catch (err) {
     console.error('getNeighborActiveBlitzes failed:', err);

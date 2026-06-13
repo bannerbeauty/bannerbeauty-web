@@ -125,8 +125,7 @@ export default async function BrigadeDetailPage({
         `&$expand=bb_Neighbor($select=bb_neighborid,bb_firstname,bb_lastname,bb_profileimageurl,bb_displayname,bb_handle)`
       ),
       dataverse.get<{ value: any[] }>(
-        `bb_blitzs?$filter=_bb_owner_value eq '${id}' and statuscode eq 121120001` +
-        `&$select=bb_blitzid,bb_blitznumber,bb_name,bb_datestart,bb_dateend`
+        `bb_blitzbrigades?$filter=_bb_brigade_value eq '${id}' and statuscode eq 121120002 and statecode eq 0&$select=_bb_blitz_value`
       ),
       dataverse.get<{ value: any[] }>(
         `bb_banners?$filter=_bb_brigade_value eq '${id}' and statuscode ne 121120002` +
@@ -187,13 +186,20 @@ export default async function BrigadeDetailPage({
       profileImageUrl: m.bb_Neighbor?.bb_profileimageurl ?? '',
     }));
 
-    blitzes = (blitzesRes.value ?? []).map((bl: any) => ({
-      blitzId: bl.bb_blitzid,
-      blitzNumber: bl.bb_blitznumber,
-      name: bl.bb_name,
-      dateStart: bl.bb_datestart ?? '',
-      dateEnd: bl.bb_dateend ?? '',
-    }));
+    const blitzIds = [...new Set((blitzesRes.value ?? []).map((bb: any) => bb._bb_blitz_value).filter(Boolean))];
+    if (blitzIds.length > 0) {
+      const blitzDetailRes = await dataverse.get<{ value: any[] }>(
+        `bb_blitzs?$filter=${blitzIds.map(bid => `bb_blitzid eq '${bid}'`).join(' or ')} and statecode eq 0` +
+        `&$select=bb_blitzid,bb_blitznumber,bb_name,bb_datestart,bb_dateend,statuscode`
+      );
+      blitzes = (blitzDetailRes.value ?? []).map((bl: any) => ({
+        blitzId: bl.bb_blitzid,
+        blitzNumber: bl.bb_blitznumber,
+        name: bl.bb_name,
+        dateStart: bl.bb_datestart ?? '',
+        dateEnd: bl.bb_dateend ?? '',
+      }));
+    }
 
     recentBumps = (bumpsRes.value ?? []).map((bump: any) => ({
       bannerId: bump.bb_bannerid,
