@@ -109,12 +109,13 @@ export default async function BrigadeDetailPage({
 
   let brigade: BrigadeDetail | null = null;
   let members: BrigadeMember[] = [];
+  let pendingMembers: BrigadeMember[] = [];
   let blitzes: BrigadeBlitz[] = [];
   let recentBumps: BrigadeBump[] = [];
   let membershipStatus: { brigadeneighborid: string; isAdmin: boolean; statuscode: number } | null = null;
 
   try {
-    const [brigadeRes, membersRes, blitzesRes, bumpsRes, followersRes] = await Promise.all([
+    const [brigadeRes, membersRes, blitzesRes, bumpsRes, followersRes, pendingRes] = await Promise.all([
       dataverse.get<{ value: any[] }>(
         `bb_brigades?$filter=bb_brigadeid eq '${id}'` +
         `&$select=bb_brigadeid,bb_brigadenumber,bb_name,bb_brigadetype,bb_brigadescope,bb_brigadestate,bb_brigadecity,bb_brigadescopedescription,bb_description,bb_imageurl,bb_profileimageurl,bb_isverified,_bb_owner_value,_bb_brigadecounty_value` +
@@ -135,6 +136,11 @@ export default async function BrigadeDetailPage({
       ),
       dataverse.get<{ value: any[] }>(
         `bb_brigadeneighbors?$filter=_bb_brigade_value eq '${id}' and statuscode eq 121120002 and statecode eq 0&$select=bb_brigadeneighborid`
+      ),
+      dataverse.get<{ value: any[] }>(
+        `bb_brigadeneighbors?$filter=_bb_brigade_value eq '${id}' and statuscode eq 1 and statecode eq 0` +
+        `&$select=bb_brigadeneighborid,bb_isadmin,bb_joindate` +
+        `&$expand=bb_Neighbor($select=bb_neighborid,bb_firstname,bb_lastname,bb_profileimageurl,bb_displayname,bb_handle)`
       ),
     ]);
 
@@ -182,6 +188,18 @@ export default async function BrigadeDetailPage({
     members = (membersRes.value ?? []).map((m: any) => ({
       brigadeneighborid: m.bb_brigadeneighborid,
       isAdmin: m.bb_isadmin ?? false,
+      joinDate: m.bb_joindate ?? '',
+      neighborId: m.bb_Neighbor?.bb_neighborid ?? '',
+      firstName: m.bb_Neighbor?.bb_firstname ?? '',
+      lastName: m.bb_Neighbor?.bb_lastname ?? '',
+      displayName: m.bb_Neighbor?.bb_displayname ?? '',
+      handle: m.bb_Neighbor?.bb_handle ?? '',
+      profileImageUrl: m.bb_Neighbor?.bb_profileimageurl ?? '',
+    }));
+
+    pendingMembers = (pendingRes.value ?? []).map((m: any) => ({
+      brigadeneighborid: m.bb_brigadeneighborid,
+      isAdmin: false,
       joinDate: m.bb_joindate ?? '',
       neighborId: m.bb_Neighbor?.bb_neighborid ?? '',
       firstName: m.bb_Neighbor?.bb_firstname ?? '',
@@ -245,6 +263,7 @@ export default async function BrigadeDetailPage({
       membershipStatus={membershipStatus}
       neighborId={neighborId}
       bannerOptionLabels={BANNER_OPTION_LABELS}
+      pendingMembers={pendingMembers}
       sidebarData={sidebarData}
     />
   );

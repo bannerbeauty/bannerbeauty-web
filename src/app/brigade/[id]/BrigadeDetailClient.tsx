@@ -34,7 +34,7 @@ interface Props {
   membershipStatus: { brigadeneighborid: string; isAdmin: boolean; statuscode: number } | null;
   neighborId: string | null;
   bannerOptionLabels: Record<number, string>;
-  pendingBrigades?: BrigadeMember[];
+  pendingMembers?: BrigadeMember[];
   sidebarData: SidebarData | null;
 }
 
@@ -46,7 +46,7 @@ export default function BrigadeDetailClient({
   membershipStatus,
   neighborId,
   bannerOptionLabels,
-  pendingBrigades,
+  pendingMembers,
   sidebarData,
 }: Props) {
   const [requestSent, setRequestSent] = useState(false);
@@ -545,12 +545,12 @@ export default function BrigadeDetailClient({
         )}
 
         {/* Pending requests — owner only */}
-        {isOwner && pendingBrigades && pendingBrigades.length > 0 && (
+        {isOwner && pendingMembers && pendingMembers.length > 0 && (
           <div style={{ marginTop: 24, background: '#FFFBEA', border: '1px solid #C5A028', borderRadius: 8, padding: 16 }}>
             <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#C5A028', marginBottom: 12, fontWeight: 700 }}>
-              ★ Pending Join Requests ({pendingBrigades.length})
+              ★ Pending Join Requests ({pendingMembers.length})
             </div>
-            {pendingBrigades.map(member => (
+            {pendingMembers.map(member => (
               <div key={member.brigadeneighborid} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 0', borderBottom: '1px solid #F5E8A0' }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
