@@ -495,6 +495,19 @@ export default function BannerBumpClient({
 
     if (amountDue === 0) { router.push('/banner-bump-confirmation?redirect_status=succeeded'); return; }
 
+    // Update Payment Intent metadata with orderId
+    if (orderData.orderId && clientSecret) {
+      const piId = clientSecret.split('_secret_')[0];
+      await fetch('/api/stripe/update-payment-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          paymentIntentId: piId,
+          orderId: orderData.orderId,
+        }),
+      }).catch(err => console.error('PI metadata update failed:', err));
+    }
+
     const { stripe, elements } = stripeRef.current!;
     const { error } = await stripe.confirmPayment({
       elements,
