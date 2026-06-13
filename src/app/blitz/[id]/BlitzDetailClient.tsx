@@ -232,6 +232,8 @@ export default function BlitzDetailClient({
               <strong>{daysRemaining(blitz.dateEnd)}</strong> days left
             </span>
           )}
+        </div>
+
         {/* Share */}
         <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginBottom: 12 }}>
           <a
