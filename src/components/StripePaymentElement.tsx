@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react';
 
-const STRIPE_PK = 'pk_test_51TckbVJhCCth9fOizWlvrQWZZMWW9KmI0IGBWY1WYmOInCirpDw1yFdzxqb8HNJheCzqXGcK5UX3baTx6MxCXWS500lhMmYOCn';
+const STRIPE_PK = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!;
 
 interface StripeInstance {
   confirmPayment: (opts: unknown) => Promise<{ error?: { message: string } }>;
