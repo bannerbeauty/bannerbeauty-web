@@ -15,6 +15,7 @@ interface Props {
   bumpBalance: number;
   expiryDate: string;
   sidebarData: SidebarData | null;
+  annualPrice: number;
 }
 
 function formatDate(iso: string) {
@@ -29,6 +30,7 @@ export default function PatriotsClubClient({
   bumpBalance,
   expiryDate,
   sidebarData,
+  annualPrice,
 }: Props) {
   const [purchasing, setPurchasing] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState<'onetime' | 'recurring'>('recurring');
@@ -121,9 +123,9 @@ export default function PatriotsClubClient({
             </div>
           ) : (
             <div style={{ fontFamily: 'Georgia, serif', fontSize: '2.5rem', fontWeight: 700, color: '#C5A028' }}>
-              $336<span style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.6)', fontFamily: 'Trebuchet MS, sans-serif' }}>/year</span>
+              ${annualPrice.toFixed(2)}<span style={{ fontSize: '1rem', color: 'rgba(255,255,255,0.6)', fontFamily: 'Trebuchet MS, sans-serif' }}>/year</span>
               <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>
-                Just $28 per Banner Bump · Buy 12, Save 12%
+                Just ${(annualPrice / 12).toFixed(2)} per Banner Bump · Buy 12, Save 12%
               </div>
             </div>
           )}
@@ -232,7 +234,7 @@ export default function PatriotsClubClient({
                 <div style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', fontWeight: 700, color: '#1B2A4A', marginBottom: 4 }}>
                   Annual Subscription
                 </div>
-                <div style={{ fontFamily: 'Georgia, serif', fontSize: '1.6rem', fontWeight: 700, color: '#C5A028' }}>$336</div>
+                <div style={{ fontFamily: 'Georgia, serif', fontSize: '1.6rem', fontWeight: 700, color: '#C5A028' }}>${annualPrice.toFixed(2)}</div>
                 <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#888888', marginTop: 4 }}>
                   per year · auto-renews · cancel anytime
                 </div>
@@ -253,7 +255,7 @@ export default function PatriotsClubClient({
                 <div style={{ fontFamily: 'Georgia, serif', fontSize: '1rem', fontWeight: 700, color: '#1B2A4A', marginBottom: 4 }}>
                   One-Time Purchase
                 </div>
-                <div style={{ fontFamily: 'Georgia, serif', fontSize: '1.6rem', fontWeight: 700, color: '#1B2A4A' }}>$336</div>
+                <div style={{ fontFamily: 'Georgia, serif', fontSize: '1.6rem', fontWeight: 700, color: '#1B2A4A' }}>${annualPrice.toFixed(2)}</div>
                 <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#888888', marginTop: 4 }}>
                   one year · no auto-renewal
                 </div>

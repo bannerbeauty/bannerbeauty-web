@@ -36,6 +36,16 @@ export default async function PatriotsClubPage() {
     }
   }
 
+  let annualPrice = 336;
+  try {
+    const priceRes = await dataverse.get<{ value: any[] }>(
+      `bb_products?$filter=bb_productid eq 'da91acdf-3c67-f111-a826-6045bd065f56' and statecode eq 0&$select=bb_price&$top=1`
+    );
+    annualPrice = priceRes.value?.[0]?.bb_price ?? 336;
+  } catch (err) {
+    console.error('PatriotsClub price fetch failed:', err);
+  }
+
   return (
     <PatriotsClubClient
       isLoggedIn={!!userEmail}
@@ -44,6 +54,7 @@ export default async function PatriotsClubPage() {
       bumpBalance={bumpBalance}
       expiryDate={expiryDate}
       sidebarData={sidebarData}
+      annualPrice={annualPrice}
     />
   );
 }
