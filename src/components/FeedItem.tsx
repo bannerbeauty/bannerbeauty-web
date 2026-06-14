@@ -293,6 +293,16 @@ export default function FeedItemCard({ item }: Props) {
             </button>
           )}
         </div>
+        {item.attributionPhotoUrl && (
+          <div style={{ margin: '12px 0' }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={item.attributionPhotoUrl}
+              alt={item.attributionName}
+              style={{ width: '100%', maxHeight: 300, objectFit: 'cover', borderRadius: 8 }}
+            />
+          </div>
+        )}
       </div>
     );
   }
