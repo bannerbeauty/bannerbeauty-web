@@ -103,7 +103,7 @@ export async function GET(req: NextRequest) {
       `bb_isfeatureable,bb_ispublicattribution,bb_ispublicnotein,bb_ispublicnotern,` +
       `bb_attributiontype,bb_attributionname,bb_attributiontext,` +
       `bb_notein,bb_notern,bb_sharename,bb_infirstname,bb_rnfirstname,` +
-      `bb_beforephotourl,bb_afterphotourl,bb_attributionphotourl,` +
+      `bb_beforephotourl,bb_afterphotourl,bb_attributionphoto,` +
       `_bb_initiatingneighbor_value,_bb_recipientneighbor_value,_bb_brigade_value,_bb_blitz_value,createdon` +
       `&$orderby=createdon desc&$top=50`
     );
@@ -203,7 +203,7 @@ export async function GET(req: NextRequest) {
         createdOn: b.createdon ?? '',
         beforePhotoUrl: b.bb_isfeatureable ? (b.bb_beforephotourl ?? '') : '',
         afterPhotoUrl: b.bb_isfeatureable ? (b.bb_afterphotourl ?? '') : '',
-        attributionPhotoUrl: b.bb_isfeatureable ? (b.bb_attributionphotourl ?? '') : '',
+        attributionPhotoUrl: b.bb_isfeatureable ? (b.bb_attributionphoto ?? '') : '',
       };
 
       // Tier 1 — My Brigades/Blitzes/Buddies items first
