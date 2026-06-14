@@ -267,20 +267,28 @@ export async function GET(req: NextRequest) {
       }
     });
 
+    // Deduplicate by id keeping first occurrence
+    const seenIds = new Set<string>();
+    const dedupedItems = feedItems.filter((item: any) => {
+      if (seenIds.has(item.id)) return false;
+      seenIds.add(item.id);
+      return true;
+    });
+
     // Sort by tier then by date
-    feedItems.sort((a: any, b: any) => {
+    dedupedItems.sort((a: any, b: any) => {
       if (a._tier !== b._tier) return a._tier - b._tier;
       return new Date(b.createdOn).getTime() - new Date(a.createdOn).getTime();
     });
 
     // Return top N items
-    const result = feedItems.slice(0, top).map(item => ({
+    const result = dedupedItems.slice(0, top).map(item => ({
       ...item,
       relativeTime: relativeTime(item.createdOn),
       bannerOptionLabel: BANNER_OPTION_LABELS[item.bannerOption] ?? 'Letter',
     }));
 
-    return Response.json({ items: result, hasMore: feedItems.length > top });
+    return Response.json({ items: result, hasMore: dedupedItems.length > top });
 
   } catch (err) {
     console.error('Feed API error:', err);
