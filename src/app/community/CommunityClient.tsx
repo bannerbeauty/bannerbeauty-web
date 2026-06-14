@@ -59,6 +59,7 @@ export default function CommunityClient({
   const [feedHasMore, setFeedHasMore] = useState(true);
   const [feedError, setFeedError] = useState(false);
   const loadingRef = useRef(false);
+  const hasLoadedOnce = useRef(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const brigadeIds = sidebarData.myBrigades.map(b => b.brigadeId).join(',');
@@ -95,7 +96,8 @@ export default function CommunityClient({
   useEffect(() => {
     setFeedItems([]);
     setFeedHasMore(true);
-    loadFeed();
+    hasLoadedOnce.current = false;
+    loadFeed().then(() => { hasLoadedOnce.current = true; });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
@@ -103,7 +105,7 @@ export default function CommunityClient({
     if (!bottomRef.current) return;
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting && feedHasMore && !loadingRef.current) {
+        if (entries[0].isIntersecting && feedHasMore && !loadingRef.current && hasLoadedOnce.current) {
           const lastItem = feedItems[feedItems.length - 1];
           if (lastItem) loadFeed(lastItem.createdOn);
         }
