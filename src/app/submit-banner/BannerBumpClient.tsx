@@ -298,9 +298,13 @@ export default function BannerBumpClient({
   // ── Effects ─────────────────────────────────────────────────────────────────
   useEffect(() => { setMounted(true); }, []);
 
-  // Auto-enable Patriot's Club if they have balance
+  // Auto-enable Patriot's Club on mount if they have balance — only once, respects user changes after
+  const patriotsClubInitialized = useRef(false);
   useEffect(() => {
-    if (patriotsClubBalance > 0) setUsePatriotsClub(true);
+    if (!patriotsClubInitialized.current && patriotsClubBalance > 0) {
+      setUsePatriotsClub(true);
+      patriotsClubInitialized.current = true;
+    }
   }, [patriotsClubBalance]);
 
   // Force Letter + Flag option and specific flag when using Patriot's Club
