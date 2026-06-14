@@ -44,6 +44,7 @@ export interface FeedItem {
   beforePhotoUrl: string;
   afterPhotoUrl: string;
   attributionPhotoUrl: string;
+  madeFeatureableDateTime: string;
 }
 
 const BANNER_OPTION_LABELS: Record<number, string> = {
@@ -103,7 +104,7 @@ export async function GET(req: NextRequest) {
       `bb_isfeatureable,bb_ispublicattribution,bb_ispublicnotein,bb_ispublicnotern,` +
       `bb_attributiontype,bb_attributionname,bb_attributiontext,` +
       `bb_notein,bb_notern,bb_sharename,bb_infirstname,bb_rnfirstname,` +
-      `bb_beforephotourl,bb_afterphotourl,bb_attributionphoto,` +
+      `bb_beforephotourl,bb_afterphotourl,bb_attributionphoto,bb_madefeatureabledatetime,` +
       `_bb_initiatingneighbor_value,_bb_recipientneighbor_value,_bb_brigade_value,_bb_blitz_value,createdon` +
       `&$orderby=createdon desc&$top=50`
     );
@@ -204,7 +205,11 @@ export async function GET(req: NextRequest) {
         beforePhotoUrl: b.bb_isfeatureable ? (b.bb_beforephotourl ?? '') : '',
         afterPhotoUrl: b.bb_isfeatureable ? (b.bb_afterphotourl ?? '') : '',
         attributionPhotoUrl: b.bb_isfeatureable ? (b.bb_attributionphoto ?? '') : '',
+        madeFeatureableDateTime: b.bb_madefeatureabledatetime ?? '',
       };
+
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      const isRecentlyApproved = b.bb_madefeatureabledatetime && b.bb_madefeatureabledatetime > sevenDaysAgo;
 
       // Tier 1 — My Brigades/Blitzes/Buddies items first
       const isMyBuddy = buddyIds.includes(base.neighborId);
@@ -217,7 +222,7 @@ export async function GET(req: NextRequest) {
         ...base,
         id: `bump-${b.bb_bannerid}`,
         type: 'bump',
-        _tier: isMyBrigade || isMyBlitz || isMyBuddy ? 1 : isMyState ? 2 : 3,
+        _tier: isRecentlyApproved || isMyBrigade || isMyBlitz || isMyBuddy ? 1 : isMyState ? 2 : 3,
       } as any);
 
       // 2. Dedication post
@@ -226,7 +231,7 @@ export async function GET(req: NextRequest) {
           ...base,
           id: `dedication-${b.bb_bannerid}`,
           type: 'dedication',
-          _tier: isMyBrigade || isMyBlitz || isMyBuddy ? 1 : isMyState ? 2 : 3,
+          _tier: isRecentlyApproved || isMyBrigade || isMyBlitz || isMyBuddy ? 1 : isMyState ? 2 : 3,
         } as any);
       }
 
@@ -236,7 +241,7 @@ export async function GET(req: NextRequest) {
           ...base,
           id: `note_in-${b.bb_bannerid}`,
           type: 'note_in',
-          _tier: isMyBrigade || isMyBlitz || isMyBuddy ? 1 : isMyState ? 2 : 3,
+          _tier: isRecentlyApproved || isMyBrigade || isMyBlitz || isMyBuddy ? 1 : isMyState ? 2 : 3,
         } as any);
       }
 
@@ -246,7 +251,7 @@ export async function GET(req: NextRequest) {
           ...base,
           id: `note_rn-${b.bb_bannerid}`,
           type: 'note_rn',
-          _tier: isMyBrigade || isMyBlitz || isMyBuddy ? 1 : isMyState ? 2 : 3,
+          _tier: isRecentlyApproved || isMyBrigade || isMyBlitz || isMyBuddy ? 1 : isMyState ? 2 : 3,
         } as any);
       }
 
@@ -256,7 +261,7 @@ export async function GET(req: NextRequest) {
           ...base,
           id: `brigade_bump-${b.bb_bannerid}`,
           type: 'brigade_bump',
-          _tier: isMyBrigade || isMyBlitz || isMyBuddy ? 1 : isMyState ? 2 : 3,
+          _tier: isRecentlyApproved || isMyBrigade || isMyBlitz || isMyBuddy ? 1 : isMyState ? 2 : 3,
         } as any);
       }
     }
