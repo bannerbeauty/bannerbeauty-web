@@ -58,8 +58,8 @@ export default async function ModerationPage() {
   };
 
   const [pending, approved, rejected] = await Promise.all([
-    fetchBanners('bb_isfeatureable eq false and bb_isrejected eq false'),
-    fetchBanners('bb_isfeatureable eq true and bb_isrejected eq false'),
+    fetchBanners('bb_isfeatureable eq false and (bb_isrejected eq false or bb_isrejected eq null)'),
+    fetchBanners('bb_isfeatureable eq true and (bb_isrejected eq false or bb_isrejected eq null)'),
     fetchBanners('bb_isrejected eq true'),
   ]);
 
