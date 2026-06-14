@@ -258,6 +258,11 @@ export default function BannerBumpClient({
   const [sharePhone,   setSharePhone]   = useState(false);
   const [shareEmail,   setShareEmail]   = useState(false);
   const [shareAddress, setShareAddress] = useState(false);
+  const [isPublicAttribution, setIsPublicAttribution] = useState(true);
+  const [beforePhotoFile, setBeforePhotoFile] = useState<File | null>(null);
+  const [beforePhotoUrl, setBeforePhotoUrl] = useState('');
+  const [beforePhotoUploading, setBeforePhotoUploading] = useState(false);
+  const beforePhotoRef = useRef<HTMLInputElement>(null);
 
   // Step 6: Letter + P.S.
   const [selectedTemplateId,  setSelectedTemplateId]  = useState('');
@@ -402,6 +407,20 @@ export default function BannerBumpClient({
   }
   function handleBack() { setStepError(''); setOrderError(''); setStep((s) => s - 1); }
 
+  // ── Before photo handler ─────────────────────────────────────────────────────
+  const handleBeforePhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setBeforePhotoFile(file);
+    setBeforePhotoUploading(true);
+    try {
+      const res = await fetch('/api/brigade/upload-image', { method: 'POST', headers: { 'Content-Type': file.type }, body: file });
+      const data = await res.json();
+      if (data.url) setBeforePhotoUrl(data.url);
+    } catch { console.error('Before photo upload failed'); }
+    finally { setBeforePhotoUploading(false); }
+  };
+
   // ── Attribution photo handler ────────────────────────────────────────────────
   const handleAttributionPhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -480,6 +499,8 @@ export default function BannerBumpClient({
           letterTemplateId: selectedTemplateId,
           customNote: !isAnon ? personalNote : '',
           isPublicNoteIn: !isAnon ? isPublicNoteIn : false,
+          isPublicAttribution: !isAnon ? isPublicAttribution : false,
+          beforePhotoUrl,
           shareName,
           sharePhone,
           shareEmail,
@@ -806,6 +827,18 @@ export default function BannerBumpClient({
                     {attributionPhotoUploading ? 'Uploading...' : attributionPhotoFile ? '📷 Change Photo' : '📷 Upload Photo'}
                   </button>
                 </div>
+                <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
+                  <input
+                    type="checkbox"
+                    id="isPublicAttribution"
+                    checked={isPublicAttribution}
+                    onChange={e => setIsPublicAttribution(e.target.checked)}
+                    style={{ width: 18, height: 18, cursor: 'pointer' }}
+                  />
+                  <label htmlFor="isPublicAttribution" style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#555555', cursor: 'pointer' }}>
+                    Share this dedication on the community feed
+                  </label>
+                </div>
               </div>
             )}
 
@@ -1023,6 +1056,23 @@ export default function BannerBumpClient({
                 ))}
               </div>
             )}
+
+            {/* Before photo upload */}
+            <div style={{ borderTop: '1px solid #EEEEEE', paddingTop: 20, marginTop: 8 }}>
+              <label style={labelStyle}>Before Photo (optional)</label>
+              <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#888888', margin: '0 0 8px' }}>
+                A photo of the tattered flag before replacement.
+              </p>
+              {beforePhotoUrl && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={beforePhotoUrl} alt="Before" style={{ width: 120, height: 90, objectFit: 'cover', borderRadius: 6, marginBottom: 8, border: '1px solid #EEEEEE', display: 'block' }} />
+              )}
+              <input ref={beforePhotoRef} type="file" accept="image/*" onChange={handleBeforePhotoChange} style={{ display: 'none' }} />
+              <button onClick={() => beforePhotoRef.current?.click()} disabled={beforePhotoUploading}
+                style={{ padding: '8px 16px', background: '#FFFFFF', border: '1.5px solid #1B2A4A', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', fontWeight: 700, color: '#1B2A4A', cursor: beforePhotoUploading ? 'not-allowed' : 'pointer' }}>
+                {beforePhotoUploading ? 'Uploading...' : beforePhotoFile ? '📷 Change' : '📷 Upload Before Photo'}
+              </button>
+            </div>
 
             {/* Personal P.S. note — hidden for anonymous */}
             {!isAnon && (
