@@ -104,7 +104,7 @@ export async function GET(req: NextRequest) {
       `&$orderby=createdon desc&$top=50`
     );
 
-    const banners = bannersRes.value ?? [];
+    const banners = [...new Map((bannersRes.value ?? []).map((b: any) => [b.bb_bannerid, b])).values()];
 
     // Collect unique IDs for batch fetching
     const neighborIds = [...new Set(banners.map((b: any) => b._bb_initiatingneighbor_value).filter(Boolean))];
