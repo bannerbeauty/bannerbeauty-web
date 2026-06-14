@@ -227,82 +227,130 @@ export default function FeedItemCard({ item }: Props) {
     const text = item.attributionText;
     const truncated = text.length > 300 && !expanded;
     const displayText = truncated ? text.slice(0, 300) + '...' : text;
+    const [showPhotoOnly, setShowPhotoOnly] = useState(false);
 
     return (
       <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', padding: '16px 20px', marginBottom: 12 }}>
         {header}
-        {/* Framed dedication card */}
-        <div style={{
-          background: '#1B2A4A',
-          borderRadius: 6,
-          padding: '20px 24px',
-          borderTop: '3px solid #C5A028',
-          borderBottom: '3px solid #C5A028',
-        }}>
-          <div style={{
-            fontFamily: 'Trebuchet MS, sans-serif',
-            fontSize: '0.65rem',
-            letterSpacing: '2.5px',
-            textTransform: 'uppercase',
-            color: '#C5A028',
-            marginBottom: 8,
-          }}>
-            {isMemory ? 'In Memory Of' : 'In Honor Of'}
-          </div>
-          <div style={{
-            fontFamily: 'Georgia, serif',
-            fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
-            fontWeight: 700,
-            color: '#FFFFFF',
-            marginBottom: 8,
-          }}>
-            {item.attributionName}
-          </div>
-          <div style={{
-            fontFamily: 'Trebuchet MS, sans-serif',
-            fontSize: '0.78rem',
-            color: 'rgba(255,255,255,0.5)',
-            marginBottom: 14,
-          }}>
-            A flag flies in {item.recipientCity}, {STATE_NAMES[item.recipientState] ?? item.recipientState}.
-          </div>
-          <p style={{
-            fontFamily: 'Georgia, serif',
-            fontSize: '0.9rem',
-            fontStyle: 'italic',
-            color: 'rgba(255,255,255,0.85)',
-            lineHeight: 1.7,
-            margin: 0,
-          }}>
-            &ldquo;{displayText}&rdquo;
-          </p>
-          {text.length > 300 && (
+        <div style={{ position: 'relative', borderRadius: 6, overflow: 'hidden' }}>
+
+          {/* Toggle button — only when photo exists */}
+          {item.attributionPhotoUrl && (
             <button
-              onClick={() => setExpanded(v => !v)}
+              onClick={() => setShowPhotoOnly(v => !v)}
               style={{
-                background: 'none',
+                position: 'absolute',
+                top: 10,
+                right: 10,
+                zIndex: 10,
+                background: 'rgba(0,0,0,0.5)',
+                color: '#FFFFFF',
                 border: 'none',
-                color: '#C5A028',
+                borderRadius: 20,
+                padding: '4px 12px',
                 fontFamily: 'Trebuchet MS, sans-serif',
-                fontSize: '0.78rem',
+                fontSize: '0.72rem',
+                fontWeight: 700,
                 cursor: 'pointer',
-                padding: '8px 0 0',
+                letterSpacing: '0.5px',
               }}
             >
-              {expanded ? 'Show less' : 'Read more'}
+              {showPhotoOnly ? 'View Tribute' : 'View Photo'}
             </button>
           )}
-        </div>
-        {item.attributionPhotoUrl && (
-          <div style={{ margin: '12px 0' }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
+
+          {showPhotoOnly ? (
+            /* Photo only mode */
+            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={item.attributionPhotoUrl}
               alt={item.attributionName}
-              style={{ width: '100%', maxHeight: 300, objectFit: 'cover', borderRadius: 8 }}
+              style={{ width: '100%', maxHeight: 400, objectFit: 'cover', display: 'block' }}
             />
-          </div>
-        )}
+          ) : (
+            /* Tribute mode — photo background with text overlay, or navy frame if no photo */
+            <div style={{
+              background: item.attributionPhotoUrl ? 'none' : '#1B2A4A',
+              borderRadius: 6,
+              borderTop: '3px solid #C5A028',
+              borderBottom: '3px solid #C5A028',
+              position: 'relative',
+              overflow: 'hidden',
+              minHeight: item.attributionPhotoUrl ? 280 : 'auto',
+            }}>
+              {/* Photo background */}
+              {item.attributionPhotoUrl && (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.attributionPhotoUrl}
+                    alt=""
+                    style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+                  />
+                  {/* Dark overlay */}
+                  <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(0,0,0,0.62)' }} />
+                </>
+              )}
+
+              {/* Text content */}
+              <div style={{ position: 'relative', zIndex: 2, padding: '20px 24px' }}>
+                <div style={{
+                  fontFamily: 'Trebuchet MS, sans-serif',
+                  fontSize: '0.65rem',
+                  letterSpacing: '2.5px',
+                  textTransform: 'uppercase',
+                  color: '#C5A028',
+                  marginBottom: 8,
+                }}>
+                  {isMemory ? 'In Memory Of' : 'In Honor Of'}
+                </div>
+                <div style={{
+                  fontFamily: 'Georgia, serif',
+                  fontSize: 'clamp(1rem, 2.5vw, 1.3rem)',
+                  fontWeight: 700,
+                  color: '#FFFFFF',
+                  marginBottom: 8,
+                }}>
+                  {item.attributionName}
+                </div>
+                <div style={{
+                  fontFamily: 'Trebuchet MS, sans-serif',
+                  fontSize: '0.78rem',
+                  color: 'rgba(255,255,255,0.6)',
+                  marginBottom: 14,
+                }}>
+                  A flag flies in {item.recipientCity}, {STATE_NAMES[item.recipientState] ?? item.recipientState}.
+                </div>
+                <p style={{
+                  fontFamily: 'Georgia, serif',
+                  fontSize: '0.9rem',
+                  fontStyle: 'italic',
+                  color: 'rgba(255,255,255,0.85)',
+                  lineHeight: 1.7,
+                  margin: 0,
+                }}>
+                  &ldquo;{displayText}&rdquo;
+                </p>
+                {text.length > 300 && (
+                  <button
+                    onClick={() => setExpanded(v => !v)}
+                    style={{
+                      background: 'none',
+                      border: 'none',
+                      color: '#C5A028',
+                      fontFamily: 'Trebuchet MS, sans-serif',
+                      fontSize: '0.78rem',
+                      cursor: 'pointer',
+                      padding: '8px 0 0',
+                    }}
+                  >
+                    {expanded ? 'Show less' : 'Read more'}
+                  </button>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     );
   }
