@@ -345,7 +345,6 @@ export default function BannerBumpClient({
     })
       .then((r) => r.json())
       .then((data) => {
-        console.log('PI response:', JSON.stringify(data));
         const secret = data.clientSecret as string;
         if (!secret) { setOrderError('Unable to load payment form. Please try again.'); return; }
         setClientSecret(secret);
