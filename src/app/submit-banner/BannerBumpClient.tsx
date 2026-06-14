@@ -345,11 +345,12 @@ export default function BannerBumpClient({
     })
       .then((r) => r.json())
       .then((data) => {
+        console.log('PI response:', JSON.stringify(data));
         const secret = data.clientSecret as string;
         if (!secret) { setOrderError('Unable to load payment form. Please try again.'); return; }
         setClientSecret(secret);
       })
-      .catch((err) => { console.error('[BannerBump] Stripe PI fetch error:', err); setOrderError('Unable to load payment form. Please try again.'); });
+      .catch((err) => { console.error('PI fetch error:', err); setOrderError('Unable to load payment form. Please try again.'); });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step, amountDue]);
 
