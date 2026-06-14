@@ -25,6 +25,7 @@ export async function POST(req: NextRequest) {
       bb_recipientrespondeddatetime: new Date().toISOString(),
       bb_ispublicnotern: body.isPublicNote ?? false,
       bb_ispublicphotorn: body.isPublicPhoto ?? false,
+      bb_isfeatureable: false,
     });
     return Response.json({ ok: true });
   } catch (err) {

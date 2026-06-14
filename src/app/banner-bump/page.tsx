@@ -6,7 +6,6 @@ import TransactionClient from './TransactionClient';
 interface DvBanner {
   bb_bannerid: string;
   bb_bannernumber?: string;
-  bb_totalcount?: number;
   bb_banneroption?: number;
   bb_attributiontype?: string;
   bb_attributionname?: string;
@@ -20,6 +19,8 @@ interface DvBanner {
   bb_shareaddress?: boolean;
   bb_beforephotourl?: string;
   bb_afterphotourl?: string;
+  bb_attributionphoto?: string;
+  bb_ispublicattribution?: boolean;
   bb_letterpdfurl?: string;
   bb_qrtokenuseddatetime?: string;
   _bb_order_value?: string;
@@ -69,7 +70,7 @@ export default async function BannerBumpPage({
   try {
     const res = await dataverse.get<{ value: DvBanner[] }>(
       `bb_banners?$filter=bb_qrtoken eq '${token}' and statecode eq 0` +
-      `&$select=bb_bannerid,bb_bannernumber,bb_totalcount,bb_banneroption,bb_attributiontype,bb_attributionname,bb_attributiontext,bb_notein,bb_notern,bb_ispublicnotern,bb_sharename,bb_sharephone,bb_shareemail,bb_shareaddress,bb_beforephotourl,bb_afterphotourl,bb_letterpdfurl,bb_qrtokenuseddatetime,_bb_order_value,_bb_lettertemplate_value,_bb_initiatingneighbor_value,_bb_recipientneighbor_value` +
+      `&$select=bb_bannerid,bb_bannernumber,bb_banneroption,bb_attributiontype,bb_attributionname,bb_attributiontext,bb_notein,bb_notern,bb_ispublicnotern,bb_ispublicattribution,bb_sharename,bb_sharephone,bb_shareemail,bb_shareaddress,bb_beforephotourl,bb_afterphotourl,bb_attributionphoto,bb_letterpdfurl,bb_qrtokenuseddatetime,_bb_order_value,_bb_lettertemplate_value,_bb_initiatingneighbor_value,_bb_recipientneighbor_value` +
       `&$top=1`
     );
     banner = res.value?.[0] ?? null;
@@ -136,11 +137,22 @@ export default async function BannerBumpPage({
     ? (gcRes.value as { value: DvOrderItem[] }).value?.[0] ?? null
     : null;
 
+  // Determine viewer role
+  let viewerRole: 'in' | 'rn' | 'guest' = 'guest';
+  if (userEmail && initiatingNeighborId) {
+    try {
+      const emailRes = await dataverse.get<{ value: { bb_neighborid: string }[] }>(
+        `bb_neighbors?$filter=bb_email eq '${userEmail}' and bb_neighborid eq '${initiatingNeighborId}' and statecode eq 0&$select=bb_neighborid&$top=1`
+      );
+      if ((emailRes.value?.length ?? 0) > 0) viewerRole = 'in';
+    } catch {}
+  }
+  if (viewerRole === 'guest' && token) viewerRole = 'rn';
+
   return (
     <TransactionClient
       bannerId={banner.bb_bannerid}
       bannerNumber={banner.bb_bannernumber ?? ''}
-      totalCount={banner.bb_totalcount ?? 1}
       bannerOption={banner.bb_banneroption ?? 121120000}
       attributionType={banner.bb_attributiontype ?? ''}
       attributionName={banner.bb_attributionname ?? ''}
@@ -153,6 +165,8 @@ export default async function BannerBumpPage({
       shareAddress={banner.bb_shareaddress ?? false}
       beforePhotoUrl={banner.bb_beforephotourl ?? null}
       afterPhotoUrl={banner.bb_afterphotourl ?? null}
+      attributionPhotoUrl={banner.bb_attributionphoto ?? ''}
+      isPublicAttribution={banner.bb_ispublicattribution ?? false}
       letterPdfUrl={banner.bb_letterpdfurl ?? null}
       templateName={template?.bb_templatename ?? ''}
       templateBodyHtml={template?.bb_bodyhtml ?? ''}
@@ -168,6 +182,7 @@ export default async function BannerBumpPage({
       gcCode={gcItem?.bb_giftcertcode ?? null}
       gcAmount={gcItem?.bb_unitprice ?? null}
       userEmail={userEmail}
+      viewerRole={viewerRole}
     />
   );
 }
