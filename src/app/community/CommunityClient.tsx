@@ -83,7 +83,15 @@ export default function CommunityClient({
       console.log('loadFeed params:', params.toString());
       const res = await fetch(`/api/feed?${params}`);
       const data = await res.json();
-      setFeedItems(prev => before ? [...prev, ...data.items] : data.items);
+      setFeedItems(prev => {
+        const combined = before ? [...prev, ...data.items] : data.items;
+        const seen = new Set<string>();
+        return combined.filter(item => {
+          if (seen.has(item.id)) return false;
+          seen.add(item.id);
+          return true;
+        });
+      });
       setFeedHasMore(data.hasMore);
     } catch {
       setFeedError(true);

@@ -159,6 +159,24 @@ export default function FeedItemCard({ item }: Props) {
           )}
           {item.blitzName && <span style={{ marginLeft: 6, color: '#1B7A3E' }}>· {item.blitzName}</span>}
         </div>
+        {(item.beforePhotoUrl || item.afterPhotoUrl) && (
+          <div style={{ display: 'flex', gap: 8, margin: '12px 0' }}>
+            {item.beforePhotoUrl && (
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.7rem', color: '#888888', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '1px' }}>Before</div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={item.beforePhotoUrl} alt="Before" style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: 6 }} />
+              </div>
+            )}
+            {item.afterPhotoUrl && (
+              <div style={{ flex: 1 }}>
+                <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.7rem', color: '#888888', marginBottom: 4, textTransform: 'uppercase', letterSpacing: '1px' }}>After</div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={item.afterPhotoUrl} alt="After" style={{ width: '100%', aspectRatio: '4/3', objectFit: 'cover', borderRadius: 6 }} />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     );
   }

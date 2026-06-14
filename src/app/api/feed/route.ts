@@ -41,6 +41,8 @@ export interface FeedItem {
   blitzId: string;
   blitzName: string;
   blitzBumpCount: number;
+  beforePhotoUrl: string;
+  afterPhotoUrl: string;
 }
 
 const BANNER_OPTION_LABELS: Record<number, string> = {
@@ -100,6 +102,7 @@ export async function GET(req: NextRequest) {
       `bb_isfeatureable,bb_ispublicattribution,bb_ispublicnotein,bb_ispublicnotern,` +
       `bb_attributiontype,bb_attributionname,bb_attributiontext,` +
       `bb_notein,bb_notern,bb_sharename,bb_infirstname,bb_rnfirstname,` +
+      `bb_beforephotourl,bb_afterphotourl,` +
       `_bb_initiatingneighbor_value,_bb_recipientneighbor_value,_bb_brigade_value,_bb_blitz_value,createdon` +
       `&$orderby=createdon desc&$top=50`
     );
@@ -197,6 +200,8 @@ export async function GET(req: NextRequest) {
         blitzId: b._bb_blitz_value ?? '',
         blitzName: blitz.bb_name ?? '',
         createdOn: b.createdon ?? '',
+        beforePhotoUrl: b.bb_beforephotourl ?? '',
+        afterPhotoUrl: b.bb_afterphotourl ?? '',
       };
 
       // Tier 1 — My Brigades/Blitzes/Buddies items first
