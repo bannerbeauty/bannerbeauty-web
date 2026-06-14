@@ -241,6 +241,11 @@ export default function BannerBumpClient({
   const [attribution,     setAttribution]     = useState<'from_me' | 'in_honor' | 'in_memoriam' | 'anonymous'>('in_memoriam');
   const [attributionName, setAttributionName] = useState('');
   const [attributionText, setAttributionText] = useState('');
+  const [attributionPhotoFile, setAttributionPhotoFile] = useState<File | null>(null);
+  const [attributionPhotoPreview, setAttributionPhotoPreview] = useState<string | null>(null);
+  const [attributionPhotoUrl, setAttributionPhotoUrl] = useState('');
+  const [attributionPhotoUploading, setAttributionPhotoUploading] = useState(false);
+  const attributionPhotoRef = useRef<HTMLInputElement>(null);
 
   // Step 4: Banner Option + Flag + GC product
   const [bannerOption,    setBannerOption]    = useState(searchParams.get('option') ?? '');
@@ -397,6 +402,28 @@ export default function BannerBumpClient({
   }
   function handleBack() { setStepError(''); setOrderError(''); setStep((s) => s - 1); }
 
+  // ── Attribution photo handler ────────────────────────────────────────────────
+  const handleAttributionPhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setAttributionPhotoFile(file);
+    setAttributionPhotoPreview(URL.createObjectURL(file));
+    setAttributionPhotoUploading(true);
+    try {
+      const res = await fetch('/api/attribution/upload-image', {
+        method: 'POST',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      });
+      const data = await res.json();
+      if (data.url) setAttributionPhotoUrl(data.url);
+    } catch {
+      console.error('Attribution photo upload failed');
+    } finally {
+      setAttributionPhotoUploading(false);
+    }
+  };
+
   // ── GC handlers ─────────────────────────────────────────────────────────────
   async function applyGC() {
     const code = gcInput.trim().toUpperCase();
@@ -470,6 +497,7 @@ export default function BannerBumpClient({
           blitzId: selectedBlitzId,
           brigadeId: selectedBlitzBrigadeId,
           usePatriotsClub: usePatriotsClub && patriotsClubBalance > 0,
+          attributionPhotoUrl,
         }),
       });
       orderData = await res.json();
@@ -755,6 +783,28 @@ export default function BannerBumpClient({
                   <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: attributionText.length > 1800 ? '#B22234' : '#AAAAAA', textAlign: 'right', marginTop: 4 }}>
                     {2000 - attributionText.length} characters remaining
                   </div>
+                </div>
+                <div style={{ marginTop: 16 }}>
+                  <label style={labelStyle}>
+                    {attribution === 'in_honor' ? 'Photo of Honoree (optional)' : 'Photo of Veteran (optional)'}
+                  </label>
+                  <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#888888', margin: '0 0 10px', lineHeight: 1.5 }}>
+                    Don&apos;t have a photo handy? You can upload one later from your Banner Bump page — we&apos;ll include a link in your confirmation email.
+                  </p>
+                  {attributionPhotoPreview && (
+                    <div style={{ marginBottom: 12 }}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={attributionPhotoPreview} alt="Preview" style={{ width: 120, height: 120, objectFit: 'cover', borderRadius: 8, border: '1px solid #EEEEEE' }} />
+                    </div>
+                  )}
+                  <input ref={attributionPhotoRef} type="file" accept="image/*" onChange={handleAttributionPhotoChange} style={{ display: 'none' }} />
+                  <button
+                    onClick={() => attributionPhotoRef.current?.click()}
+                    disabled={attributionPhotoUploading}
+                    style={{ padding: '8px 16px', background: '#FFFFFF', border: '1.5px solid #1B2A4A', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', fontWeight: 700, color: '#1B2A4A', cursor: attributionPhotoUploading ? 'not-allowed' : 'pointer' }}
+                  >
+                    {attributionPhotoUploading ? 'Uploading...' : attributionPhotoFile ? '📷 Change Photo' : '📷 Upload Photo'}
+                  </button>
                 </div>
               </div>
             )}
