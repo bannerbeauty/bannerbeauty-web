@@ -94,9 +94,6 @@ export async function GET(req: NextRequest) {
       if (blitzIds.length > 0) conditions.push(`(${blitzIds.map(id => `_bb_blitz_value eq '${id}'`).join(' or ')})`);
       if (conditions.length > 0) filter += ` and (${conditions.join(' or ')})`;
     }
-    console.log('Feed filter:', filter);
-    console.log('brigadeIds filter:', brigadeIds);
-
     // Fetch banners — get enough to expand into multiple feed items
     const bannersRes = await dataverse.get<{ value: any[] }>(
       `bb_banners?$filter=${filter}` +

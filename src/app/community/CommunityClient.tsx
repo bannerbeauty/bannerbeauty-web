@@ -80,7 +80,6 @@ export default function CommunityClient({
         buddyIds,
       });
       if (before) params.set('before', before);
-      console.log('loadFeed params:', params.toString());
       const res = await fetch(`/api/feed?${params}`);
       const data = await res.json();
       setFeedItems(prev => {

@@ -68,7 +68,6 @@ async function getNeighborActiveBlitzes(neighborId: string): Promise<ActiveBlitz
         }
       }
     }
-    console.log('Active blitzes:', JSON.stringify(Array.from(blitzMap.values())));
     return Array.from(blitzMap.values());
   } catch (err) {
     console.error('getNeighborActiveBlitzes failed:', err);

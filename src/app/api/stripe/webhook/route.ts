@@ -46,8 +46,6 @@ export async function POST(req: NextRequest) {
   const orderId = paymentIntent?.metadata?.orderId ?? '';
   const paymentIntentId = paymentIntent?.id ?? '';
 
-  console.log(`Stripe webhook: ${event.type}, orderId: ${orderId}, piId: ${paymentIntentId}`);
-
   if (event.type === 'payment_intent.succeeded') {
     try {
       await fetch(`${process.env.NEXTAUTH_URL}/api/flows/update-order-payment`, {

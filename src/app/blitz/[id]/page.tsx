@@ -131,7 +131,6 @@ export default async function BlitzDetailPage({
       `&$select=bb_blitzbrigadeid,_bb_brigade_value`
     );
 
-    console.log('participatingRes raw:', JSON.stringify(participatingRes.value));
     const participatingBrigadeIds = (participatingRes.value ?? []).map((bb: any) => bb._bb_brigade_value).filter(Boolean);
     let participatingBrigadeDetails: any[] = [];
     if (participatingBrigadeIds.length > 0) {
