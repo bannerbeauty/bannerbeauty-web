@@ -293,6 +293,16 @@ export default function TransactionClient(props: TransactionClientProps) {
         </div>
       </div>
 
+      <div style={{
+        background: 'rgba(197,160,40,0.12)',
+        borderBottom: '1px solid rgba(197,160,40,0.3)',
+        padding: '10px 24px',
+      }}>
+        <div style={{ maxWidth: 680, margin: '0 auto', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#7A6010', textAlign: 'center' }}>
+          ⚠ Changes made on this page will trigger a moderation review before they become visible on Banner Beauty.
+        </div>
+      </div>
+
       <div style={{ maxWidth: 680, margin: '0 auto', padding: '24px 16px 80px' }}>
 
         {/* 1. The Letter */}
