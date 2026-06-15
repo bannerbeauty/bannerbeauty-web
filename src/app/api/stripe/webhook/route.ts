@@ -45,6 +45,9 @@ export async function POST(req: NextRequest) {
   const paymentIntent = event.data?.object;
   const orderId = paymentIntent?.metadata?.orderId ?? '';
   const paymentIntentId = paymentIntent?.id ?? '';
+  const neighborId = paymentIntent?.metadata?.neighborId ?? '';
+  const isBannerBump = paymentIntent?.metadata?.isBannerBump === 'true';
+  const isPatriotsClubPurchase = paymentIntent?.metadata?.isPatriotsClubPurchase === 'true';
 
   if (event.type === 'payment_intent.succeeded') {
     try {
@@ -56,6 +59,10 @@ export async function POST(req: NextRequest) {
           paymentIntentId,
           paymentStatus: 121120001, // Paid
           paymentDatetime: new Date().toISOString(),
+          neighborId,
+          isBannerBump,
+          isPatriotsClubPurchase,
+          orderTotal: (paymentIntent?.amount ?? 0) / 100,
         }),
       });
     } catch (err) {
@@ -73,6 +80,10 @@ export async function POST(req: NextRequest) {
           paymentIntentId,
           paymentStatus: 121120002, // Failed
           paymentDatetime: new Date().toISOString(),
+          neighborId,
+          isBannerBump,
+          isPatriotsClubPurchase,
+          orderTotal: (paymentIntent?.amount ?? 0) / 100,
         }),
       });
     } catch (err) {

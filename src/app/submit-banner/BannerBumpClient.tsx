@@ -347,6 +347,9 @@ export default function BannerBumpClient({
       shipState: recipientState || '',
       shipZip: recipientZipcode || '',
       description: 'Banner Bump Order',
+      neighborId: neighbor?.neighborId ?? '',
+      isBannerBump: true,
+      isPatriotsClubPurchase: false,
     };
     fetch('/api/flows/stripe-payment-intent', {
       method: 'POST',
