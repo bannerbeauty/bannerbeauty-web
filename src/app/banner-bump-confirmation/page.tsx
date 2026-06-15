@@ -25,6 +25,7 @@ interface BannerOrder {
   total: number;
   qrToken: string;
   orderId: string;
+  pointsAwarded?: number;
 }
 
 const sectionLabelStyle: React.CSSProperties = {
@@ -156,6 +157,23 @@ function BannerBumpConfirmationInner() {
             )}
           </p>
         </div>
+
+        {/* Points earned */}
+        {(order?.pointsAwarded ?? 0) > 0 && (
+          <div style={{
+            background: 'rgba(197,160,40,0.1)',
+            border: '1px solid #C5A028',
+            borderRadius: 6,
+            padding: '12px 20px',
+            textAlign: 'center',
+            marginBottom: 20,
+            fontFamily: 'Trebuchet MS, sans-serif',
+            fontSize: '0.88rem',
+            color: '#7A6010',
+          }}>
+            ★ You earned <strong>{order!.pointsAwarded} points</strong> for this Banner Bump!
+          </div>
+        )}
 
         {/* Order details card */}
         {order && (

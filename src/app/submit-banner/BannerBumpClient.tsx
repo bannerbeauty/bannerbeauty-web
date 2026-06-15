@@ -481,7 +481,7 @@ export default function BannerBumpClient({
     if (amountDue > 0 && !stripeRef.current) { setOrderError('Payment form not ready. Please wait.'); return; }
     setPlacing(true); setOrderError('');
 
-    let orderData: { orderId?: string; qrToken?: string; bannerId?: string } = {};
+    let orderData: { orderId?: string; qrToken?: string; bannerId?: string; pointsAwarded?: number } = {};
     try {
       const res = await fetch('/api/flows/create-banner-order', {
         method: 'POST',
@@ -532,6 +532,8 @@ export default function BannerBumpClient({
       return; // Stop here — don't proceed to Stripe
     }
 
+    const pointsAwarded = orderData.pointsAwarded ?? 0;
+
     const bannerOrder = {
       inFirstName, inEmail,
       recipientData: { firstName: recipientFirstName, lastName: recipientLastName, address1: recipientAddress1, address2: recipientAddress2, city: recipientCity, state: recipientState, zipcode: recipientZipcode },
@@ -545,7 +547,7 @@ export default function BannerBumpClient({
     };
 
     try {
-      sessionStorage.setItem('bb_banner_order', JSON.stringify(bannerOrder));
+      sessionStorage.setItem('bb_banner_order', JSON.stringify({ ...bannerOrder, pointsAwarded }));
       if (orderData.bannerId) sessionStorage.setItem('bb_bannerId', orderData.bannerId);
     } catch {}
 
