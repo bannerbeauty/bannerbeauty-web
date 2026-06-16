@@ -426,11 +426,11 @@ export default function FeedItemCard({ item }: Props) {
   if (item.type === 'milestone') {
     const BANNER_BUMP_FISTS_URL = 'https://bannerbeautystorage.blob.core.windows.net/images/banner-bump.png';
 
-    const milestoneLabel = item.milestoneType === 121120000 ? 'NATIONWIDE MILESTONE'
-      : item.milestoneType === 121120001 ? `${item.milestoneState} MILESTONE`
-      : item.milestoneType === 121120002 ? 'BRIGADE MILESTONE'
-      : item.milestoneType === 121120003 ? 'BLITZ MILESTONE'
-      : 'PERSONAL MILESTONE';
+    const milestoneTitle = item.milestoneType === 121120000 ? 'United States'
+      : item.milestoneType === 121120001 ? (STATE_NAMES[item.milestoneState] ?? item.milestoneState)
+      : item.milestoneType === 121120002 ? item.milestoneBrigadeName
+      : item.milestoneType === 121120003 ? item.milestoneBlitzName
+      : item.displayName;
 
     const identifierImageUrl = item.milestoneType === 121120000
       ? 'https://flagcdn.com/w320/us.png'
@@ -537,12 +537,14 @@ export default function FeedItemCard({ item }: Props) {
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(27,42,74,0.82)' }} />
           <div style={{ position: 'relative', zIndex: 2, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             {(item.milestoneType === 121120000 || item.milestoneType === 121120001) ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={identifierImageUrl}
-                alt=""
-                style={{ width: '100%', height: 100, objectFit: 'cover', objectPosition: 'center', display: 'block', marginBottom: 16, opacity: 0.85 }}
-              />
+              <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={identifierImageUrl}
+                  alt=""
+                  style={{ width: '40%', height: 'auto', display: 'block', opacity: 0.9 }}
+                />
+              </div>
             ) : (
               <div style={{ position: 'relative', marginBottom: 16 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -568,8 +570,15 @@ export default function FeedItemCard({ item }: Props) {
             <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: 12 }}>
               Banner Bumps
             </div>
-            <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.65rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#C5A028' }}>
-              {milestoneLabel}
+            <div style={{
+              fontFamily: 'Georgia, serif',
+              fontSize: 'clamp(1.2rem, 3vw, 1.8rem)',
+              fontWeight: 700,
+              color: '#FFFFFF',
+              marginBottom: 8,
+              textAlign: 'center',
+            }}>
+              {milestoneTitle}
             </div>
           </div>
         </div>
