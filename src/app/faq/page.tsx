@@ -48,11 +48,11 @@ export default async function FAQPage() {
   let faqs: { question: string; answer: string }[] = [];
   try {
     const res = await dataverse.get<{ value: any[] }>(
-      `bb_faqs?$filter=statecode eq 0&$select=bb_question,bb_answer`
+      `bb_faqs?$filter=statecode eq 0&$select=bb_question,bb_answerformatted`
     );
     faqs = (res.value ?? []).map((f: any) => ({
       question: f.bb_question ?? '',
-      answer: f.bb_answer ?? '',
+      answer: f.bb_answerformatted ?? '',
     }));
   } catch (err) {
     console.error('FAQ fetch failed:', err);

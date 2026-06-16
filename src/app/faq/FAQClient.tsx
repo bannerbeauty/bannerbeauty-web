@@ -177,7 +177,7 @@ export default function FAQClient({ faqs }: { faqs: FAQ[] }) {
                         borderTop: '1px solid #EEEEEE',
                         paddingTop: 16,
                       }}>
-                        {faq.answer}
+                        <div dangerouslySetInnerHTML={{ __html: faq.answer }} style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#555555', lineHeight: 1.8 }} />
                       </div>
                     )}
                   </div>
