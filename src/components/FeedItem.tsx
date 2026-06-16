@@ -490,7 +490,7 @@ export default function FeedItemCard({ item }: Props) {
         <img
           src="https://bannerbeautystorage.blob.core.windows.net/images/banner-bump.png"
           alt=""
-          style={{ width: 20, height: 20, objectFit: 'contain', verticalAlign: 'middle', marginRight: 4 }}
+          style={{ width: 30, height: 30, objectFit: 'contain', verticalAlign: 'middle', marginRight: 4, display: 'inline' }}
         />
       );
       const hasBrigade = !!item.milestoneBrigadeId;
@@ -548,7 +548,7 @@ export default function FeedItemCard({ item }: Props) {
             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
           />
-          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(27,42,74,0.82)' }} />
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(27,42,74,0.62)' }} />
           <div style={{ position: 'relative', zIndex: 2, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
             {(item.milestoneType === 121120000 || item.milestoneType === 121120001) ? (
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}>
