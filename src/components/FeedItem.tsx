@@ -448,58 +448,45 @@ export default function FeedItemCard({ item }: Props) {
       ? item.milestoneBlitzImageUrl || getDefaultAvatar(item.milestoneBlitzId)
       : item.profileImageUrl || getDefaultAvatar(item.neighborId);
 
-    const neighborLink = `/neighbor/${item.neighborId}`;
-    const brigadeLink = item.milestoneBrigadeId ? `/brigade/${item.milestoneBrigadeId}` : null;
-    const blitzLink = item.milestoneBlitzId ? `/blitz/${item.milestoneBlitzId}` : null;
-    const stateLink = `/leaderboard?state=${item.milestoneState}`;
-    const patriotsClubLink = '/store/product?sku=PN-PATRIOT-12';
-
-    const neighborName = (
-      <Link href={neighborLink} style={{ color: '#1B2A4A', textDecoration: 'underline', fontWeight: 700 }}>
-        {item.milestoneIsPatriotsClub ? (
-          <>
-            <Link href={patriotsClubLink} style={{ color: '#C5A028', textDecoration: 'underline', fontWeight: 700 }}>Patriot&apos;s Club</Link>
-            {' '}member {item.displayName}
-          </>
-        ) : item.displayName}
-      </Link>
-    );
-
-    const brigadeRef = brigadeLink ? (
-      <Link href={brigadeLink} style={{ color: '#1B2A4A', textDecoration: 'underline', fontWeight: 700 }}>
-        {item.milestoneBrigadeName}
-      </Link>
-    ) : null;
-
-    const blitzRef = blitzLink ? (
-      <Link href={blitzLink} style={{ color: '#1B2A4A', textDecoration: 'underline', fontWeight: 700 }}>
-        {item.milestoneBlitzName}
-      </Link>
-    ) : null;
-
-    const stateRef = (
-      <Link href={stateLink} style={{ color: '#1B2A4A', textDecoration: 'underline', fontWeight: 700 }}>
-        {STATE_NAMES[item.milestoneState] ?? item.milestoneState}
-      </Link>
-    );
-
     const milestoneText = () => {
-      const count = <strong style={{ color: '#B22234' }}>{toOrdinal(item.milestoneCount)} Banner Bump</strong>;
-      const bannerBumpIcon = (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src="https://bannerbeautystorage.blob.core.windows.net/images/banner-bump.png"
-          alt=""
-          style={{ width: 30, height: 30, objectFit: 'contain', verticalAlign: 'middle', marginRight: 4, display: 'inline' }}
-        />
-      );
       const hasBrigade = !!item.milestoneBrigadeId;
       const hasBlitz = !!item.milestoneBlitzId;
+      const isPC = item.milestoneIsPatriotsClub;
+
+      const neighborName = (
+        <Link href={`/neighbor/${item.neighborId}`} style={{ color: '#1B2A4A', textDecoration: 'underline', fontWeight: 700 }}>
+          {isPC ? <><Link href="/store/product?sku=PN-PATRIOT-12" style={{ color: '#C5A028', textDecoration: 'underline', fontWeight: 700 }}>Patriot&apos;s Club</Link> member {item.displayName}</> : item.displayName}
+        </Link>
+      );
+
+      const brigadeRef = hasBrigade ? (
+        <Link href={`/brigade/${item.milestoneBrigadeId}`} style={{ color: '#1B2A4A', textDecoration: 'underline', fontWeight: 700 }}>
+          {item.milestoneBrigadeName}
+        </Link>
+      ) : null;
+
+      const blitzRef = hasBlitz ? (
+        <Link href={`/blitz/${item.milestoneBlitzId}`} style={{ color: '#1B2A4A', textDecoration: 'underline', fontWeight: 700 }}>
+          {item.milestoneBlitzName}
+        </Link>
+      ) : null;
+
+      const stateRef = (
+        <Link href={`/leaderboard?state=${item.milestoneState}`} style={{ color: '#1B2A4A', textDecoration: 'underline', fontWeight: 700 }}>
+          {STATE_NAMES[item.milestoneState] ?? item.milestoneState}
+        </Link>
+      );
+
+      const pStyle: React.CSSProperties = { fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#333333', lineHeight: 1.7, margin: 0 };
+      const countOrdinal = <strong style={{ color: '#B22234' }}>{toOrdinal(item.milestoneCount)} Banner Bump</strong>;
+      const countPlain = <strong style={{ color: '#B22234' }}>{item.milestoneCount.toLocaleString()} Banner Bumps</strong>;
+      // eslint-disable-next-line @next/next/no-img-element
+      const bannerBumpIcon = <img src="https://bannerbeautystorage.blob.core.windows.net/images/banner-bump.png" alt="" style={{ width: 30, height: 30, objectFit: 'contain', verticalAlign: 'middle', marginRight: 4, display: 'inline' }} />;
 
       if (item.milestoneType === 121120000) {
         return (
-          <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#333333', lineHeight: 1.7, margin: 0 }}>
-            {bannerBumpIcon} Banner Beauty just hit {count} nationwide! The milestone was reached in {stateRef} by {neighborName}
+          <p style={pStyle}>
+            {bannerBumpIcon} Banner Beauty just hit its {countOrdinal} nationwide! {neighborName} sent the milestone bump
             {hasBrigade && <>, bumping in support of {brigadeRef}</>}
             {hasBlitz && <> during the {blitzRef}</>}!
           </p>
@@ -507,32 +494,32 @@ export default function FeedItemCard({ item }: Props) {
       }
       if (item.milestoneType === 121120001) {
         return (
-          <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#333333', lineHeight: 1.7, margin: 0 }}>
-            {bannerBumpIcon} {stateRef} just hit {count}! {neighborName} sent the milestone bump
-            {hasBrigade && <> in support of {brigadeRef}</>}
+          <p style={pStyle}>
+            {bannerBumpIcon} {stateRef} just hit its {countOrdinal} statewide! {neighborName} sent the milestone bump
+            {hasBrigade && <>, in support of {brigadeRef}</>}
             {hasBlitz && <> during the {blitzRef}</>}!
           </p>
         );
       }
       if (item.milestoneType === 121120002) {
         return (
-          <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#333333', lineHeight: 1.7, margin: 0 }}>
-            {bannerBumpIcon} {brigadeRef} just hit {count}! {neighborName} sent the milestone bump
+          <p style={pStyle}>
+            {bannerBumpIcon} {brigadeRef} just hit {countPlain}! {neighborName} sent the milestone bump
             {hasBlitz && <> while supporting the {blitzRef}</>}!
           </p>
         );
       }
       if (item.milestoneType === 121120003) {
         return (
-          <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#333333', lineHeight: 1.7, margin: 0 }}>
-            {bannerBumpIcon} {blitzRef} just hit {count}! {neighborName} sent the milestone bump
+          <p style={pStyle}>
+            {bannerBumpIcon} {blitzRef} just hit {countPlain}! {neighborName} sent the milestone bump
             {hasBrigade && <> representing {brigadeRef}</>}!
           </p>
         );
       }
       return (
-        <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#333333', lineHeight: 1.7, margin: 0 }}>
-          {bannerBumpIcon} {neighborName} just sent their {count}!
+        <p style={pStyle}>
+          {bannerBumpIcon} {neighborName} just sent their {countOrdinal}!
         </p>
       );
     };
