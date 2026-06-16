@@ -448,31 +448,33 @@ export default function FeedItemCard({ item }: Props) {
       ? item.milestoneBlitzImageUrl || getDefaultAvatar(item.milestoneBlitzId)
       : item.profileImageUrl || getDefaultAvatar(item.neighborId);
 
+    const scrollTop = () => window.scrollTo({ top: 0, behavior: 'instant' });
+
     const milestoneText = () => {
       const hasBrigade = !!item.milestoneBrigadeId;
       const hasBlitz = !!item.milestoneBlitzId;
       const isPC = item.milestoneIsPatriotsClub;
 
       const neighborName = (
-        <Link href={`/neighbor/${item.neighborId}`} style={{ color: '#1B2A4A', textDecoration: 'none', fontWeight: 700 }}>
-          {isPC ? <><Link href="/store/product?sku=PN-PATRIOT-12" style={{ color: '#C5A028', textDecoration: 'none', fontWeight: 700 }}>Patriot&apos;s Club</Link> member {item.displayName}</> : item.displayName}
+        <Link href={`/neighbor/${item.neighborId}`} onClick={scrollTop} style={{ color: '#1B2A4A', textDecoration: 'none', fontWeight: 700 }}>
+          {isPC ? <><Link href="/store/product?sku=PN-PATRIOT-12" onClick={scrollTop} style={{ color: '#C5A028', textDecoration: 'none', fontWeight: 700 }}>Patriot&apos;s Club</Link> member {item.displayName}</> : item.displayName}
         </Link>
       );
 
       const brigadeRef = hasBrigade ? (
-        <Link href={`/brigade/${item.milestoneBrigadeId}`} style={{ color: '#1B2A4A', textDecoration: 'none', fontWeight: 700 }}>
+        <Link href={`/brigade/${item.milestoneBrigadeId}`} onClick={scrollTop} style={{ color: '#1B2A4A', textDecoration: 'none', fontWeight: 700 }}>
           {item.milestoneBrigadeName}
         </Link>
       ) : null;
 
       const blitzRef = hasBlitz ? (
-        <Link href={`/blitz/${item.milestoneBlitzId}`} style={{ color: '#1B2A4A', textDecoration: 'none', fontWeight: 700 }}>
+        <Link href={`/blitz/${item.milestoneBlitzId}`} onClick={scrollTop} style={{ color: '#1B2A4A', textDecoration: 'none', fontWeight: 700 }}>
           {item.milestoneBlitzName}
         </Link>
       ) : null;
 
       const stateRef = (
-        <Link href={`/leaderboard?state=${item.milestoneState}`} style={{ color: '#1B2A4A', textDecoration: 'none', fontWeight: 700 }}>
+        <Link href={`/leaderboard?state=${item.milestoneState}`} onClick={scrollTop} style={{ color: '#1B2A4A', textDecoration: 'none', fontWeight: 700 }}>
           {STATE_NAMES[item.milestoneState] ?? item.milestoneState}
         </Link>
       );
