@@ -422,5 +422,155 @@ export default function FeedItemCard({ item }: Props) {
     );
   }
 
+  // ── MILESTONE ────────────────────────────────────────────────────────────────
+  if (item.type === 'milestone') {
+    const BANNER_BUMP_FISTS_URL = 'https://bannerbeautystorage.blob.core.windows.net/logos/banner-bump-fists.png';
+
+    const milestoneLabel = item.milestoneType === 121120000 ? 'NATIONWIDE MILESTONE'
+      : item.milestoneType === 121120001 ? `${item.milestoneState} MILESTONE`
+      : item.milestoneType === 121120002 ? 'BRIGADE MILESTONE'
+      : item.milestoneType === 121120003 ? 'BLITZ MILESTONE'
+      : 'PERSONAL MILESTONE';
+
+    const identifierImageUrl = item.milestoneType === 121120000
+      ? 'https://flagcdn.com/w160/us.png'
+      : item.milestoneType === 121120001
+      ? `https://flagcdn.com/w160/${item.milestoneState.toLowerCase()}.png`
+      : item.milestoneType === 121120002
+      ? item.milestoneBrigadeProfileImageUrl || getDefaultAvatar(item.milestoneBrigadeId)
+      : item.milestoneType === 121120003
+      ? item.milestoneBlitzImageUrl || getDefaultAvatar(item.milestoneBlitzId)
+      : item.profileImageUrl || getDefaultAvatar(item.neighborId);
+
+    const neighborLink = `/neighbor/${item.neighborId}`;
+    const brigadeLink = item.milestoneBrigadeId ? `/brigade/${item.milestoneBrigadeId}` : null;
+    const blitzLink = item.milestoneBlitzId ? `/blitz/${item.milestoneBlitzId}` : null;
+    const stateLink = `/leaderboard?state=${item.milestoneState}`;
+    const patriotsClubLink = '/store/product?sku=PN-PATRIOT-12';
+
+    const neighborName = (
+      <Link href={neighborLink} style={{ color: '#C5A028', textDecoration: 'none', fontWeight: 700 }}>
+        {item.milestoneIsPatriotsClub ? (
+          <>
+            <Link href={patriotsClubLink} style={{ color: '#C5A028', textDecoration: 'underline', fontWeight: 700 }}>Patriot&apos;s Club</Link>
+            {' '}member {item.displayName}
+          </>
+        ) : item.displayName}
+      </Link>
+    );
+
+    const brigadeRef = brigadeLink ? (
+      <Link href={brigadeLink} style={{ color: '#C5A028', textDecoration: 'none', fontWeight: 700 }}>
+        {item.milestoneBrigadeName}
+      </Link>
+    ) : null;
+
+    const blitzRef = blitzLink ? (
+      <Link href={blitzLink} style={{ color: '#C5A028', textDecoration: 'none', fontWeight: 700 }}>
+        {item.milestoneBlitzName}
+      </Link>
+    ) : null;
+
+    const stateRef = (
+      <Link href={stateLink} style={{ color: '#C5A028', textDecoration: 'none', fontWeight: 700 }}>
+        {STATE_NAMES[item.milestoneState] ?? item.milestoneState}
+      </Link>
+    );
+
+    const milestoneText = () => {
+      const count = <strong style={{ color: '#C5A028' }}>{item.milestoneCount.toLocaleString()} Banner Bumps</strong>;
+      const hasBrigade = !!item.milestoneBrigadeId;
+      const hasBlitz = !!item.milestoneBlitzId;
+
+      if (item.milestoneType === 121120000) {
+        return (
+          <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: 'rgba(255,255,255,0.9)', lineHeight: 1.7, margin: 0 }}>
+            🇺🇸 Banner Beauty just hit {count} nationwide! The milestone was reached in {stateRef} by {neighborName}
+            {hasBrigade && <>, bumping in support of {brigadeRef}</>}
+            {hasBlitz && <> during the {blitzRef}</>}!
+          </p>
+        );
+      }
+      if (item.milestoneType === 121120001) {
+        return (
+          <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: 'rgba(255,255,255,0.9)', lineHeight: 1.7, margin: 0 }}>
+            🇺🇸 {stateRef} just hit {count}! {neighborName} sent the milestone bump
+            {hasBrigade && <> in support of {brigadeRef}</>}
+            {hasBlitz && <> during the {blitzRef}</>}!
+          </p>
+        );
+      }
+      if (item.milestoneType === 121120002) {
+        return (
+          <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: 'rgba(255,255,255,0.9)', lineHeight: 1.7, margin: 0 }}>
+            ⚡ {brigadeRef} just hit {count}! {neighborName} sent the milestone bump
+            {hasBlitz && <> while supporting the {blitzRef}</>}!
+          </p>
+        );
+      }
+      if (item.milestoneType === 121120003) {
+        return (
+          <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: 'rgba(255,255,255,0.9)', lineHeight: 1.7, margin: 0 }}>
+            ⚡ {blitzRef} just hit {count}! {neighborName} sent the milestone bump
+            {hasBrigade && <> representing {brigadeRef}</>}!
+          </p>
+        );
+      }
+      return (
+        <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: 'rgba(255,255,255,0.9)', lineHeight: 1.7, margin: 0 }}>
+          ★ {neighborName} just sent their {count}!
+        </p>
+      );
+    };
+
+    return (
+      <div style={{ borderRadius: 8, overflow: 'hidden', marginBottom: 12, position: 'relative' }}>
+        <div style={{ position: 'relative', width: '100%', minHeight: 280 }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={BANNER_BUMP_FISTS_URL}
+            alt=""
+            style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+          />
+          <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(27,42,74,0.82)' }} />
+          <div style={{ position: 'relative', zIndex: 2, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
+            <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.65rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#C5A028', marginBottom: 16 }}>
+              {milestoneLabel}
+            </div>
+            <div style={{ position: 'relative', marginBottom: 16 }}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={identifierImageUrl}
+                alt=""
+                style={{ width: 80, height: 80, borderRadius: '50%', objectFit: 'cover', border: '3px solid #C5A028', display: 'block' }}
+              />
+              {item.milestoneType === 121120004 && item.milestoneIsPatriotsClub && (
+                <div style={{
+                  position: 'absolute', bottom: 0, right: 0,
+                  width: 24, height: 24, borderRadius: '50%',
+                  background: '#FFFFFF', border: '1.5px solid #EEEEEE',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '0.85rem', color: '#C5A028',
+                }}>★</div>
+              )}
+            </div>
+            <div style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(2.5rem, 8vw, 4rem)', fontWeight: 700, color: '#C5A028', lineHeight: 1, marginBottom: 4 }}>
+              {item.milestoneCount.toLocaleString()}
+            </div>
+            <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: 20 }}>
+              Banner Bumps
+            </div>
+            <div style={{ maxWidth: 480, textAlign: 'center' }}>
+              {milestoneText()}
+            </div>
+            <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', marginTop: 16 }}>
+              {item.relativeTime}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return null;
 }

@@ -3,7 +3,7 @@ import { dataverse } from '@/lib/dataverse';
 
 export interface FeedItem {
   id: string;
-  type: 'bump' | 'dedication' | 'note_in' | 'note_rn' | 'brigade_bump';
+  type: 'bump' | 'dedication' | 'note_in' | 'note_rn' | 'brigade_bump' | 'milestone';
   createdOn: string;
   // Banner data
   bannerId: string;
@@ -45,6 +45,17 @@ export interface FeedItem {
   afterPhotoUrl: string;
   attributionPhotoUrl: string;
   madeFeatureableDateTime: string;
+  // Milestone specific
+  milestoneType: number;
+  milestoneCount: number;
+  milestoneBrigadeId: string;
+  milestoneBrigadeName: string;
+  milestoneBrigadeProfileImageUrl: string;
+  milestoneBlitzId: string;
+  milestoneBlitzName: string;
+  milestoneBlitzImageUrl: string;
+  milestoneState: string;
+  milestoneIsPatriotsClub: boolean;
 }
 
 const BANNER_OPTION_LABELS: Record<number, string> = {
@@ -107,6 +118,42 @@ export async function GET(req: NextRequest) {
     );
 
     const banners = [...new Map((bannersRes.value ?? []).map((b: any) => [b.bb_bannerid, b])).values()];
+
+    const milestonesRes = await dataverse.get<{ value: any[] }>(
+      `bb_milestones?$filter=statecode eq 0${before ? ` and createdon lt ${before}` : ''}` +
+      `&$select=bb_milestoneid,bb_milestonenumber,bb_milestonetype,bb_count,bb_state,bb_bannernumber,createdon,_bb_neighbor_value,_bb_brigade_value,_bb_blitz_value` +
+      `&$orderby=createdon desc&$top=10`
+    );
+    const milestones = milestonesRes.value ?? [];
+
+    const milestoneNeighborIds = [...new Set(milestones.map((m: any) => m._bb_neighbor_value).filter(Boolean))];
+    const milestoneBrigadeIds = [...new Set(milestones.map((m: any) => m._bb_brigade_value).filter(Boolean))];
+    const milestoneBlitzIds = [...new Set(milestones.map((m: any) => m._bb_blitz_value).filter(Boolean))];
+
+    const [milestoneNeighborRes, milestoneBrigadeRes, milestoneBlitzRes] = await Promise.all([
+      milestoneNeighborIds.length > 0
+        ? dataverse.get<{ value: any[] }>(
+            `bb_neighbors?$filter=${milestoneNeighborIds.map(id => `bb_neighborid eq '${id}'`).join(' or ')}` +
+            `&$select=bb_neighborid,bb_displayname,bb_profileimageurl,bb_ispatriotsclub`
+          )
+        : Promise.resolve({ value: [] }),
+      milestoneBrigadeIds.length > 0
+        ? dataverse.get<{ value: any[] }>(
+            `bb_brigades?$filter=${milestoneBrigadeIds.map(id => `bb_brigadeid eq '${id}'`).join(' or ')}` +
+            `&$select=bb_brigadeid,bb_name,bb_profileimageurl`
+          )
+        : Promise.resolve({ value: [] }),
+      milestoneBlitzIds.length > 0
+        ? dataverse.get<{ value: any[] }>(
+            `bb_blitzs?$filter=${milestoneBlitzIds.map(id => `bb_blitzid eq '${id}'`).join(' or ')}` +
+            `&$select=bb_blitzid,bb_name,bb_imageurl`
+          )
+        : Promise.resolve({ value: [] }),
+    ]);
+
+    const milestoneNeighborMap = Object.fromEntries((milestoneNeighborRes.value ?? []).map((n: any) => [n.bb_neighborid, n]));
+    const milestoneBrigadeMap = Object.fromEntries((milestoneBrigadeRes.value ?? []).map((b: any) => [b.bb_brigadeid, b]));
+    const milestoneBlitzMap = Object.fromEntries((milestoneBlitzRes.value ?? []).map((bl: any) => [bl.bb_blitzid, bl]));
 
     // Collect unique IDs for batch fetching
     const neighborIds = [...new Set(banners.map((b: any) => b._bb_initiatingneighbor_value).filter(Boolean))];
@@ -263,14 +310,75 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    const milestoneFeedItems = milestones.map((m: any) => {
+      const neighbor = milestoneNeighborMap[m._bb_neighbor_value];
+      const brigade = milestoneBrigadeMap[m._bb_brigade_value];
+      const blitz = milestoneBlitzMap[m._bb_blitz_value];
+      return {
+        id: `milestone-${m.bb_milestoneid}`,
+        type: 'milestone',
+        createdOn: m.createdon,
+        bannerNumber: m.bb_bannernumber ?? '',
+        neighborId: m._bb_neighbor_value ?? '',
+        displayName: neighbor?.bb_displayname ?? 'A Patriotic Neighbor',
+        profileImageUrl: neighbor?.bb_profileimageurl ?? '',
+        isPatriotsClub: neighbor?.bb_ispatriotsclub ?? false,
+        milestoneType: m.bb_milestonetype ?? 0,
+        milestoneCount: m.bb_count ?? 0,
+        milestoneState: m.bb_state ?? '',
+        milestoneBrigadeId: m._bb_brigade_value ?? '',
+        milestoneBrigadeName: brigade?.bb_name ?? '',
+        milestoneBrigadeProfileImageUrl: brigade?.bb_profileimageurl ?? '',
+        milestoneBlitzId: m._bb_blitz_value ?? '',
+        milestoneBlitzName: blitz?.bb_name ?? '',
+        milestoneBlitzImageUrl: blitz?.bb_imageurl ?? '',
+        milestoneIsPatriotsClub: neighbor?.bb_ispatriotsclub ?? false,
+        bannerOption: 0,
+        recipientCity: '',
+        recipientState: m.bb_state ?? '',
+        attributionType: 0,
+        attributionName: '',
+        attributionText: '',
+        attributionPhotoUrl: '',
+        beforePhotoUrl: '',
+        afterPhotoUrl: '',
+        noteIn: '',
+        noteRn: '',
+        brigadeId: m._bb_brigade_value ?? '',
+        brigadeName: brigade?.bb_name ?? '',
+        brigadeProfileImageUrl: brigade?.bb_profileimageurl ?? '',
+        blitzId: m._bb_blitz_value ?? '',
+        rnProfileImageUrl: '',
+        madeFeatureableDateTime: '',
+        _tier: m.bb_milestonetype === 121120000 ? 1 : 2,
+        relativeTime: relativeTime(m.createdon),
+        bannerOptionLabel: '',
+        // Required FeedItem fields not applicable to milestones
+        bannerId: '',
+        handle: '',
+        isVerified: false,
+        rnFirstName: '',
+        rnNeighborId: '',
+        rnDisplayName: '',
+        rnHandle: '',
+        rnIsVerified: false,
+        shareName: false,
+        inFirstName: '',
+        blitzName: '',
+        blitzBumpCount: 0,
+      };
+    });
+
+    const allFeedItems = [...feedItems, ...milestoneFeedItems];
+
     // Compute blitz bump counts for brigade_bump cards
     const blitzBumpCounts: Record<string, number> = {};
-    feedItems.forEach((item: any) => {
+    allFeedItems.forEach((item: any) => {
       if ((item.type === 'bump' || item.type === 'brigade_bump') && item.blitzId) {
         blitzBumpCounts[item.blitzId] = (blitzBumpCounts[item.blitzId] ?? 0) + 1;
       }
     });
-    feedItems.forEach((item: any) => {
+    allFeedItems.forEach((item: any) => {
       if (item.type === 'brigade_bump') {
         item.blitzBumpCount = blitzBumpCounts[item.blitzId] ?? 0;
       }
@@ -278,7 +386,7 @@ export async function GET(req: NextRequest) {
 
     // Deduplicate by id keeping first occurrence
     const seenIds = new Set<string>();
-    const dedupedItems = feedItems.filter((item: any) => {
+    const dedupedItems = allFeedItems.filter((item: any) => {
       if (seenIds.has(item.id)) return false;
       seenIds.add(item.id);
       return true;
