@@ -524,7 +524,8 @@ export default function FeedItemCard({ item }: Props) {
     };
 
     return (
-      <div style={{ borderRadius: 8, overflow: 'hidden', marginBottom: 12, position: 'relative' }}>
+      <div style={{ borderRadius: 8, overflow: 'hidden', marginBottom: 12 }}>
+        {/* IMAGE SECTION */}
         <div style={{ position: 'relative', width: '100%', minHeight: 280 }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -534,9 +535,6 @@ export default function FeedItemCard({ item }: Props) {
           />
           <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(27,42,74,0.82)' }} />
           <div style={{ position: 'relative', zIndex: 2, padding: '24px 20px', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>
-            <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.65rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#C5A028', marginBottom: 16 }}>
-              {milestoneLabel}
-            </div>
             <div style={{ position: 'relative', marginBottom: 16 }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -557,15 +555,19 @@ export default function FeedItemCard({ item }: Props) {
             <div style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(2.5rem, 8vw, 4rem)', fontWeight: 700, color: '#C5A028', lineHeight: 1, marginBottom: 4 }}>
               {item.milestoneCount.toLocaleString()}
             </div>
-            <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: 20 }}>
+            <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', letterSpacing: '2px', textTransform: 'uppercase', color: 'rgba(255,255,255,0.6)', marginBottom: 12 }}>
               Banner Bumps
             </div>
-            <div style={{ maxWidth: 480, textAlign: 'center' }}>
-              {milestoneText()}
+            <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.65rem', letterSpacing: '3px', textTransform: 'uppercase', color: '#C5A028' }}>
+              {milestoneLabel}
             </div>
-            <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: 'rgba(255,255,255,0.4)', marginTop: 16 }}>
-              {item.relativeTime}
-            </div>
+          </div>
+        </div>
+        {/* TEXT SECTION */}
+        <div style={{ background: '#FFFFFF', padding: '16px 20px', borderTop: '3px solid #C5A028' }}>
+          {milestoneText()}
+          <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#AAAAAA', marginTop: 8 }}>
+            {item.relativeTime}
           </div>
         </div>
       </div>
