@@ -454,25 +454,25 @@ export default function FeedItemCard({ item }: Props) {
       const isPC = item.milestoneIsPatriotsClub;
 
       const neighborName = (
-        <Link href={`/neighbor/${item.neighborId}`} style={{ color: '#1B2A4A', textDecoration: 'underline', fontWeight: 700 }}>
-          {isPC ? <><Link href="/store/product?sku=PN-PATRIOT-12" style={{ color: '#C5A028', textDecoration: 'underline', fontWeight: 700 }}>Patriot&apos;s Club</Link> member {item.displayName}</> : item.displayName}
+        <Link href={`/neighbor/${item.neighborId}`} style={{ color: '#1B2A4A', textDecoration: 'none', fontWeight: 700 }}>
+          {isPC ? <><Link href="/store/product?sku=PN-PATRIOT-12" style={{ color: '#C5A028', textDecoration: 'none', fontWeight: 700 }}>Patriot&apos;s Club</Link> member {item.displayName}</> : item.displayName}
         </Link>
       );
 
       const brigadeRef = hasBrigade ? (
-        <Link href={`/brigade/${item.milestoneBrigadeId}`} style={{ color: '#1B2A4A', textDecoration: 'underline', fontWeight: 700 }}>
+        <Link href={`/brigade/${item.milestoneBrigadeId}`} style={{ color: '#1B2A4A', textDecoration: 'none', fontWeight: 700 }}>
           {item.milestoneBrigadeName}
         </Link>
       ) : null;
 
       const blitzRef = hasBlitz ? (
-        <Link href={`/blitz/${item.milestoneBlitzId}`} style={{ color: '#1B2A4A', textDecoration: 'underline', fontWeight: 700 }}>
+        <Link href={`/blitz/${item.milestoneBlitzId}`} style={{ color: '#1B2A4A', textDecoration: 'none', fontWeight: 700 }}>
           {item.milestoneBlitzName}
         </Link>
       ) : null;
 
       const stateRef = (
-        <Link href={`/leaderboard?state=${item.milestoneState}`} style={{ color: '#1B2A4A', textDecoration: 'underline', fontWeight: 700 }}>
+        <Link href={`/leaderboard?state=${item.milestoneState}`} style={{ color: '#1B2A4A', textDecoration: 'none', fontWeight: 700 }}>
           {STATE_NAMES[item.milestoneState] ?? item.milestoneState}
         </Link>
       );
