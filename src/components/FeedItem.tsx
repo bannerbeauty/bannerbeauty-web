@@ -424,7 +424,7 @@ export default function FeedItemCard({ item }: Props) {
 
   // ── MILESTONE ────────────────────────────────────────────────────────────────
   if (item.type === 'milestone') {
-    const BANNER_BUMP_FISTS_URL = 'https://bannerbeautystorage.blob.core.windows.net/logos/banner-bump-fists.png';
+    const BANNER_BUMP_FISTS_URL = 'https://bannerbeautystorage.blob.core.windows.net/images/banner-bump.png';
 
     const milestoneLabel = item.milestoneType === 121120000 ? 'NATIONWIDE MILESTONE'
       : item.milestoneType === 121120001 ? `${item.milestoneState} MILESTONE`
@@ -433,9 +433,9 @@ export default function FeedItemCard({ item }: Props) {
       : 'PERSONAL MILESTONE';
 
     const identifierImageUrl = item.milestoneType === 121120000
-      ? 'https://flagcdn.com/w160/us.png'
+      ? 'https://flagcdn.com/w320/us.png'
       : item.milestoneType === 121120001
-      ? `https://flagcdn.com/w160/${item.milestoneState.toLowerCase()}.png`
+      ? `https://flagcdn.com/w320/us-${item.milestoneState.toLowerCase()}.png`
       : item.milestoneType === 121120002
       ? item.milestoneBrigadeProfileImageUrl || getDefaultAvatar(item.milestoneBrigadeId)
       : item.milestoneType === 121120003
@@ -526,7 +526,7 @@ export default function FeedItemCard({ item }: Props) {
     return (
       <div style={{ borderRadius: 8, overflow: 'hidden', marginBottom: 12 }}>
         {/* IMAGE SECTION */}
-        <div style={{ position: 'relative', width: '100%', minHeight: 280 }}>
+        <div style={{ position: 'relative', width: '100%', minHeight: 280, background: '#1B2A4A' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={BANNER_BUMP_FISTS_URL}
@@ -541,7 +541,7 @@ export default function FeedItemCard({ item }: Props) {
               <img
                 src={identifierImageUrl}
                 alt=""
-                style={{ width: '100%', height: 80, objectFit: 'cover', display: 'block', marginBottom: 16, opacity: 0.9 }}
+                style={{ width: '100%', height: 100, objectFit: 'cover', objectPosition: 'center', display: 'block', marginBottom: 16, opacity: 0.85 }}
               />
             ) : (
               <div style={{ position: 'relative', marginBottom: 16 }}>
