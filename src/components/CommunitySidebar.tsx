@@ -168,6 +168,9 @@ export default function CommunitySidebar({ data, onNavigate }: Props) {
         <Link href="/blitzes" onClick={onNavigate} style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#C5A028', textDecoration: 'none' }}>
           Browse all Blitzes →
         </Link>
+        <Link href="/leaderboard" onClick={onNavigate} style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#C5A028', textDecoration: 'none' }}>
+          🏆 Patriot Leaderboard →
+        </Link>
       </div>
     </div>
   );
