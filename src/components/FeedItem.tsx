@@ -424,7 +424,7 @@ export default function FeedItemCard({ item }: Props) {
 
   // ── MILESTONE ────────────────────────────────────────────────────────────────
   if (item.type === 'milestone') {
-    const BANNER_BUMP_FISTS_URL = 'https://bannerbeautystorage.blob.core.windows.net/images/banner-bump.png';
+    const FIREWORKS_URL = 'https://bannerbeautystorage.blob.core.windows.net/images/Fireworks.png';
 
     const toOrdinal = (n: number): string => {
       const s = ['th', 'st', 'nd', 'rd'];
@@ -485,13 +485,21 @@ export default function FeedItemCard({ item }: Props) {
 
     const milestoneText = () => {
       const count = <strong style={{ color: '#B22234' }}>{toOrdinal(item.milestoneCount)} Banner Bump</strong>;
+      const bannerBumpIcon = (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src="https://bannerbeautystorage.blob.core.windows.net/images/banner-bump.png"
+          alt=""
+          style={{ width: 20, height: 20, objectFit: 'contain', verticalAlign: 'middle', marginRight: 4 }}
+        />
+      );
       const hasBrigade = !!item.milestoneBrigadeId;
       const hasBlitz = !!item.milestoneBlitzId;
 
       if (item.milestoneType === 121120000) {
         return (
           <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#333333', lineHeight: 1.7, margin: 0 }}>
-            🇺🇸 Banner Beauty just hit {count} nationwide! The milestone was reached in {stateRef} by {neighborName}
+            {bannerBumpIcon} Banner Beauty just hit {count} nationwide! The milestone was reached in {stateRef} by {neighborName}
             {hasBrigade && <>, bumping in support of {brigadeRef}</>}
             {hasBlitz && <> during the {blitzRef}</>}!
           </p>
@@ -500,7 +508,7 @@ export default function FeedItemCard({ item }: Props) {
       if (item.milestoneType === 121120001) {
         return (
           <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#333333', lineHeight: 1.7, margin: 0 }}>
-            🇺🇸 {stateRef} just hit {count}! {neighborName} sent the milestone bump
+            {bannerBumpIcon} {stateRef} just hit {count}! {neighborName} sent the milestone bump
             {hasBrigade && <> in support of {brigadeRef}</>}
             {hasBlitz && <> during the {blitzRef}</>}!
           </p>
@@ -509,7 +517,7 @@ export default function FeedItemCard({ item }: Props) {
       if (item.milestoneType === 121120002) {
         return (
           <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#333333', lineHeight: 1.7, margin: 0 }}>
-            ⚡ {brigadeRef} just hit {count}! {neighborName} sent the milestone bump
+            {bannerBumpIcon} {brigadeRef} just hit {count}! {neighborName} sent the milestone bump
             {hasBlitz && <> while supporting the {blitzRef}</>}!
           </p>
         );
@@ -517,14 +525,14 @@ export default function FeedItemCard({ item }: Props) {
       if (item.milestoneType === 121120003) {
         return (
           <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#333333', lineHeight: 1.7, margin: 0 }}>
-            ⚡ {blitzRef} just hit {count}! {neighborName} sent the milestone bump
+            {bannerBumpIcon} {blitzRef} just hit {count}! {neighborName} sent the milestone bump
             {hasBrigade && <> representing {brigadeRef}</>}!
           </p>
         );
       }
       return (
         <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: '#333333', lineHeight: 1.7, margin: 0 }}>
-          ★ {neighborName} just sent their {count}!
+          {bannerBumpIcon} {neighborName} just sent their {count}!
         </p>
       );
     };
@@ -535,7 +543,7 @@ export default function FeedItemCard({ item }: Props) {
         <div style={{ position: 'relative', width: '100%', minHeight: 280, background: '#1B2A4A' }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={BANNER_BUMP_FISTS_URL}
+            src={FIREWORKS_URL}
             alt=""
             style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
