@@ -426,6 +426,12 @@ export default function FeedItemCard({ item }: Props) {
   if (item.type === 'milestone') {
     const BANNER_BUMP_FISTS_URL = 'https://bannerbeautystorage.blob.core.windows.net/images/banner-bump.png';
 
+    const toOrdinal = (n: number): string => {
+      const s = ['th', 'st', 'nd', 'rd'];
+      const v = n % 100;
+      return n.toLocaleString() + (s[(v - 20) % 10] || s[v] || s[0]);
+    };
+
     const milestoneTitle = item.milestoneType === 121120000 ? 'United States'
       : item.milestoneType === 121120001 ? (STATE_NAMES[item.milestoneState] ?? item.milestoneState)
       : item.milestoneType === 121120002 ? item.milestoneBrigadeName
@@ -478,7 +484,7 @@ export default function FeedItemCard({ item }: Props) {
     );
 
     const milestoneText = () => {
-      const count = <strong style={{ color: '#B22234' }}>{item.milestoneCount.toLocaleString()} Banner Bumps</strong>;
+      const count = <strong style={{ color: '#B22234' }}>{toOrdinal(item.milestoneCount)} Banner Bump</strong>;
       const hasBrigade = !!item.milestoneBrigadeId;
       const hasBlitz = !!item.milestoneBlitzId;
 
