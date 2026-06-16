@@ -2,7 +2,16 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { type Order, type BannerBump, ORDER_STATUS, BANNER_STATUS } from './page';
+import { type Order, type BannerBump, type PointsTransaction, ORDER_STATUS, BANNER_STATUS } from './page';
+
+const TRANSACTION_TYPE_LABELS: Record<number, string> = {
+  121120000: 'Banner Bump',
+  121120001: 'Store Purchase',
+  121120002: "Patriot's Club",
+  121120003: 'Referral Bonus',
+  121120004: 'Annual Reset',
+  121120005: 'Adjustment',
+};
 
 const BANNER_OPTION_LABEL: Record<number, string> = {
   121120000: 'Letter Only',
@@ -26,11 +35,15 @@ const sectionLabelStyle: React.CSSProperties = {
 interface Props {
   orders: Order[];
   bannerBumps: BannerBump[];
+  pointsTransactions: PointsTransaction[];
+  pointsBalance: number;
+  pointsAllTime: number;
 }
 
-export default function MyActivityClient({ orders, bannerBumps }: Props) {
+export default function MyActivityClient({ orders, bannerBumps, pointsTransactions, pointsBalance, pointsAllTime }: Props) {
   const [orderFilter, setOrderFilter] = useState<number | null>(null);
   const [bannerFilter, setBannerFilter] = useState<number | null>(null);
+  const [pointsOpen, setPointsOpen] = useState(true);
   const [bannersOpen, setBannersOpen] = useState(true);
   const [ordersOpen, setOrdersOpen] = useState(true);
 
@@ -68,6 +81,59 @@ export default function MyActivityClient({ orders, bannerBumps }: Props) {
           }}>
             Your Banner Bumps and store orders in one place.
           </p>
+        </div>
+
+        {/* Points Summary */}
+        <div style={{ background: '#FFFFFF', borderRadius: 8, border: '1px solid #EEEEEE', marginBottom: 16, overflow: 'hidden' }}>
+          <div style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', background: 'rgba(197,160,40,0.05)' }}
+            onClick={() => setPointsOpen(v => !v)}>
+            <div style={{ fontFamily: 'Georgia, serif', fontWeight: 700, color: '#1B2A4A', fontSize: '1rem' }}>
+              ★ Points
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+              <span style={{ fontFamily: 'Georgia, serif', fontWeight: 700, color: '#C5A028', fontSize: '1.1rem' }}>
+                {pointsBalance.toLocaleString()} pts
+              </span>
+              <span style={{ color: '#AAAAAA', fontSize: '0.85rem' }}>{pointsOpen ? '▲' : '▼'}</span>
+            </div>
+          </div>
+          {pointsOpen && (
+            <div style={{ borderTop: '1px solid #EEEEEE' }}>
+              {/* Points summary bar */}
+              <div style={{ display: 'flex', gap: 24, padding: '12px 20px', borderBottom: '1px solid #EEEEEE', background: '#FAF7F2' }}>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '1.2rem', fontWeight: 700, color: '#C5A028' }}>{pointsBalance.toLocaleString()}</div>
+                  <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.7rem', color: '#888888', textTransform: 'uppercase', letterSpacing: '1px' }}>This Year</div>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <div style={{ fontFamily: 'Georgia, serif', fontSize: '1.2rem', fontWeight: 700, color: '#1B2A4A' }}>{pointsAllTime.toLocaleString()}</div>
+                  <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.7rem', color: '#888888', textTransform: 'uppercase', letterSpacing: '1px' }}>All Time</div>
+                </div>
+              </div>
+              {/* Transaction list */}
+              {pointsTransactions.length === 0 ? (
+                <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#AAAAAA', padding: '20px', textAlign: 'center' }}>
+                  No points transactions yet.
+                </p>
+              ) : (
+                pointsTransactions.map(tx => (
+                  <div key={tx.transactionId} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 20px', borderBottom: '1px solid #F5F5F5' }}>
+                    <div>
+                      <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', fontWeight: 600, color: '#1B2A4A' }}>
+                        {TRANSACTION_TYPE_LABELS[tx.transactionType] ?? 'Transaction'}
+                      </div>
+                      <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#888888', marginTop: 2 }}>
+                        {tx.description} · {formatDate(tx.date)}
+                      </div>
+                    </div>
+                    <div style={{ fontFamily: 'Georgia, serif', fontWeight: 700, color: tx.points < 0 ? '#B22234' : '#1B7A3E', fontSize: '0.95rem', flexShrink: 0 }}>
+                      {tx.points > 0 ? '+' : ''}{tx.points.toLocaleString()} pts
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          )}
         </div>
 
         {/* Banner Bumps Section */}

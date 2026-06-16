@@ -5,6 +5,8 @@ import MyActivityClient from './MyActivityClient';
 
 interface DvNeighbor {
   bb_neighborid: string;
+  bb_points?: number;
+  bb_pointsalltime?: number;
 }
 
 interface DvOrder {
@@ -29,6 +31,16 @@ interface DvBanner {
   bb_recipientrespondeddatetime?: string;
 }
 
+interface DvPointsTransaction {
+  bb_pointstransactionid: string;
+  bb_pointstransactionnumber?: string;
+  createdon?: string;
+  bb_points?: number;
+  bb_transactiontype?: number;
+  bb_description?: string;
+  bb_pointsyear?: number;
+}
+
 export interface Order {
   orderId: string;
   orderNumber: string;
@@ -48,6 +60,16 @@ export interface BannerBump {
   qrToken: string;
   statusCode: number;
   recipientResponded: boolean;
+}
+
+export interface PointsTransaction {
+  transactionId: string;
+  transactionNumber: string;
+  date: string;
+  points: number;
+  transactionType: number;
+  description: string;
+  pointsYear: number;
 }
 
 const ORDER_STATUS: Record<number, { label: string; color: string }> = {
@@ -78,21 +100,27 @@ export default async function MyActivityPage() {
   const userEmail = session.user.email;
 
   let neighborId: string | null = null;
+  let pointsBalance = 0;
+  let pointsAllTime = 0;
   try {
     const res = await dataverse.get<{ value: DvNeighbor[] }>(
-      `bb_neighbors?$filter=bb_email eq '${userEmail}' and statecode eq 0&$select=bb_neighborid&$top=1`
+      `bb_neighbors?$filter=bb_email eq '${userEmail}' and statecode eq 0&$select=bb_neighborid,bb_points,bb_pointsalltime&$top=1`
     );
-    neighborId = res.value?.[0]?.bb_neighborid ?? null;
+    const neighbor = res.value?.[0] ?? null;
+    neighborId = neighbor?.bb_neighborid ?? null;
+    pointsBalance = neighbor?.bb_points ?? 0;
+    pointsAllTime = neighbor?.bb_pointsalltime ?? 0;
   } catch (err) {
     console.error('MyActivity neighbor fetch failed:', err);
   }
 
   let orders: Order[] = [];
   let bannerBumps: BannerBump[] = [];
+  let pointsTransactions: PointsTransaction[] = [];
 
   if (neighborId) {
     try {
-      const [ordersRes, bannersRes] = await Promise.all([
+      const [ordersRes, bannersRes, pointsRes] = await Promise.all([
         dataverse.get<{ value: DvOrder[] }>(
           `bb_orders?$filter=_bb_neighbor_value eq '${neighborId}'` +
           `&$select=bb_orderid,bb_ordernumber,createdon,bb_grandtotal,statuscode,statecode` +
@@ -102,6 +130,11 @@ export default async function MyActivityPage() {
           `bb_banners?$filter=_bb_initiatingneighbor_value eq '${neighborId}'` +
           `&$select=bb_bannerid,bb_bannernumber,createdon,bb_banneroption,bb_recipientcity,bb_recipientstate,bb_isletterprinted,bb_qrtoken,statuscode,bb_recipientrespondeddatetime` +
           `&$orderby=createdon desc`
+        ),
+        dataverse.get<{ value: DvPointsTransaction[] }>(
+          `bb_pointstransactions?$filter=_bb_neighbor_value eq '${neighborId}'` +
+          `&$select=bb_pointstransactionid,bb_pointstransactionnumber,createdon,bb_points,bb_transactiontype,bb_description,bb_pointsyear` +
+          `&$orderby=createdon desc&$top=50`
         ),
       ]);
 
@@ -125,6 +158,16 @@ export default async function MyActivityPage() {
         statusCode: b.statuscode ?? 1,
         recipientResponded: !!b.bb_recipientrespondeddatetime,
       }));
+
+      pointsTransactions = (pointsRes.value ?? []).map(p => ({
+        transactionId: p.bb_pointstransactionid,
+        transactionNumber: p.bb_pointstransactionnumber ?? '',
+        date: p.createdon ?? '',
+        points: p.bb_points ?? 0,
+        transactionType: p.bb_transactiontype ?? 0,
+        description: p.bb_description ?? '',
+        pointsYear: p.bb_pointsyear ?? 0,
+      }));
     } catch (err) {
       console.error('MyActivity data fetch failed:', err);
     }
@@ -134,6 +177,9 @@ export default async function MyActivityPage() {
     <MyActivityClient
       orders={orders}
       bannerBumps={bannerBumps}
+      pointsTransactions={pointsTransactions}
+      pointsBalance={pointsBalance}
+      pointsAllTime={pointsAllTime}
     />
   );
 }

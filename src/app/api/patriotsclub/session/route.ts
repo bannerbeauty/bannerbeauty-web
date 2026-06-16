@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
     return Response.json({
       subscriptionId: session.subscription ?? '',
       isRecurring: session.mode === 'subscription',
+      amount: (session.amount_total ?? 0) / 100,
     });
   } catch (err) {
     console.error('Session fetch error:', err);

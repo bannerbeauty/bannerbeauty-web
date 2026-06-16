@@ -24,6 +24,7 @@ function SuccessInner() {
           sessionId,
           subscriptionId: sessionData.subscriptionId ?? '',
           isRecurring: sessionData.isRecurring ?? false,
+          amount: sessionData.amount ?? 0,
         }),
       });
     }
