@@ -27,12 +27,24 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'Invalid code. Please try again.' }, { status: 400 });
     }
 
-    // Look up Neighbor by phone number
+    // Look up Neighbor by phone number — try multiple formats
+    const digits = phoneNumber.replace(/\D/g, '');
+    const formats = [
+      phoneNumber,
+      digits,
+      digits.slice(1),
+      `(${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`,
+    ];
+    const filterStr = formats.map(f => `bb_phone eq '${f}'`).join(' or ');
+
     const neighborRes = await dataverse.get<{ value: any[] }>(
-      `bb_neighbors?$filter=bb_phone eq '${phoneNumber}' and statecode eq 0` +
+      `bb_neighbors?$filter=(${filterStr}) and statecode eq 0` +
       `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_phone,bb_displayname,bb_handle` +
       `&$top=1`
     );
+
+    console.log('Neighbor lookup result:', JSON.stringify(neighborRes.value));
+    console.log('Phone formats searched:', formats);
 
     const neighbor = neighborRes.value?.[0] ?? null;
 
