@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 import TransactionClient from './TransactionClient';
 
@@ -62,8 +62,8 @@ export default async function BannerBumpPage({
   const { token } = await searchParams;
   if (!token) redirect('/');
 
-  const session = await auth();
-  const userEmail = session?.user?.email ?? null;
+  const session = await getSession();
+  const sessionNeighborId = session?.neighborId ?? null;
 
   // Step 1: Fetch banner (no $expand)
   let banner: DvBanner | null = null;
@@ -139,13 +139,8 @@ export default async function BannerBumpPage({
 
   // Determine viewer role
   let viewerRole: 'in' | 'rn' | 'guest' = 'guest';
-  if (userEmail && initiatingNeighborId) {
-    try {
-      const emailRes = await dataverse.get<{ value: { bb_neighborid: string }[] }>(
-        `bb_neighbors?$filter=bb_email eq '${userEmail}' and bb_neighborid eq '${initiatingNeighborId}' and statecode eq 0&$select=bb_neighborid&$top=1`
-      );
-      if ((emailRes.value?.length ?? 0) > 0) viewerRole = 'in';
-    } catch {}
+  if (sessionNeighborId && initiatingNeighborId && sessionNeighborId === initiatingNeighborId) {
+    viewerRole = 'in';
   }
   if (viewerRole === 'guest' && token) viewerRole = 'rn';
 
@@ -181,7 +176,7 @@ export default async function BannerBumpPage({
       recipientLastName={recipient?.bb_lastname ?? ''}
       gcCode={gcItem?.bb_giftcertcode ?? null}
       gcAmount={gcItem?.bb_unitprice ?? null}
-      userEmail={userEmail}
+      userEmail=""
       viewerRole={viewerRole}
     />
   );

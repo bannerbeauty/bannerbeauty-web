@@ -1,5 +1,5 @@
 import { redirect, notFound } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 import { getSidebarData } from '@/lib/community-sidebar';
 import NeighborProfileClient from './NeighborProfileClient';
@@ -49,23 +49,10 @@ export default async function NeighborProfilePage({
   const { id } = await params;
   if (!id) notFound();
 
-  const session = await auth();
-  if (!session?.user?.email) {
-    redirect(`/api/auth/signin?callbackUrl=/neighbor/${id}`);
-  }
-
-  const userEmail = session.user.email;
-
-  // Get logged-in neighbor ID
-  let loggedInNeighborId: string | null = null;
-  try {
-    const res = await dataverse.get<{ value: { bb_neighborid: string }[] }>(
-      `bb_neighbors?$filter=bb_email eq '${userEmail}' and statecode eq 0&$select=bb_neighborid&$top=1`
-    );
-    loggedInNeighborId = res.value?.[0]?.bb_neighborid ?? null;
-  } catch {}
-
-  const sidebarData = await getSidebarData(userEmail);
+  const session = await getSession();
+  const neighborId = session?.neighborId ?? null;
+  const sidebarData = neighborId ? await getSidebarData(neighborId) : null;
+  const loggedInNeighborId = neighborId;
 
   let profile: NeighborProfile | null = null;
   let brigades: NeighborBrigade[] = [];

@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 import MyActivityClient from './MyActivityClient';
 
@@ -92,22 +92,20 @@ const BANNER_STATUS: Record<number, { label: string; color: string }> = {
 export { ORDER_STATUS, BANNER_STATUS };
 
 export default async function MyActivityPage() {
-  const session = await auth();
-  if (!session?.user?.email) {
-    redirect('/api/auth/signin?callbackUrl=/my-activity');
+  const session = await getSession();
+  if (!session?.isLoggedIn) {
+    redirect('/signin');
   }
 
-  const userEmail = session.user.email;
+  const neighborId = session.neighborId;
 
-  let neighborId: string | null = null;
   let pointsBalance = 0;
   let pointsAllTime = 0;
   try {
     const res = await dataverse.get<{ value: DvNeighbor[] }>(
-      `bb_neighbors?$filter=bb_email eq '${userEmail}' and statecode eq 0&$select=bb_neighborid,bb_points,bb_pointsalltime&$top=1`
+      `bb_neighbors?$filter=bb_neighborid eq '${neighborId}' and statecode eq 0&$select=bb_neighborid,bb_points,bb_pointsalltime&$top=1`
     );
     const neighbor = res.value?.[0] ?? null;
-    neighborId = neighbor?.bb_neighborid ?? null;
     pointsBalance = neighbor?.bb_points ?? 0;
     pointsAllTime = neighbor?.bb_pointsalltime ?? 0;
   } catch (err) {

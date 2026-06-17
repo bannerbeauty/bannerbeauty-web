@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 import { getSidebarData } from '@/lib/community-sidebar';
 import Link from 'next/link';
@@ -92,20 +92,9 @@ export default async function BrigadeDetailPage({
   const { id } = await params;
   if (!id) notFound();
 
-  const session = await auth();
-  const userEmail = session?.user?.email ?? null;
-
-  const sidebarData = userEmail ? await getSidebarData(userEmail) : null;
-
-  let neighborId: string | null = null;
-  if (userEmail) {
-    try {
-      const res = await dataverse.get<{ value: { bb_neighborid: string }[] }>(
-        `bb_neighbors?$filter=bb_email eq '${userEmail}' and statecode eq 0&$select=bb_neighborid&$top=1`
-      );
-      neighborId = res.value?.[0]?.bb_neighborid ?? null;
-    } catch {}
-  }
+  const session = await getSession();
+  const neighborId = session?.neighborId ?? null;
+  const sidebarData = neighborId ? await getSidebarData(neighborId) : null;
 
   let brigade: BrigadeDetail | null = null;
   let members: BrigadeMember[] = [];

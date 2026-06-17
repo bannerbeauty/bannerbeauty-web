@@ -1,4 +1,4 @@
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 import LeaderboardClient from './LeaderboardClient';
 
@@ -25,8 +25,8 @@ const US_STATES = [
 ];
 
 export default async function LeaderboardPage() {
-  const session = await auth();
-  const userEmail = session?.user?.email ?? null;
+  const session = await getSession();
+  const neighborId = session?.neighborId ?? null;
 
   let myNeighborId: string | null = null;
   let myPoints = 0;
@@ -35,10 +35,10 @@ export default async function LeaderboardPage() {
   let myDisplayName = '';
   let myProfileImageUrl = '';
 
-  if (userEmail) {
+  if (neighborId) {
     try {
       const res = await dataverse.get<{ value: any[] }>(
-        `bb_neighbors?$filter=bb_email eq '${userEmail}' and statecode eq 0` +
+        `bb_neighbors?$filter=bb_neighborid eq '${neighborId}' and statecode eq 0` +
         `&$select=bb_neighborid,bb_displayname,bb_profileimageurl,bb_state,bb_points,bb_pointsalltime` +
         `&$top=1`
       );

@@ -1,4 +1,4 @@
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 import CheckoutClient, { type NeighborData } from './CheckoutClient';
 
@@ -14,10 +14,10 @@ interface DvNeighbor {
   bb_zipcode?: string;
 }
 
-async function getNeighbor(email: string): Promise<NeighborData | null> {
+async function getNeighbor(neighborId: string): Promise<NeighborData | null> {
   try {
     const res = await dataverse.get<{ value: DvNeighbor[] }>(
-      `bb_neighbors?$filter=bb_email eq '${email}' and statecode eq 0` +
+      `bb_neighbors?$filter=bb_neighborid eq '${neighborId}' and statecode eq 0` +
       `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_phone,bb_addressline1,bb_addressline2,bb_city,bb_state,bb_zipcode` +
       `&$top=1`
     );
@@ -40,22 +40,20 @@ async function getNeighbor(email: string): Promise<NeighborData | null> {
 }
 
 export default async function CheckoutPage() {
-  const session = await auth();
+  const session = await getSession();
   let neighbor: NeighborData | null = null;
 
-  const userEmail = session?.user?.email ?? null;
-  const userFirstName = session?.user?.name?.split(' ')[0] ?? '';
-  const userLastName = session?.user?.name?.split(' ').slice(1).join(' ') ?? '';
+  const neighborId = session?.neighborId ?? null;
 
-  if (userEmail) {
-    neighbor = await getNeighbor(userEmail);
+  if (neighborId) {
+    neighbor = await getNeighbor(neighborId);
   }
 
   return (
     <CheckoutClient
-      userEmail={userEmail}
-      userFirstName={userFirstName}
-      userLastName={userLastName}
+      userEmail=""
+      userFirstName={neighbor?.firstName ?? ''}
+      userLastName={neighbor?.lastName ?? ''}
       neighbor={neighbor}
     />
   );

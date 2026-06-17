@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 import { getSidebarData } from '@/lib/community-sidebar';
 import CommunityClient from './CommunityClient';
@@ -46,14 +46,14 @@ const BANNER_OPTION_LABELS: Record<number, string> = {
 };
 
 export default async function CommunityPage() {
-  const session = await auth();
-  if (!session?.user?.email) {
-    redirect('/api/auth/signin?callbackUrl=/community');
+  const session = await getSession();
+  if (!session?.isLoggedIn) {
+    redirect('/signin');
   }
 
-  const userEmail = session.user.email;
+  const neighborId = session.neighborId;
 
-  const sidebarData = await getSidebarData(userEmail);
+  const sidebarData = await getSidebarData(neighborId);
   if (!sidebarData) redirect('/profile');
 
   const neighbor: NeighborProfile = {

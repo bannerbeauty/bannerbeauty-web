@@ -1,5 +1,5 @@
 import { redirect, notFound } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 import Link from 'next/link';
 
@@ -62,19 +62,19 @@ export default async function OrderDetailPage({
   const { id } = await searchParams;
   if (!id) notFound();
 
-  const session = await auth();
-  if (!session?.user?.email) {
-    redirect('/api/auth/signin?callbackUrl=/my-activity');
+  const session = await getSession();
+  if (!session?.isLoggedIn) {
+    redirect('/signin');
   }
 
-  const userEmail = session.user.email;
+  const neighborId = session.neighborId;
 
   // Verify the order belongs to this user
   let order: DvOrder | null = null;
   let orderItems: DvOrderItem[] = [];
 
   try {
-    const [orderRes, itemsRes, neighborRes] = await Promise.all([
+    const [orderRes, itemsRes] = await Promise.all([
       dataverse.get<{ value: DvOrder[] }>(
         `bb_orders?$filter=bb_orderid eq '${id}'` +
         `&$select=bb_orderid,bb_ordernumber,createdon,bb_grandtotal,bb_subtotal,bb_shippingamount,bb_discountamount,statuscode,bb_shippingaddressline1,bb_shippingaddressline2,bb_shippingcity,bb_shippingstate,bb_shippingzipcode,bb_trackingnumber` +
@@ -85,18 +85,14 @@ export default async function OrderDetailPage({
         `&$select=bb_orderitemid,bb_quantity,bb_unitprice,bb_giftcertcode` +
         `&$expand=bb_Product($select=bb_productname,bb_productnumber,bb_producttype)`
       ),
-      dataverse.get<{ value: { bb_neighborid: string }[] }>(
-        `bb_neighbors?$filter=bb_email eq '${userEmail}' and statecode eq 0&$select=bb_neighborid&$top=1`
-      ),
     ]);
 
     order = orderRes.value?.[0] ?? null;
     orderItems = itemsRes.value ?? [];
 
-    // Security check — verify order belongs to this neighbor
-    const neighborId = neighborRes.value?.[0]?.bb_neighborid;
-    if (!neighborId || !order) notFound();
+    if (!order) notFound();
 
+    // Security check — verify order belongs to this neighbor
     const ownerCheck = await dataverse.get<{ value: { bb_orderid: string }[] }>(
       `bb_orders?$filter=bb_orderid eq '${id}' and _bb_neighbor_value eq '${neighborId}'&$select=bb_orderid&$top=1`
     );

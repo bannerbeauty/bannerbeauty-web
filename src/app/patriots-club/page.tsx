@@ -1,4 +1,4 @@
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 import { getSidebarData } from '@/lib/community-sidebar';
 import PatriotsClubClient from './PatriotsClubClient';
@@ -8,25 +8,23 @@ export const metadata = {
 };
 
 export default async function PatriotsClubPage() {
-  const session = await auth();
-  const userEmail = session?.user?.email ?? null;
+  const session = await getSession();
+  const neighborId = session?.neighborId ?? null;
 
-  let neighborId: string | null = null;
   let isPatriotsClub = false;
   let bumpBalance = 0;
   let expiryDate = '';
-  const sidebarData = userEmail ? await getSidebarData(userEmail) : null;
+  const sidebarData = neighborId ? await getSidebarData(neighborId) : null;
 
-  if (userEmail) {
+  if (neighborId) {
     try {
       const res = await dataverse.get<{ value: any[] }>(
-        `bb_neighbors?$filter=bb_email eq '${userEmail}' and statecode eq 0` +
+        `bb_neighbors?$filter=bb_neighborid eq '${neighborId}' and statecode eq 0` +
         `&$select=bb_neighborid,bb_ispatriotsclub,bb_bumpbalance,bb_patriotsclubexpiry` +
         `&$top=1`
       );
       const n = res.value?.[0];
       if (n) {
-        neighborId = n.bb_neighborid;
         isPatriotsClub = n.bb_ispatriotsclub ?? false;
         bumpBalance = n.bb_bumpbalance ?? 0;
         expiryDate = n.bb_patriotsclubexpiry ?? '';
@@ -48,7 +46,7 @@ export default async function PatriotsClubPage() {
 
   return (
     <PatriotsClubClient
-      isLoggedIn={!!userEmail}
+      isLoggedIn={!!neighborId}
       neighborId={neighborId}
       isPatriotsClub={isPatriotsClub}
       bumpBalance={bumpBalance}

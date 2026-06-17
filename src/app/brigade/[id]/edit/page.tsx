@@ -1,5 +1,5 @@
 import { redirect, notFound } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 import { getSidebarData } from '@/lib/community-sidebar';
 import BrigadeEditClient from './BrigadeEditClient';
@@ -12,22 +12,12 @@ export default async function BrigadeEditPage({
   const { id } = await params;
   if (!id) notFound();
 
-  const session = await auth();
-  if (!session?.user?.email) {
-    redirect(`/api/auth/signin?callbackUrl=/brigade/${id}/edit`);
+  const session = await getSession();
+  if (!session?.isLoggedIn) {
+    redirect('/signin');
   }
 
-  const userEmail = session.user.email;
-
-  let neighborId: string | null = null;
-  try {
-    const res = await dataverse.get<{ value: { bb_neighborid: string }[] }>(
-      `bb_neighbors?$filter=bb_email eq '${userEmail}' and statecode eq 0&$select=bb_neighborid&$top=1`
-    );
-    neighborId = res.value?.[0]?.bb_neighborid ?? null;
-  } catch {}
-
-  if (!neighborId) redirect(`/brigade/${id}`);
+  const neighborId = session.neighborId;
 
   // Verify owner or admin
   let isEligible = false;
@@ -77,7 +67,7 @@ export default async function BrigadeEditPage({
     notFound();
   }
 
-  const sidebarData = await getSidebarData(userEmail);
+  const sidebarData = await getSidebarData(neighborId);
 
   return (
     <BrigadeEditClient

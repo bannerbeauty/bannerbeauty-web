@@ -1,6 +1,6 @@
 import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 import BannerBumpClient, {
   type NeighborData,
@@ -115,18 +115,16 @@ interface DvGcProduct {
 }
 
 export default async function SubmitBannerPage() {
-  const session = await auth();
-  if (!session?.user?.email) {
-    redirect('/api/auth/signin?callbackUrl=/submit-banner');
+  const session = await getSession();
+  if (!session?.isLoggedIn) {
+    redirect('/signin');
   }
 
-  const userEmail = session.user.email;
-  const userFirstName = session.user.name?.split(' ')[0] ?? '';
-  const userLastName = session.user.name?.split(' ').slice(1).join(' ') ?? '';
+  const neighborId = session.neighborId;
 
   const [neighborRes, templatesRes, flagsRes, letterRes, gcProductsRes] = await Promise.allSettled([
     dataverse.get<{ value: DvNeighbor[] }>(
-      `bb_neighbors?$filter=bb_email eq '${userEmail}' and statecode eq 0` +
+      `bb_neighbors?$filter=bb_neighborid eq '${neighborId}' and statecode eq 0` +
       `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_phone,bb_addressline1,bb_addressline2,bb_city,bb_state,bb_zipcode,bb_bumpbalance,bb_ispatriotsclub&$top=1`
     ),
     dataverse.get<{ value: DvTemplate[] }>(
@@ -209,9 +207,9 @@ export default async function SubmitBannerPage() {
   return (
     <Suspense fallback={<div style={{ minHeight: '60vh', background: '#FAF7F2' }} />}>
       <BannerBumpClient
-        userEmail={userEmail}
-        userFirstName={userFirstName}
-        userLastName={userLastName}
+        userEmail=""
+        userFirstName={neighbor?.firstName ?? ''}
+        userLastName={neighbor?.lastName ?? ''}
         neighbor={neighbor}
         letterTemplates={letterTemplates}
         flagProducts={flagProducts}

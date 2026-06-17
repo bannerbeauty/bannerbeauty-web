@@ -1,9 +1,7 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 import ModerationClient from './ModerationClient';
-
-const ADMIN_EMAIL = 'admin@bannerbeauty.com';
 
 export interface ModerationBanner {
   bannerId: string;
@@ -24,8 +22,8 @@ export interface ModerationBanner {
 }
 
 export default async function ModerationPage() {
-  const session = await auth();
-  if (session?.user?.email !== ADMIN_EMAIL) redirect('/');
+  const session = await getSession();
+  if (!session?.isAdmin) redirect('/');
 
   const fetchBanners = async (filter: string): Promise<ModerationBanner[]> => {
     try {

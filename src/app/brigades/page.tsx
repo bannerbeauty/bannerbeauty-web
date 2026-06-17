@@ -1,4 +1,4 @@
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 import BrigadesClient from './BrigadesClient';
 
@@ -40,8 +40,8 @@ export interface BrigadeListItem {
 }
 
 export default async function BrigadesPage() {
-  const session = await auth();
-  const isLoggedIn = !!session?.user?.email;
+  const session = await getSession();
+  const isLoggedIn = !!session?.isLoggedIn;
 
   let brigades: BrigadeListItem[] = [];
 

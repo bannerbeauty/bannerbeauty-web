@@ -1,10 +1,10 @@
 import type { NextRequest } from 'next/server';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 
 export async function POST(req: NextRequest) {
-  const session = await auth();
-  if (!session?.user?.email) {
+  const session = await getSession();
+  if (!session?.isLoggedIn) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
