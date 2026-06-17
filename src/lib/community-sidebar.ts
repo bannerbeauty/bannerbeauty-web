@@ -49,7 +49,7 @@ const BRIGADE_TYPE_LABELS: Record<number, string> = {
 export async function getSidebarData(neighborId: string): Promise<SidebarData | null> {
   try {
     // Get neighbor
-    const neighborRes: { value: any[] } = await dataverse.get<{ value: any[] }>(
+    const neighborRes = await dataverse.get<{ value: any[] }>(
       `bb_neighbors?$filter=bb_neighborid eq '${neighborId}' and statecode eq 0` +
       `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_displayname,bb_handle,bb_profileimageurl,bb_state` +
       `&$top=1`
@@ -57,10 +57,10 @@ export async function getSidebarData(neighborId: string): Promise<SidebarData | 
     const n = neighborRes.value?.[0];
     if (!n) return null;
 
-    const neighborId = n.bb_neighborid;
+    const fetchedNeighborId = n.bb_neighborid;
 
     const neighbor: SidebarNeighbor = {
-      neighborId,
+      neighborId: fetchedNeighborId,
       firstName: n.bb_firstname ?? '',
       lastName: n.bb_lastname ?? '',
       displayName: n.bb_displayname ?? '',
@@ -72,11 +72,11 @@ export async function getSidebarData(neighborId: string): Promise<SidebarData | 
     // Fetch owned brigades + member brigades + blitzes in parallel
     const [ownedRes, memberRes, allBrigadesRes] = await Promise.all([
       dataverse.get<{ value: any[] }>(
-        `bb_brigades?$filter=_bb_owner_value eq '${neighborId}' and statecode eq 0` +
+        `bb_brigades?$filter=_bb_owner_value eq '${fetchedNeighborId}' and statecode eq 0` +
         `&$select=bb_brigadeid,bb_name,bb_brigadetype,bb_profileimageurl,bb_isverified`
       ),
       dataverse.get<{ value: any[] }>(
-        `bb_brigadeneighbors?$filter=_bb_neighbor_value eq '${neighborId}' and statecode eq 0 and statuscode eq 121120001` +
+        `bb_brigadeneighbors?$filter=_bb_neighbor_value eq '${fetchedNeighborId}' and statecode eq 0 and statuscode eq 121120001` +
         `&$select=bb_brigadeneighborid,_bb_brigade_value`
       ),
       dataverse.get<{ value: any[] }>(
@@ -140,7 +140,7 @@ export async function getSidebarData(neighborId: string): Promise<SidebarData | 
 
     // Fetch buddy IDs (neighbors this user is following)
     const buddyRes = await dataverse.get<{ value: any[] }>(
-      `bb_bannerbuddies?$filter=_bb_neighbor_value eq '${neighborId}' and statecode eq 0&$select=_bb_buddy_value&$top=200`
+      `bb_bannerbuddies?$filter=_bb_neighbor_value eq '${fetchedNeighborId}' and statecode eq 0&$select=_bb_buddy_value&$top=200`
     );
     const buddyIds = (buddyRes.value ?? []).map((bb: any) => bb._bb_buddy_value).filter(Boolean);
 
