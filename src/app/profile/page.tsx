@@ -7,6 +7,7 @@ interface DvNeighbor {
   bb_neighborid: string;
   bb_firstname?: string;
   bb_lastname?: string;
+  bb_email?: string;
   bb_phone?: string;
   bb_addressline1?: string;
   bb_addressline2?: string;
@@ -33,7 +34,7 @@ export default async function ProfilePage() {
   try {
     const res = await dataverse.get<{ value: DvNeighbor[] }>(
       `bb_neighbors?$filter=bb_neighborid eq '${neighborId}' and statecode eq 0` +
-      `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_phone,bb_addressline1,bb_addressline2,bb_city,bb_state,bb_zipcode,bb_preferredauthmethod,bb_emailoptin,bb_smsoptin,bb_displayname,bb_handle,bb_profileimageurl` +
+      `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_email,bb_phone,bb_addressline1,bb_addressline2,bb_city,bb_state,bb_zipcode,bb_preferredauthmethod,bb_emailoptin,bb_smsoptin,bb_displayname,bb_handle,bb_profileimageurl` +
       `&$top=1`
     );
     neighbor = res.value?.[0] ?? null;
@@ -44,7 +45,7 @@ export default async function ProfilePage() {
   return (
     <ProfileClient
       neighborId={neighbor?.bb_neighborid ?? null}
-      userEmail=""
+      userEmail={neighbor?.bb_email ?? ''}
       firstName={neighbor?.bb_firstname ?? ''}
       lastName={neighbor?.bb_lastname ?? ''}
       phone={neighbor?.bb_phone ?? ''}
