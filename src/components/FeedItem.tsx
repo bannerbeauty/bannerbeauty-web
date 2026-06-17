@@ -455,9 +455,19 @@ export default function FeedItemCard({ item }: Props) {
       const hasBlitz = !!item.milestoneBlitzId;
       const isPC = item.milestoneIsPatriotsClub;
 
-      const neighborName = (
+      const neighborName = isPC ? (
+        <>
+          <Link href="/store/product?sku=PN-PATRIOT-12" onClick={scrollTop} style={{ color: '#C5A028', textDecoration: 'none', fontWeight: 700 }}>
+            Patriot&apos;s Club
+          </Link>
+          {' '}member{' '}
+          <Link href={`/neighbor/${item.neighborId}`} onClick={scrollTop} style={{ color: '#1B2A4A', textDecoration: 'none', fontWeight: 700 }}>
+            {item.displayName}
+          </Link>
+        </>
+      ) : (
         <Link href={`/neighbor/${item.neighborId}`} onClick={scrollTop} style={{ color: '#1B2A4A', textDecoration: 'none', fontWeight: 700 }}>
-          {isPC ? <><Link href="/store/product?sku=PN-PATRIOT-12" onClick={scrollTop} style={{ color: '#C5A028', textDecoration: 'none', fontWeight: 700 }}>Patriot&apos;s Club</Link> member {item.displayName}</> : item.displayName}
+          {item.displayName}
         </Link>
       );
 
