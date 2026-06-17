@@ -1,11 +1,12 @@
 import type { NextRequest } from 'next/server';
 
 const APP_KEY = process.env.SINCH_APPLICATION_KEY!;
-const APP_SECRET_ENCODED = process.env.SINCH_APPLICATION_SECRET_ENCODED!;
+const SECRET_PART1 = process.env.SINCH_SECRET_PART1!;
+const SECRET_PART2 = process.env.SINCH_SECRET_PART2!;
 const SINCH_BASE_URL = 'https://verification.api.sinch.com';
 
 function getAuthHeader(): string {
-  const secret = decodeURIComponent(APP_SECRET_ENCODED);
+  const secret = `${SECRET_PART1}${SECRET_PART2}`;
   const credentials = Buffer.from(`${APP_KEY}:${secret}`).toString('base64');
   return `Basic ${credentials}`;
 }
