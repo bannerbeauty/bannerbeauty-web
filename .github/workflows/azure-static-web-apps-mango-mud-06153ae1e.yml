@@ -46,8 +46,8 @@ jobs:
           NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
           BB_API_SECRET: ${{ secrets.BB_API_SECRET }}
           NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ${{ secrets.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY }}
-          SINCH_APPLICATION_KEY: ${{ secrets.31f4e9f1-f912-4228-b75e-7c9c01291b66 }}
-          SINCH_APPLICATION_SECRET: ${{ secrets.rleJP/2sMUGDM4WiPpBR/Q== }}
+          SINCH_APPLICATION_KEY: ${{ secrets.SINCH_APPLICATION_KEY }}
+          SINCH_APPLICATION_SECRET: ${{ secrets.SINCH_APPLICATION_SECRET }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
 
   close_pull_request_job:
