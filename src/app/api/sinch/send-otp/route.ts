@@ -1,15 +1,8 @@
 import type { NextRequest } from 'next/server';
+import { getSinchHeaders } from '@/lib/sinch-auth';
 
-const APP_KEY = process.env.SINCH_APPLICATION_KEY!;
-const SECRET_PART1 = process.env.SINCH_SECRET_PART1!;
-const SECRET_PART2 = process.env.SINCH_SECRET_PART2!;
 const SINCH_BASE_URL = 'https://verification.api.sinch.com';
-
-function getAuthHeader(): string {
-  const secret = `${SECRET_PART1}${SECRET_PART2}`;
-  const credentials = Buffer.from(`${APP_KEY}:${secret}`).toString('base64');
-  return `Basic ${credentials}`;
-}
+const PATH = '/verification/v1/verifications';
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,19 +11,17 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'Phone number is required' }, { status: 400 });
     }
 
-    const res = await fetch(`${SINCH_BASE_URL}/verification/v1/verifications`, {
+    const body = JSON.stringify({
+      identity: { type: 'number', endpoint: phoneNumber },
+      method: 'sms',
+    });
+
+    const headers = getSinchHeaders('POST', PATH, body, 'application/json');
+
+    const res = await fetch(`${SINCH_BASE_URL}${PATH}`, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': getAuthHeader(),
-      },
-      body: JSON.stringify({
-        identity: {
-          type: 'number',
-          endpoint: phoneNumber,
-        },
-        method: 'sms',
-      }),
+      headers,
+      body,
     });
 
     const data = await res.json();

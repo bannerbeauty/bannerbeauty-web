@@ -1,15 +1,7 @@
 import type { NextRequest } from 'next/server';
+import { getSinchHeaders } from '@/lib/sinch-auth';
 
-const APP_KEY = process.env.SINCH_APPLICATION_KEY!;
-const SECRET_PART1 = process.env.SINCH_SECRET_PART1!;
-const SECRET_PART2 = process.env.SINCH_SECRET_PART2!;
 const SINCH_BASE_URL = 'https://verification.api.sinch.com';
-
-function getAuthHeader(): string {
-  const secret = `${SECRET_PART1}${SECRET_PART2}`;
-  const credentials = Buffer.from(`${APP_KEY}:${secret}`).toString('base64');
-  return `Basic ${credentials}`;
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,22 +10,15 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'Phone number and code are required' }, { status: 400 });
     }
 
-    const res = await fetch(
-      `${SINCH_BASE_URL}/verification/v1/verifications/number/${encodeURIComponent(phoneNumber)}`,
-      {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': getAuthHeader(),
-        },
-        body: JSON.stringify({
-          method: 'sms',
-          sms: {
-            code: code,
-          },
-        }),
-      }
-    );
+    const path = `/verification/v1/verifications/number/${encodeURIComponent(phoneNumber)}`;
+    const body = JSON.stringify({ method: 'sms', sms: { code } });
+    const headers = getSinchHeaders('PUT', path, body, 'application/json');
+
+    const res = await fetch(`${SINCH_BASE_URL}${path}`, {
+      method: 'PUT',
+      headers,
+      body,
+    });
 
     const data = await res.json();
 

@@ -53,6 +53,7 @@ jobs:
           SINCH_APPLICATION_SECRET_ENCODED: ${{ secrets.SINCH_APPLICATION_SECRET_ENCODED }}
           SINCH_SECRET_PART1: ${{ secrets.SINCH_SECRET_PART1 }}
           SINCH_SECRET_PART2: ${{ secrets.SINCH_SECRET_PART2 }}
+          SINCH_APPLICATION_KEY_SECRET: ${{ secrets.SINCH_APPLICATION_KEY_SECRET }}
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
