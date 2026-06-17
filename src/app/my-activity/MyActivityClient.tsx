@@ -2,7 +2,54 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { type Order, type BannerBump, type PointsTransaction, ORDER_STATUS, BANNER_STATUS } from './page';
+
+export interface Order {
+  orderId: string;
+  orderNumber: string;
+  date: string;
+  total: number;
+  statusCode: number;
+}
+
+export interface BannerBump {
+  bannerId: string;
+  bannerNumber: string;
+  date: string;
+  bannerOption: number;
+  recipientCity: string;
+  recipientState: string;
+  isLetterPrinted: boolean;
+  qrToken: string;
+  statusCode: number;
+  recipientResponded: boolean;
+}
+
+export interface PointsTransaction {
+  transactionId: string;
+  transactionNumber: string;
+  date: string;
+  points: number;
+  transactionType: number;
+  description: string;
+  pointsYear: number;
+}
+
+export const ORDER_STATUS: Record<number, { label: string; color: string }> = {
+  1:         { label: 'Pending',    color: '#C5A028' },
+  121120001: { label: 'Processing', color: '#1B2A4A' },
+  121120002: { label: 'Shipped',    color: '#0A7ABF' },
+  2:         { label: 'Delivered',  color: '#1B7A3E' },
+  121120003: { label: 'Returned',   color: '#B22234' },
+  121120004: { label: 'Cancelled',  color: '#888888' },
+};
+
+export const BANNER_STATUS: Record<number, { label: string; color: string }> = {
+  1:         { label: 'Submitted',           color: '#C5A028' },
+  121120001: { label: 'Fulfilled',           color: '#1B7A3E' },
+  2:         { label: 'Recipient Responded', color: '#0A7ABF' },
+  121120002: { label: 'Cancelled',           color: '#888888' },
+  121120003: { label: 'Page Accessed',       color: '#0A7ABF' },
+};
 
 const TRANSACTION_TYPE_LABELS: Record<number, string> = {
   121120000: 'Banner Bump',
