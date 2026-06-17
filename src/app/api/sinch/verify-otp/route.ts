@@ -26,7 +26,9 @@ export async function POST(req: NextRequest) {
         },
         body: JSON.stringify({
           method: 'sms',
-          sms: { code },
+          sms: {
+            code: code,
+          },
         }),
       }
     );
