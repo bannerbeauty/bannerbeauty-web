@@ -5,8 +5,10 @@ const APP_SECRET = process.env.SINCH_APPLICATION_SECRET!;
 const SINCH_BASE_URL = 'https://verification.api.sinch.com';
 
 function getAuthHeader(): string {
-  const credentials = Buffer.from(`${APP_KEY}:${APP_SECRET}`).toString('base64');
-  return `Basic ${credentials}`;
+  const raw = `${APP_KEY}:${APP_SECRET}`;
+  const encoded = Buffer.from(raw, 'utf8').toString('base64');
+  console.log('Auth raw length:', raw.length, 'Encoded length:', encoded.length);
+  return `Basic ${encoded}`;
 }
 
 export async function POST(req: NextRequest) {
