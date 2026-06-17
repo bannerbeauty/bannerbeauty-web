@@ -23,6 +23,7 @@ export async function POST(req: NextRequest) {
     );
 
     const sinchData = await sinchRes.json();
+    console.log('Sinch verified:', sinchData.verified);
     if (!sinchData.verified) {
       return Response.json({ error: 'Invalid code. Please try again.' }, { status: 400 });
     }
@@ -35,7 +36,7 @@ export async function POST(req: NextRequest) {
       digits.slice(1),
       `(${digits.slice(1, 4)}) ${digits.slice(4, 7)}-${digits.slice(7)}`,
     ];
-    const filterStr = formats.map(f => `bb_phone eq '${f}'`).join(' or ');
+    const filterStr = formats.map(f => `bb_phone eq '${f.replace(/\+/g, '%2B')}'`).join(' or ');
 
     const neighborRes = await dataverse.get<{ value: any[] }>(
       `bb_neighbors?$filter=(${filterStr}) and statecode eq 0` +
@@ -43,8 +44,8 @@ export async function POST(req: NextRequest) {
       `&$top=1`
     );
 
-    console.log('Neighbor lookup result:', JSON.stringify(neighborRes.value));
-    console.log('Phone formats searched:', formats);
+    console.log('Neighbor found:', JSON.stringify(neighborRes.value?.[0] ?? null));
+    console.log('Phone formats:', formats);
 
     const neighbor = neighborRes.value?.[0] ?? null;
 

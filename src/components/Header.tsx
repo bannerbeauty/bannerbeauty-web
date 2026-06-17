@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 
@@ -19,6 +19,7 @@ const NAV_LINKS_LOGGED_IN = [
 
 export default function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -29,7 +30,7 @@ export default function Header() {
       .then(r => r.json())
       .then(data => setIsLoggedIn(data.isLoggedIn ?? false))
       .catch(() => setIsLoggedIn(false));
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
