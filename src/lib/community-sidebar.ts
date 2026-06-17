@@ -49,7 +49,7 @@ const BRIGADE_TYPE_LABELS: Record<number, string> = {
 export async function getSidebarData(neighborId: string): Promise<SidebarData | null> {
   try {
     // Get neighbor
-    const neighborRes = await dataverse.get<{ value: any[] }>(
+    const neighborRes: { value: any[] } = await dataverse.get<{ value: any[] }>(
       `bb_neighbors?$filter=bb_neighborid eq '${neighborId}' and statecode eq 0` +
       `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_displayname,bb_handle,bb_profileimageurl,bb_state` +
       `&$top=1`
