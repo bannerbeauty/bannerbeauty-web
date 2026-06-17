@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
-import { auth } from '@/lib/auth';
+import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 import ProfileClient from './ProfileClient';
 
@@ -22,17 +22,17 @@ interface DvNeighbor {
 }
 
 export default async function ProfilePage() {
-  const session = await auth();
-  if (!session?.user?.email) {
-    redirect('/api/auth/signin?callbackUrl=/profile');
+  const session = await getSession();
+  if (!session?.isLoggedIn) {
+    redirect('/signin');
   }
 
-  const userEmail = session.user.email;
+  const neighborId = session.neighborId;
 
   let neighbor: DvNeighbor | null = null;
   try {
     const res = await dataverse.get<{ value: DvNeighbor[] }>(
-      `bb_neighbors?$filter=bb_email eq '${userEmail}' and statecode eq 0` +
+      `bb_neighbors?$filter=bb_neighborid eq '${neighborId}' and statecode eq 0` +
       `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_phone,bb_addressline1,bb_addressline2,bb_city,bb_state,bb_zipcode,bb_preferredauthmethod,bb_emailoptin,bb_smsoptin,bb_displayname,bb_handle,bb_profileimageurl` +
       `&$top=1`
     );
@@ -44,7 +44,7 @@ export default async function ProfilePage() {
   return (
     <ProfileClient
       neighborId={neighbor?.bb_neighborid ?? null}
-      userEmail={userEmail}
+      userEmail=""
       firstName={neighbor?.bb_firstname ?? ''}
       lastName={neighbor?.bb_lastname ?? ''}
       phone={neighbor?.bb_phone ?? ''}
