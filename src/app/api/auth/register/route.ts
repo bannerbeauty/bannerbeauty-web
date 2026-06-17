@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       bb_firstname: firstName,
       bb_lastname: lastName,
       ...(email ? { bb_email: email } : {}),
-    });
+    }) as Record<string, string>;
 
     const neighborId = newNeighbor.bb_neighborid;
 
