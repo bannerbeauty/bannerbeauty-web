@@ -4,6 +4,8 @@ const APP_KEY = process.env.SINCH_APPLICATION_KEY!;
 const APP_SECRET = process.env.SINCH_APPLICATION_SECRET!;
 const SINCH_BASE_URL = 'https://verification.api.sinch.com';
 
+console.log('Sinch key length:', APP_KEY?.length, 'Secret length:', APP_SECRET?.length);
+
 function getAuthHeader(): string {
   const credentials = Buffer.from(`${APP_KEY}:${APP_SECRET}`).toString('base64');
   return `Basic ${credentials}`;
