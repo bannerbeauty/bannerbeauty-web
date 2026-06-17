@@ -1,10 +1,10 @@
 import type { NextRequest } from 'next/server';
 
-const APP_KEY = process.env.SINCH_APPLICATION_KEY!;
+const SINCH_AUTH = process.env.SINCH_AUTH_BASE64!;
 const SINCH_BASE_URL = 'https://verification.api.sinch.com';
 
 function getAuthHeader(): string {
-  return `Application ${APP_KEY}`;
+  return `Basic ${SINCH_AUTH}`;
 }
 
 export async function POST(req: NextRequest) {
