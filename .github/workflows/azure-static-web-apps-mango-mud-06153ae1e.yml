@@ -49,6 +49,7 @@ jobs:
           SINCH_APPLICATION_KEY: ${{ secrets.SINCH_APPLICATION_KEY }}
           SINCH_APPLICATION_SECRET: ${{ secrets.SINCH_APPLICATION_SECRET }}
           SESSION_SECRET: ${{ secrets.SESSION_SECRET }}
+          SINCH_AUTH_BASE64: ${{ secrets.SINCH_AUTH_BASE64 }}
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'

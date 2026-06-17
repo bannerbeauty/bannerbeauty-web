@@ -1,16 +1,10 @@
 import type { NextRequest } from 'next/server';
 
-const APP_KEY = process.env.SINCH_APPLICATION_KEY!;
-const APP_SECRET = process.env.SINCH_APPLICATION_SECRET!;
+const SINCH_AUTH = process.env.SINCH_AUTH_BASE64!;
 const SINCH_BASE_URL = 'https://verification.api.sinch.com';
 
-console.log('Sinch key length:', APP_KEY?.length, 'Secret length:', APP_SECRET?.length);
-
 function getAuthHeader(): string {
-  const raw = `${APP_KEY}:${APP_SECRET}`;
-  const encoded = Buffer.from(raw, 'utf8').toString('base64');
-  console.log('Auth raw length:', raw.length, 'Encoded length:', encoded.length);
-  return `Basic ${encoded}`;
+  return `Basic ${SINCH_AUTH}`;
 }
 
 export async function POST(req: NextRequest) {
