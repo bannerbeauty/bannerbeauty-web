@@ -422,6 +422,41 @@ export default function FeedItemCard({ item }: Props) {
     );
   }
 
+  // ── ANNOUNCEMENT ─────────────────────────────────────────────────────────────
+  if (item.type === 'announcement') {
+    return (
+      <div style={{
+        borderRadius: 8,
+        overflow: 'hidden',
+        marginBottom: 12,
+        border: '2px solid #C5A028',
+        background: '#1B2A4A',
+      }}>
+        {item.announcementImageUrl && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={item.announcementImageUrl} alt={item.announcementTitle} style={{ width: '100%', maxHeight: 280, objectFit: 'cover', display: 'block' }} />
+        )}
+        <div style={{ padding: '16px 20px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+            <span style={{ color: '#C5A028', fontSize: '1rem' }}>★</span>
+            <span style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.65rem', letterSpacing: '2px', textTransform: 'uppercase', color: '#C5A028', fontWeight: 700 }}>
+              Official Banner Beauty Announcement
+            </span>
+          </div>
+          <div style={{ fontFamily: 'Georgia, serif', fontWeight: 700, color: '#FFFFFF', fontSize: '1.1rem', marginBottom: 8 }}>
+            {item.announcementTitle}
+          </div>
+          <p style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.88rem', color: 'rgba(255,255,255,0.85)', lineHeight: 1.7, margin: 0 }}>
+            {item.announcementMessage}
+          </p>
+          <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.7rem', color: 'rgba(255,255,255,0.4)', marginTop: 10 }}>
+            {item.relativeTime}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ── MILESTONE ────────────────────────────────────────────────────────────────
   if (item.type === 'milestone') {
     const FIREWORKS_URL = 'https://bannerbeautystorage.blob.core.windows.net/images/Fireworks.png';

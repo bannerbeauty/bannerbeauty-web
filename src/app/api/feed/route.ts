@@ -3,7 +3,7 @@ import { dataverse } from '@/lib/dataverse';
 
 export interface FeedItem {
   id: string;
-  type: 'bump' | 'dedication' | 'note_in' | 'note_rn' | 'brigade_bump' | 'milestone';
+  type: 'bump' | 'dedication' | 'note_in' | 'note_rn' | 'brigade_bump' | 'milestone' | 'announcement';
   createdOn: string;
   // Banner data
   bannerId: string;
@@ -56,6 +56,10 @@ export interface FeedItem {
   milestoneBlitzImageUrl: string;
   milestoneState: string;
   milestoneIsPatriotsClub: boolean;
+  // Announcement
+  announcementTitle: string;
+  announcementMessage: string;
+  announcementImageUrl: string;
 }
 
 const BANNER_OPTION_LABELS: Record<number, string> = {
@@ -369,7 +373,37 @@ export async function GET(req: NextRequest) {
       };
     });
 
-    const allFeedItems = [...feedItems, ...milestoneFeedItems];
+    let announcementFeedItems: any[] = [];
+    if (!before) {
+      try {
+        const announcementsRes = await dataverse.get<{ value: any[] }>(
+          `bb_announcements?$filter=bb_isactive eq true&$select=bb_announcementid,bb_title,bb_message,bb_imageurl,createdon&$orderby=createdon desc&$top=5`
+        );
+        announcementFeedItems = (announcementsRes.value ?? []).map((a: any) => ({
+          id: `announcement-${a.bb_announcementid}`,
+          type: 'announcement',
+          createdOn: a.createdon,
+          announcementTitle: a.bb_title ?? '',
+          announcementMessage: a.bb_message ?? '',
+          announcementImageUrl: a.bb_imageurl ?? '',
+          // Required FeedItem fields with defaults
+          bannerNumber: '', neighborId: '', displayName: '', profileImageUrl: '', isPatriotsClub: false,
+          bannerOption: 0, recipientCity: '', recipientState: '', attributionType: 0, attributionName: '',
+          attributionText: '', attributionPhotoUrl: '', beforePhotoUrl: '', afterPhotoUrl: '', noteIn: '', noteRn: '',
+          brigadeId: '', brigadeName: '', brigadeProfileImageUrl: '', blitzId: '', rnProfileImageUrl: '',
+          madeFeatureableDateTime: '', milestoneType: 0, milestoneCount: 0, milestoneState: '',
+          milestoneBrigadeId: '', milestoneBrigadeName: '', milestoneBrigadeProfileImageUrl: '',
+          milestoneBlitzId: '', milestoneBlitzName: '', milestoneBlitzImageUrl: '', milestoneIsPatriotsClub: false,
+          _tier: 0,
+          relativeTime: relativeTime(a.createdon),
+          bannerOptionLabel: '',
+        }));
+      } catch (err) {
+        console.error('Announcements fetch failed:', err);
+      }
+    }
+
+    const allFeedItems = [...announcementFeedItems, ...feedItems, ...milestoneFeedItems];
 
     // Compute blitz bump counts for brigade_bump cards
     const blitzBumpCounts: Record<string, number> = {};
