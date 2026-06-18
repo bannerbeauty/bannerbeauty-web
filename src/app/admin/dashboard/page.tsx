@@ -39,10 +39,10 @@ export default async function AdminDashboardPage() {
     pcMembersRes,
     pendingModerationRes,
   ] = await Promise.allSettled([
-    dataverse.get<{ value: any[] }>(`bb_banners?$filter=statecode eq 0&$select=bb_bannerid&$top=1`),
+    dataverse.get<{ value: any[] }>(`bb_banners?$filter=statecode eq 0&$select=bb_bannerid`),
     dataverse.get<{ value: any[] }>(`bb_banners?$filter=statecode eq 0 and createdon gt '${todayIso}'&$select=bb_bannerid`),
     dataverse.get<{ value: any[] }>(`bb_banners?$filter=statecode eq 0 and createdon gt '${weekAgoIso}'&$select=bb_bannerid`),
-    dataverse.get<{ value: any[] }>(`bb_neighbors?$filter=statecode eq 0&$select=bb_neighborid&$top=1`),
+    dataverse.get<{ value: any[] }>(`bb_neighbors?$filter=statecode eq 0&$select=bb_neighborid`),
     dataverse.get<{ value: any[] }>(`bb_neighbors?$filter=statecode eq 0 and createdon gt '${todayIso}'&$select=bb_neighborid`),
     dataverse.get<{ value: any[] }>(`bb_brigades?$filter=statecode eq 0&$select=bb_brigadeid`),
     dataverse.get<{ value: any[] }>(`bb_blitzs?$filter=statecode eq 0&$select=bb_blitzid`),
