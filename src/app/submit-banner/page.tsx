@@ -79,6 +79,7 @@ interface DvNeighbor {
   bb_neighborid: string;
   bb_firstname?: string;
   bb_lastname?: string;
+  bb_email?: string;
   bb_phone?: string;
   bb_addressline1?: string;
   bb_addressline2?: string;
@@ -125,7 +126,7 @@ export default async function SubmitBannerPage() {
   const [neighborRes, templatesRes, flagsRes, letterRes, gcProductsRes] = await Promise.allSettled([
     dataverse.get<{ value: DvNeighbor[] }>(
       `bb_neighbors?$filter=bb_neighborid eq '${neighborId}' and statecode eq 0` +
-      `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_phone,bb_addressline1,bb_addressline2,bb_city,bb_state,bb_zipcode,bb_bumpbalance,bb_ispatriotsclub&$top=1`
+      `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_email,bb_phone,bb_addressline1,bb_addressline2,bb_city,bb_state,bb_zipcode,bb_bumpbalance,bb_ispatriotsclub&$top=1`
     ),
     dataverse.get<{ value: DvTemplate[] }>(
       `bb_lettertemplates?$filter=statecode eq 0` +
@@ -156,6 +157,7 @@ export default async function SubmitBannerPage() {
         neighborId: dvNeighbor.bb_neighborid,
         firstName: dvNeighbor.bb_firstname ?? '',
         lastName: dvNeighbor.bb_lastname ?? '',
+        email: dvNeighbor.bb_email ?? '',
         phone: dvNeighbor.bb_phone ?? '',
         address1: dvNeighbor.bb_addressline1 ?? '',
         address2: dvNeighbor.bb_addressline2 ?? '',
@@ -207,7 +209,7 @@ export default async function SubmitBannerPage() {
   return (
     <Suspense fallback={<div style={{ minHeight: '60vh', background: '#FAF7F2' }} />}>
       <BannerBumpClient
-        userEmail=""
+        userEmail={dvNeighbor?.bb_email ?? ''}
         userFirstName={neighbor?.firstName ?? ''}
         userLastName={neighbor?.lastName ?? ''}
         neighbor={neighbor}
