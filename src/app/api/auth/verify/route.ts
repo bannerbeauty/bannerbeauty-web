@@ -2,8 +2,6 @@ import type { NextRequest } from 'next/server';
 import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 
-const ADMIN_PHONE = process.env.ADMIN_PHONE ?? '';
-
 export async function POST(req: NextRequest) {
   try {
     const { phoneNumber, code, verificationId } = await req.json();
@@ -40,7 +38,7 @@ export async function POST(req: NextRequest) {
 
     const neighborRes = await dataverse.get<{ value: any[] }>(
       `bb_neighbors?$filter=(${filterStr}) and statecode eq 0` +
-      `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_phone,bb_displayname,bb_handle` +
+      `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_phone,bb_displayname,bb_handle,bb_isbannerbeautyadmin` +
       `&$top=1`
     );
 
@@ -59,7 +57,7 @@ export async function POST(req: NextRequest) {
     session.neighborId = neighbor.bb_neighborid;
     session.phone = phoneNumber;
     session.isLoggedIn = true;
-    session.isAdmin = phoneNumber === ADMIN_PHONE;
+    session.isAdmin = neighbor.bb_isbannerbeautyadmin ?? false;
     await session.save();
 
     return Response.json({

@@ -2,8 +2,6 @@ import type { NextRequest } from 'next/server';
 import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
 
-const ADMIN_PHONE = process.env.ADMIN_PHONE ?? '';
-
 export async function POST(req: NextRequest) {
   try {
     const { phoneNumber, firstName, lastName, email } = await req.json();
@@ -27,7 +25,7 @@ export async function POST(req: NextRequest) {
     session.neighborId = neighborId;
     session.phone = phoneNumber;
     session.isLoggedIn = true;
-    session.isAdmin = phoneNumber === ADMIN_PHONE;
+    session.isAdmin = false;
     await session.save();
 
     return Response.json({ ok: true, neighborId });
