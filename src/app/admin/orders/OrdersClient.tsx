@@ -150,8 +150,11 @@ export default function OrdersClient({ orders }: { orders: AdminOrder[] }) {
 
                   {/* Order number */}
                   <div>
-                    <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', fontWeight: 700, color: '#1B2A4A' }}>
+                    <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', fontWeight: 700, color: '#1B2A4A', display: 'flex', alignItems: 'center', gap: 6 }}>
                       {o.orderNumber}
+                      {o.isPatriotsClubPurchase && (
+                        <span style={{ background: '#C5A028', color: '#FFFFFF', fontSize: '0.6rem', padding: '2px 6px', borderRadius: 10, fontWeight: 700 }}>★ PC</span>
+                      )}
                     </div>
                     <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#AAAAAA' }}>
                       {formatDate(o.createdOn)}
