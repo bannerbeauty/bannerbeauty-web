@@ -151,10 +151,7 @@ export default async function AdminDashboardPage() {
                 border: '1px solid #EEEEEE',
                 padding: '16px 20px',
                 borderLeft: `4px solid ${page.color}`,
-                transition: 'box-shadow 0.15s',
               }}
-                onMouseEnter={e => (e.currentTarget.style.boxShadow = '0 4px 12px rgba(27,42,74,0.1)')}
-                onMouseLeave={e => (e.currentTarget.style.boxShadow = 'none')}
               >
                 <div style={{ fontFamily: 'Georgia, serif', fontSize: '0.95rem', fontWeight: 700, color: '#1B2A4A', marginBottom: 4 }}>
                   {page.label}
