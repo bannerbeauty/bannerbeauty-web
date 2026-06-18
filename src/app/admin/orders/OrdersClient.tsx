@@ -29,11 +29,7 @@ export default function OrdersClient({ orders }: { orders: AdminOrder[] }) {
 
   const filtered = orders.filter(o => {
     const q = search.toLowerCase();
-    const matchesSearch =
-      o.orderNumber.toLowerCase().includes(q) ||
-      o.firstName.toLowerCase().includes(q) ||
-      o.lastName.toLowerCase().includes(q) ||
-      o.phone.includes(q);
+    const matchesSearch = o.orderNumber.toLowerCase().includes(q);
     const matchesStatus = filterStatus === 'all' || o.paymentStatus === filterStatus;
     return matchesSearch && matchesStatus;
   });
@@ -144,7 +140,7 @@ export default function OrdersClient({ orders }: { orders: AdminOrder[] }) {
               return (
                 <div key={o.orderId} style={{
                   display: 'grid',
-                  gridTemplateColumns: '140px 1fr 100px 100px 120px',
+                  gridTemplateColumns: '140px 1fr 100px 120px',
                   alignItems: 'center',
                   gap: 12,
                   padding: '12px 20px',
@@ -162,14 +158,14 @@ export default function OrdersClient({ orders }: { orders: AdminOrder[] }) {
                     </div>
                   </div>
 
-                  {/* Customer */}
-                  <div>
-                    <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#1B2A4A', fontWeight: 600 }}>
-                      {o.firstName} {o.lastName}
-                    </div>
-                    <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.75rem', color: '#888888' }}>
-                      {o.phone} · {o.isBannerBump ? '🚩 Banner Bump' : '🛍️ Store'}
-                    </div>
+                  {/* Neighbor */}
+                  <div style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.85rem', color: '#1B2A4A' }}>
+                    {o.neighborId ? (
+                      <Link href={`/neighbor/${o.neighborId}`} target="_blank"
+                        style={{ color: '#1B2A4A', textDecoration: 'none', fontWeight: 600 }}>
+                        View Neighbor →
+                      </Link>
+                    ) : '—'}
                   </div>
 
                   {/* Total */}
@@ -191,17 +187,8 @@ export default function OrdersClient({ orders }: { orders: AdminOrder[] }) {
                     {PAYMENT_STATUS_LABELS[o.paymentStatus] ?? 'Unknown'}
                   </div>
 
-                  {/* View neighbor */}
-                  {o.neighborId ? (
-                    <Link href={`/neighbor/${o.neighborId}`} target="_blank"
-                      style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.78rem', color: '#1B2A4A', textDecoration: 'none', textAlign: 'center' }}>
-                      View Neighbor →
-                    </Link>
-                  ) : (
-                    <div />
-                  )}
 
-                </div>
+</div>
               );
             })
           )}

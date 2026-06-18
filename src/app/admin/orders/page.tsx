@@ -7,13 +7,9 @@ export interface AdminOrder {
   orderId: string;
   orderNumber: string;
   createdOn: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
   total: number;
   paymentStatus: number;
   statusCode: number;
-  isBannerBump: boolean;
   neighborId: string;
 }
 
@@ -25,7 +21,7 @@ export default async function AdminOrdersPage() {
   try {
     const res = await dataverse.get<{ value: any[] }>(
       `bb_orders?$filter=statecode eq 0` +
-      `&$select=bb_orderid,bb_ordernumber,createdon,bb_firstname,bb_lastname,bb_phone,bb_grandtotal,bb_paymentstatus,statuscode,bb_isbannerbump,_bb_neighbor_value` +
+      `&$select=bb_orderid,bb_ordernumber,createdon,bb_grandtotal,bb_paymentstatus,statuscode,_bb_neighbor_value` +
       `&$orderby=createdon desc&$top=200`
     );
 
@@ -33,13 +29,9 @@ export default async function AdminOrdersPage() {
       orderId: o.bb_orderid,
       orderNumber: o.bb_ordernumber ?? '',
       createdOn: o.createdon ?? '',
-      firstName: o.bb_firstname ?? '',
-      lastName: o.bb_lastname ?? '',
-      phone: o.bb_phone ?? '',
       total: o.bb_grandtotal ?? 0,
       paymentStatus: o.bb_paymentstatus ?? 121120000,
       statusCode: o.statuscode ?? 1,
-      isBannerBump: o.bb_isbannerbump ?? false,
       neighborId: o._bb_neighbor_value ?? '',
     }));
 
