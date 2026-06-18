@@ -22,7 +22,7 @@ export default async function AdminOrdersPage() {
   try {
     const res = await dataverse.get<{ value: any[] }>(
       `bb_orders?$filter=statecode eq 0` +
-      `&$select=bb_orderid,bb_ordernumber,createdon,bb_grandtotal,bb_paymentstatus,statuscode,_bb_neighbor_value,bb_ispatriotsclubpurchase` +
+      `&$select=bb_orderid,bb_ordernumber,createdon,bb_grandtotal,bb_paymentstatus,statuscode,_bb_neighbor_value,bb_ispatriotcluborder` +
       `&$orderby=createdon desc&$top=200`
     );
 
@@ -34,7 +34,7 @@ export default async function AdminOrdersPage() {
       paymentStatus: o.bb_paymentstatus ?? 121120000,
       statusCode: o.statuscode ?? 1,
       neighborId: o._bb_neighbor_value ?? '',
-      isPatriotsClubPurchase: o.bb_ispatriotsclubpurchase ?? false,
+      isPatriotsClubPurchase: o.bb_ispatriotcluborder ?? false,
     }));
 
     return <OrdersClient orders={orders} />;
