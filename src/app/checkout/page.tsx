@@ -12,41 +12,39 @@ interface DvNeighbor {
   bb_city?: string;
   bb_state?: string;
   bb_zipcode?: string;
-}
-
-async function getNeighbor(neighborId: string): Promise<NeighborData | null> {
-  try {
-    const res = await dataverse.get<{ value: DvNeighbor[] }>(
-      `bb_neighbors?$filter=bb_neighborid eq '${neighborId}' and statecode eq 0` +
-      `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_phone,bb_addressline1,bb_addressline2,bb_city,bb_state,bb_zipcode` +
-      `&$top=1`
-    );
-    const n = res.value?.[0];
-    if (!n) return null;
-    return {
-      neighborId: n.bb_neighborid,
-      firstName: n.bb_firstname ?? '',
-      lastName: n.bb_lastname ?? '',
-      phone: n.bb_phone ?? '',
-      address1: n.bb_addressline1 ?? '',
-      address2: n.bb_addressline2 ?? '',
-      city: n.bb_city ?? '',
-      state: n.bb_state ?? '',
-      zipcode: n.bb_zipcode ?? '',
-    };
-  } catch {
-    return null;
-  }
+  bb_ispatriotsclub?: boolean;
 }
 
 export default async function CheckoutPage() {
   const session = await getSession();
-  let neighbor: NeighborData | null = null;
-
   const neighborId = session?.neighborId ?? null;
 
+  let dvNeighbor: DvNeighbor | null = null;
+  let neighbor: NeighborData | null = null;
+
   if (neighborId) {
-    neighbor = await getNeighbor(neighborId);
+    try {
+      const res = await dataverse.get<{ value: DvNeighbor[] }>(
+        `bb_neighbors?$filter=bb_neighborid eq '${neighborId}' and statecode eq 0` +
+        `&$select=bb_neighborid,bb_firstname,bb_lastname,bb_phone,bb_addressline1,bb_addressline2,bb_city,bb_state,bb_zipcode,bb_ispatriotsclub` +
+        `&$top=1`
+      );
+      dvNeighbor = res.value?.[0] ?? null;
+    } catch {}
+
+    if (dvNeighbor) {
+      neighbor = {
+        neighborId: dvNeighbor.bb_neighborid,
+        firstName: dvNeighbor.bb_firstname ?? '',
+        lastName: dvNeighbor.bb_lastname ?? '',
+        phone: dvNeighbor.bb_phone ?? '',
+        address1: dvNeighbor.bb_addressline1 ?? '',
+        address2: dvNeighbor.bb_addressline2 ?? '',
+        city: dvNeighbor.bb_city ?? '',
+        state: dvNeighbor.bb_state ?? '',
+        zipcode: dvNeighbor.bb_zipcode ?? '',
+      };
+    }
   }
 
   return (
@@ -55,6 +53,7 @@ export default async function CheckoutPage() {
       userFirstName={neighbor?.firstName ?? ''}
       userLastName={neighbor?.lastName ?? ''}
       neighbor={neighbor}
+      isPatriotsClub={dvNeighbor?.bb_ispatriotsclub ?? false}
     />
   );
 }

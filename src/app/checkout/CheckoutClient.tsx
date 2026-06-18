@@ -39,6 +39,7 @@ interface CheckoutClientProps {
   userFirstName: string;
   userLastName: string;
   neighbor: NeighborData | null;
+  isPatriotsClub: boolean;
 }
 
 const inputStyle: React.CSSProperties = {
@@ -72,7 +73,7 @@ const sectionTitleStyle: React.CSSProperties = {
   marginBottom: 16,
 };
 
-export default function CheckoutClient({ userEmail, userFirstName, userLastName, neighbor }: CheckoutClientProps) {
+export default function CheckoutClient({ userEmail, userFirstName, userLastName, neighbor, isPatriotsClub }: CheckoutClientProps) {
   const router = useRouter();
   const stripeRef = useRef<{
     stripe: { confirmPayment: (opts: unknown) => Promise<{ error?: { message: string } }> };
@@ -233,7 +234,7 @@ export default function CheckoutClient({ userEmail, userFirstName, userLastName,
   }
 
   function saveOrderToSession() {
-    sessionStorage.setItem('bb_store_order', JSON.stringify({
+    const existingOrderData = {
       firstName, lastName, email, phone,
       address1: hasPhysical ? address1 : '',
       address2: hasPhysical ? address2 : '',
@@ -249,6 +250,11 @@ export default function CheckoutClient({ userEmail, userFirstName, userLastName,
       marketingOptin,
       hasGC,
       hasPhysical,
+    };
+    const pointsAwarded = Math.round(amountDue * (isPatriotsClub ? 1.25 : 1));
+    sessionStorage.setItem('bb_store_order', JSON.stringify({
+      ...existingOrderData,
+      pointsAwarded,
     }));
     sessionStorage.setItem('bb_applied_gcs', JSON.stringify(appliedGCs));
     sessionStorage.setItem('bb_gc_total', String(gcTotal));
