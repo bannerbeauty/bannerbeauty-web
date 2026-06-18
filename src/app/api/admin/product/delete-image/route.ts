@@ -10,7 +10,7 @@ export async function DELETE(req: NextRequest) {
   try {
     const { imageId } = await req.json();
     if (!imageId) return Response.json({ error: 'Missing imageId' }, { status: 400 });
-    await dataverse.delete('bb_productimages', imageId);
+    await dataverse.patch('bb_productimages', imageId, { statecode: 1 });
     return Response.json({ ok: true });
   } catch (err) {
     console.error('Delete product image failed:', err);

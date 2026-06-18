@@ -78,6 +78,7 @@ export default async function AdminDashboardPage() {
     { href: '/admin/faqs', label: '❓ FAQs', description: 'Manage FAQ entries', color: '#1B7A3E' },
     { href: '/admin/products', label: '🛍️ Products', description: 'Manage store products', color: '#7B3F99' },
     { href: '/admin/brigades', label: '⚡ Brigades', description: `${stats.totalBrigades} total`, color: '#E87722' },
+    { href: '/admin/blitzes', label: '🏆 Blitz Stats', description: `${stats.totalBlitzes} total`, color: '#E87722' },
     { href: '/admin/announcements', label: '📣 Announcements', description: 'Push to feed', color: '#0077CC' },
   ];
 

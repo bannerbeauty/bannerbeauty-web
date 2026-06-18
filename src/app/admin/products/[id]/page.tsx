@@ -47,7 +47,7 @@ export default async function ProductEditPage({ params }: { params: Promise<{ id
           `bb_products(${id})?$select=bb_productid,bb_productnumber,bb_productname,bb_producttype,bb_productmaterial,bb_productsize,bb_price,bb_displayinstore,bb_stripetaxcode,bb_productdescription,bb_sortorder,bb_stockstatus,bb_heightin,bb_lengthin,bb_widthin,bb_weightoz,statecode`
         ),
         dataverse.get<{ value: any[] }>(
-          `bb_productimages?$filter=_bb_product_value eq '${id}'&$select=bb_productimageid,bb_imageurl,bb_alttext,bb_isprimary,bb_sortorder&$orderby=bb_sortorder asc`
+          `bb_productimages?$filter=_bb_product_value eq '${id}' and statecode eq 0&$select=bb_productimageid,bb_imageurl,bb_alttext,bb_isprimary,bb_sortorder&$orderby=bb_sortorder asc`
         ),
       ]);
 
