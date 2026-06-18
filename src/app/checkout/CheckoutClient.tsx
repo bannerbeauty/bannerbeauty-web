@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { APIProvider } from '@vis.gl/react-google-maps';
 import StripePaymentElement from '@/components/StripePaymentElement';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
+import { POINTS_MULTIPLIERS, calculatePoints } from '@/lib/points';
 
 export interface NeighborData {
   neighborId: string;
@@ -251,7 +252,7 @@ export default function CheckoutClient({ userEmail, userFirstName, userLastName,
       hasGC,
       hasPhysical,
     };
-    const pointsAwarded = Math.round(amountDue * (isPatriotsClub ? 1.25 : 1));
+    const pointsAwarded = calculatePoints(amountDue, isPatriotsClub ? POINTS_MULTIPLIERS.STORE_PURCHASE_PC : POINTS_MULTIPLIERS.STORE_PURCHASE);
     sessionStorage.setItem('bb_store_order', JSON.stringify({
       ...existingOrderData,
       pointsAwarded,
