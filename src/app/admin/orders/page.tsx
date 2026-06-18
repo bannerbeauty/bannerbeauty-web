@@ -17,14 +17,6 @@ export interface AdminOrder {
   neighborId: string;
 }
 
-const PAYMENT_STATUS_LABELS: Record<number, string> = {
-  121120000: 'Pending',
-  121120001: 'Paid',
-  121120002: 'Failed',
-  121120003: 'Refunded',
-};
-
-export { PAYMENT_STATUS_LABELS };
 
 export default async function AdminOrdersPage() {
   const session = await getSession();

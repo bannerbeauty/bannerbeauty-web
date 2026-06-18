@@ -3,7 +3,13 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import type { AdminOrder } from './page';
-import { PAYMENT_STATUS_LABELS } from './page';
+
+const PAYMENT_STATUS_LABELS: Record<number, string> = {
+  121120000: 'Pending',
+  121120001: 'Paid',
+  121120002: 'Failed',
+  121120003: 'Refunded',
+};
 
 function formatDate(iso: string) {
   if (!iso) return '—';
