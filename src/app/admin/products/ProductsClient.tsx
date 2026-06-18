@@ -47,7 +47,7 @@ export default function ProductsClient({ products }: { products: AdminProduct[] 
                 <Link key={p.productId} href={`/admin/products/${p.productId}`} style={{ textDecoration: 'none' }}>
                   <div style={{
                     display: 'grid',
-                    gridTemplateColumns: '100px 1fr 100px 100px',
+                    gridTemplateColumns: '150px 1fr 100px 100px',
                     alignItems: 'center',
                     gap: 12,
                     padding: '12px 20px',
