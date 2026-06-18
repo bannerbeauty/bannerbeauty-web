@@ -11,6 +11,7 @@ export interface AdminProduct {
   productType: number;
   productTypeLabel: string;
   isActive: boolean;
+  stockStatusLabel: string;
 }
 
 export default async function AdminProductsPage() {
@@ -19,8 +20,8 @@ export default async function AdminProductsPage() {
 
   try {
     const res = await dataverse.get<{ value: any[] }>(
-      `bb_products?$select=bb_productid,bb_productname,bb_productnumber,bb_price,bb_producttype,statecode` +
-      `&$orderby=bb_producttype asc,bb_productnumber asc`
+      `bb_products?$select=bb_productid,bb_productname,bb_productnumber,bb_price,bb_producttype,statecode,bb_stockstatus` +
+      `&$orderby=bb_producttype asc,bb_sortorder asc`
     );
 
     const products: AdminProduct[] = (res.value ?? []).map((p: any) => ({
@@ -31,6 +32,7 @@ export default async function AdminProductsPage() {
       productType: p.bb_producttype ?? 0,
       productTypeLabel: p['bb_producttype@OData.Community.Display.V1.FormattedValue'] ?? 'Other',
       isActive: p.statecode === 0,
+      stockStatusLabel: p['bb_stockstatus@OData.Community.Display.V1.FormattedValue'] ?? '',
     }));
 
     return <ProductsClient products={products} />;
