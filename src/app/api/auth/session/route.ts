@@ -10,6 +10,7 @@ export async function GET() {
       isLoggedIn: true,
       neighborId: session.neighborId,
       phone: session.phone,
+      isAdmin: session.isAdmin ?? false,
     });
   } catch {
     return Response.json({ isLoggedIn: false });

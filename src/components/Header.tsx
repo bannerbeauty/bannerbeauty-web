@@ -21,6 +21,7 @@ export default function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -28,7 +29,10 @@ export default function Header() {
   useEffect(() => {
     fetch('/api/auth/session')
       .then(r => r.json())
-      .then(data => setIsLoggedIn(data.isLoggedIn ?? false))
+      .then(data => {
+        setIsLoggedIn(data.isLoggedIn ?? false);
+        setIsAdmin(data.isAdmin ?? false);
+      })
       .catch(() => setIsLoggedIn(false));
   }, [pathname]);
 
@@ -159,6 +163,12 @@ export default function Header() {
                       style={{ display: 'block', padding: '12px 16px', fontFamily: 'Georgia, serif', fontSize: '0.88rem', color: '#1B2A4A', textDecoration: 'none', borderBottom: '1px solid #EEEEEE' }}>
                       My Activity
                     </Link>
+                    {isAdmin && (
+                      <Link href="/admin/dashboard" onClick={() => setDropdownOpen(false)}
+                        style={{ display: 'block', padding: '12px 16px', fontFamily: 'Georgia, serif', fontSize: '0.88rem', color: '#B22234', textDecoration: 'none', borderBottom: '1px solid #EEEEEE', fontWeight: 700 }}>
+                        ★ Admin Panel
+                      </Link>
+                    )}
                     <button onClick={handleSignOut}
                       style={{ display: 'block', width: '100%', padding: '12px 16px', fontFamily: 'Georgia, serif', fontSize: '0.88rem', color: '#B22234', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer' }}>
                       Sign Out
@@ -243,6 +253,12 @@ export default function Header() {
                     style={{ display: 'block', color: '#C5A028', textDecoration: 'none', fontFamily: 'Georgia, serif', fontSize: '0.95rem', padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.08)' }}>
                     My Activity
                   </Link>
+                  {isAdmin && (
+                    <Link href="/admin/dashboard" onClick={() => setMenuOpen(false)}
+                      style={{ display: 'block', color: '#B22234', textDecoration: 'none', fontFamily: 'Georgia, serif', fontSize: '0.95rem', padding: '12px 0', borderBottom: '1px solid rgba(255,255,255,0.08)', fontWeight: 700 }}>
+                      ★ Admin Panel
+                    </Link>
+                  )}
                   <button onClick={handleSignOut}
                     style={{ marginTop: 12, background: 'none', border: '1px solid rgba(255,255,255,0.3)', borderRadius: 4, color: '#FFFFFF', padding: '10px 20px', fontFamily: 'Georgia, serif', fontSize: '0.88rem', cursor: 'pointer', width: '100%' }}>
                     Sign Out
