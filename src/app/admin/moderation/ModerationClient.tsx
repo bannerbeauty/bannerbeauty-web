@@ -95,9 +95,14 @@ export default function ModerationClient({ pending, approved, rejected }: Props)
             Content Moderation
           </h1>
         </div>
-        <a href="/" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', textDecoration: 'none' }}>
-          ← Back to Site
-        </a>
+        <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
+          <a href="/admin/dashboard" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', textDecoration: 'none' }}>
+            ← Dashboard
+          </a>
+          <a href="/" style={{ color: 'rgba(255,255,255,0.6)', fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', textDecoration: 'none' }}>
+            ← Back to Site
+          </a>
+        </div>
       </div>
 
       {/* Filter row */}
