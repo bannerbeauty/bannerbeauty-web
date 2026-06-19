@@ -34,13 +34,7 @@ export async function POST(req: NextRequest) {
 
     return Response.json({ id: data.id, status: 'sent' });
   } catch (err) {
-    const errorMessage = err instanceof Error ? err.message : String(err);
-    console.error('send-otp error:', errorMessage);
-    return Response.json({
-      error: 'Internal server error',
-      debug: errorMessage,
-      keyLength: APP_KEY?.length ?? 0,
-      secretLength: process.env.SINCH_APPLICATION_KEY_SECRET?.length ?? 0,
-    }, { status: 500 });
+    console.error('send-otp error:', err instanceof Error ? err.message : err);
+    return Response.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
