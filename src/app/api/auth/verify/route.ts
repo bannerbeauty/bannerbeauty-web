@@ -67,7 +67,8 @@ export async function POST(req: NextRequest) {
       neighborId: neighbor.bb_neighborid,
     });
   } catch (err) {
-    console.error('Auth verify error:', err);
-    return Response.json({ error: 'Internal server error' }, { status: 500 });
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    console.error('Auth verify error:', errorMessage);
+    return Response.json({ error: 'Internal server error', debug: errorMessage }, { status: 500 });
   }
 }
