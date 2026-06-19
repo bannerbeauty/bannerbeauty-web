@@ -30,7 +30,11 @@ export async function POST(req: NextRequest) {
     const verified = data.status === 'SUCCESSFUL';
     return Response.json({ verified, status: data.status });
   } catch (err) {
-    console.error('verify-otp error:', err);
-    return Response.json({ error: 'Internal server error' }, { status: 500 });
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    console.error('verify-otp error:', errorMessage);
+    return Response.json({
+      error: 'Internal server error',
+      debug: errorMessage,
+    }, { status: 500 });
   }
 }
