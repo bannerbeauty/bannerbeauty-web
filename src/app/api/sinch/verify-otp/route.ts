@@ -10,11 +10,12 @@ export async function POST(req: NextRequest) {
       return Response.json({ error: 'Phone number and code are required' }, { status: 400 });
     }
 
-    const path = `/verification/v1/verifications/number/${encodeURIComponent(phoneNumber)}`;
+    const unencodedPath = `/verification/v1/verifications/number/${phoneNumber}`;
+    const encodedPath = `/verification/v1/verifications/number/${encodeURIComponent(phoneNumber)}`;
     const body = JSON.stringify({ method: 'sms', sms: { code } });
-    const headers = getSinchHeaders('PUT', path, body, 'application/json');
+    const headers = getSinchHeaders('PUT', unencodedPath, body, 'application/json');
 
-    const res = await fetch(`${SINCH_BASE_URL}${path}`, {
+    const res = await fetch(`${SINCH_BASE_URL}${encodedPath}`, {
       method: 'PUT',
       headers,
       body,
