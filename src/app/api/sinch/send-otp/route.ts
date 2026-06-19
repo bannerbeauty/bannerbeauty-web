@@ -33,7 +33,8 @@ export async function POST(req: NextRequest) {
 
     return Response.json({ id: data.id, status: 'sent' });
   } catch (err) {
-    console.error('send-otp error:', err);
+    console.error('send-otp error:', err instanceof Error ? err.message : err);
+    console.error('send-otp error stack:', err instanceof Error ? err.stack : 'no stack');
     return Response.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
