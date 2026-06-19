@@ -1,6 +1,7 @@
 import type { NextRequest } from 'next/server';
 import { getSinchHeaders } from '@/lib/sinch-auth';
 
+const APP_KEY = process.env.SINCH_APPLICATION_KEY;
 const SINCH_BASE_URL = 'https://verification.api.sinch.com';
 const PATH = '/verification/v1/verifications';
 
@@ -33,8 +34,13 @@ export async function POST(req: NextRequest) {
 
     return Response.json({ id: data.id, status: 'sent' });
   } catch (err) {
-    console.error('send-otp error:', err instanceof Error ? err.message : err);
-    console.error('send-otp error stack:', err instanceof Error ? err.stack : 'no stack');
-    return Response.json({ error: 'Internal server error' }, { status: 500 });
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    console.error('send-otp error:', errorMessage);
+    return Response.json({
+      error: 'Internal server error',
+      debug: errorMessage,
+      keyLength: APP_KEY?.length ?? 0,
+      secretLength: process.env.SINCH_APPLICATION_KEY_SECRET?.length ?? 0,
+    }, { status: 500 });
   }
 }
