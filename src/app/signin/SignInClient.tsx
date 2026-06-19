@@ -1,12 +1,14 @@
 'use client';
 
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 type Step = 'phone' | 'code' | 'register';
 
 export default function SignInClient() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/community';
   const [step, setStep] = useState<Step>('phone');
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
@@ -66,7 +68,7 @@ export default function SignInClient() {
       if (data.newUser) {
         setStep('register');
       } else {
-        router.push('/community');
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch {

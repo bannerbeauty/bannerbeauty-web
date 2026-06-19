@@ -333,9 +333,29 @@ export default async function HomePage() {
               borderRadius: 4,
               textDecoration: 'none',
               letterSpacing: '0.5px',
+              marginBottom: 16,
             }}
           >
             ★ Banner Bump a Fellow Patriot
+          </Link>
+          <br />
+          <Link
+            href="/signin?callbackUrl=/community"
+            style={{
+              display: 'inline-block',
+              background: 'transparent',
+              color: '#FFFFFF',
+              fontFamily: 'Georgia, serif',
+              fontSize: '0.92rem',
+              fontWeight: 700,
+              padding: '14px 36px',
+              borderRadius: 4,
+              textDecoration: 'none',
+              letterSpacing: '0.5px',
+              border: '2px solid #FFFFFF',
+            }}
+          >
+            🏠 Enter the Community
           </Link>
         </div>
       </section>
