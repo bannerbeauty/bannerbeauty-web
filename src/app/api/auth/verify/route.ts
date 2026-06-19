@@ -11,8 +11,9 @@ export async function POST(req: NextRequest) {
     }
 
     // Verify OTP with Sinch
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${req.headers.get('host')}`;
     const sinchRes = await fetch(
-      `${process.env.NEXT_PUBLIC_APP_URL}/api/sinch/verify-otp`,
+      `${baseUrl}/api/sinch/verify-otp`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
