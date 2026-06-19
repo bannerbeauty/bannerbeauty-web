@@ -66,7 +66,7 @@ export default function SignInClient() {
       if (data.newUser) {
         setStep('register');
       } else {
-        router.push('/');
+        router.push('/community');
         router.refresh();
       }
     } catch {
