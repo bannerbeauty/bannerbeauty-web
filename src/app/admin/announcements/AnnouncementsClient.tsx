@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import Link from 'next/link';
 import type { AdminAnnouncement } from './page';
 
@@ -16,6 +16,24 @@ export default function AnnouncementsClient({ announcements }: { announcements: 
   const [newMessage, setNewMessage] = useState('');
   const [newImageUrl, setNewImageUrl] = useState('');
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const res = await fetch('/api/admin/announcement/upload-image', {
+        method: 'POST',
+        headers: { 'Content-Type': file.type },
+        body: file,
+      });
+      const data = await res.json();
+      if (data.url) setNewImageUrl(data.url);
+    } catch { console.error('Image upload failed'); }
+    finally { setUploading(false); }
+  };
 
   const handleCreate = async () => {
     if (!newTitle.trim() || !newMessage.trim()) return;
@@ -105,8 +123,20 @@ export default function AnnouncementsClient({ announcements }: { announcements: 
             <input type="text" value={newTitle} onChange={e => setNewTitle(e.target.value)} style={inputStyle} placeholder="Banner Beauty Turns 1!" />
             <label style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#888888', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: 6 }}>Message</label>
             <textarea value={newMessage} onChange={e => setNewMessage(e.target.value)} rows={4} style={inputStyle} placeholder="Thank you to every patriot..." />
-            <label style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#888888', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: 6 }}>Image URL (optional)</label>
-            <input type="text" value={newImageUrl} onChange={e => setNewImageUrl(e.target.value)} style={inputStyle} placeholder="https://..." />
+            <label style={{ fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.72rem', color: '#888888', textTransform: 'uppercase', letterSpacing: '1px', display: 'block', marginBottom: 6 }}>Image (optional)</label>
+            {newImageUrl && (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={newImageUrl} alt="Preview" style={{ width: '100%', maxHeight: 200, objectFit: 'cover', borderRadius: 6, marginBottom: 10 }} />
+            )}
+            <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} style={{ display: 'none' }} />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploading}
+              type="button"
+              style={{ padding: '8px 16px', background: '#FFFFFF', border: '1.5px solid #1B2A4A', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', fontWeight: 700, color: '#1B2A4A', cursor: 'pointer', marginBottom: 10 }}
+            >
+              {uploading ? 'Uploading...' : newImageUrl ? '📷 Replace Image' : '📷 Upload Image'}
+            </button>
             <div style={{ display: 'flex', gap: 8 }}>
               <button onClick={handleCreate} disabled={saving} style={{ padding: '8px 20px', background: '#1B7A3E', color: '#FFFFFF', border: 'none', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', fontWeight: 700, cursor: 'pointer' }}>
                 {saving ? 'Posting...' : 'Post Announcement'}
