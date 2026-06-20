@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { APIProvider } from '@vis.gl/react-google-maps';
 import AddressAutocomplete from '@/components/AddressAutocomplete';
 
@@ -116,6 +117,10 @@ export default function ProfileClient({
   handle: initialHandle,
   profileImageUrl: initialProfileImageUrl,
 }: ProfileClientProps) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const isNewUser = searchParams.get('new') === 'true';
+
   const [firstName, setFirstName] = useState(initialFirstName);
   const [lastName, setLastName] = useState(initialLastName);
   const [phone, setPhone] = useState(initialPhone);
@@ -220,6 +225,11 @@ export default function ProfileClient({
 
       setSaveStatus('success');
       setSaveMessage('Your profile has been updated.');
+      if (isNewUser) {
+        setTimeout(() => {
+          router.push('/community');
+        }, 1200);
+      }
     } catch (err) {
       setSaveStatus('error');
       setSaveMessage(err instanceof Error ? err.message : 'An error occurred. Please try again.');

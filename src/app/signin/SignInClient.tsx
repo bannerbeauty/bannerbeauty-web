@@ -92,7 +92,7 @@ export default function SignInClient() {
         setError(data.error ?? 'Registration failed. Please try again.');
         return;
       }
-      router.push('/profile');
+      router.push('/profile?new=true');
       router.refresh();
     } catch {
       setError('Something went wrong. Please try again.');

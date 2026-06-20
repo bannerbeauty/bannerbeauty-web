@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import { redirect } from 'next/navigation';
 import { getSession } from '@/lib/session';
 import { dataverse } from '@/lib/dataverse';
@@ -43,23 +44,25 @@ export default async function ProfilePage() {
   }
 
   return (
-    <ProfileClient
-      neighborId={neighbor?.bb_neighborid ?? null}
-      userEmail={neighbor?.bb_email ?? ''}
-      firstName={neighbor?.bb_firstname ?? ''}
-      lastName={neighbor?.bb_lastname ?? ''}
-      phone={neighbor?.bb_phone ?? ''}
-      address1={neighbor?.bb_addressline1 ?? ''}
-      address2={neighbor?.bb_addressline2 ?? ''}
-      city={neighbor?.bb_city ?? ''}
-      state={neighbor?.bb_state ?? ''}
-      zipcode={neighbor?.bb_zipcode ?? ''}
-      preferredAuth={neighbor?.bb_preferredauthmethod != null ? String(neighbor.bb_preferredauthmethod) : '121120000'}
-      emailOptin={neighbor?.bb_emailoptin ?? false}
-      smsOptin={neighbor?.bb_smsoptin ?? false}
-      displayName={neighbor?.bb_displayname ?? ''}
-      handle={neighbor?.bb_handle ?? ''}
-      profileImageUrl={neighbor?.bb_profileimageurl ?? null}
-    />
+    <Suspense fallback={null}>
+      <ProfileClient
+        neighborId={neighbor?.bb_neighborid ?? null}
+        userEmail={neighbor?.bb_email ?? ''}
+        firstName={neighbor?.bb_firstname ?? ''}
+        lastName={neighbor?.bb_lastname ?? ''}
+        phone={neighbor?.bb_phone ?? ''}
+        address1={neighbor?.bb_addressline1 ?? ''}
+        address2={neighbor?.bb_addressline2 ?? ''}
+        city={neighbor?.bb_city ?? ''}
+        state={neighbor?.bb_state ?? ''}
+        zipcode={neighbor?.bb_zipcode ?? ''}
+        preferredAuth={neighbor?.bb_preferredauthmethod != null ? String(neighbor.bb_preferredauthmethod) : '121120000'}
+        emailOptin={neighbor?.bb_emailoptin ?? false}
+        smsOptin={neighbor?.bb_smsoptin ?? false}
+        displayName={neighbor?.bb_displayname ?? ''}
+        handle={neighbor?.bb_handle ?? ''}
+        profileImageUrl={neighbor?.bb_profileimageurl ?? null}
+      />
+    </Suspense>
   );
 }
