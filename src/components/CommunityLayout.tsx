@@ -197,7 +197,7 @@ export default function CommunityLayout({ sidebarData, children, tabBar, hideAva
   return (
     <div style={{ background: '#FAF7F2', minHeight: '100vh' }}>
       {tabBar && (
-        <div style={{ position: 'sticky', top: 64, zIndex: 10, background: '#1B2A4A' }}>
+        <div style={{ position: 'sticky', top: 0, zIndex: 10, background: '#1B2A4A' }}>
           <div style={{ maxWidth: 1100, margin: '0 auto' }}>
             {tabBar}
           </div>

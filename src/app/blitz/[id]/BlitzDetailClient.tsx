@@ -275,7 +275,7 @@ export default function BlitzDetailClient({
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', borderBottom: '1px solid #EEEEEE', background: '#FFFFFF', position: 'sticky', top: 64, zIndex: 10 }}>
+      <div style={{ display: 'flex', borderBottom: '1px solid #EEEEEE', background: '#FFFFFF', position: 'sticky', top: 0, zIndex: 10 }}>
         {(['bumps', 'brigades', ...(isOwner && pendingBrigades.length > 0 ? ['pending'] : [])] as const).map(tab => (
           <button
             key={tab}
