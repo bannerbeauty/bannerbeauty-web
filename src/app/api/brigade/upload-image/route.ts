@@ -24,6 +24,6 @@ export async function POST(req: NextRequest) {
     return Response.json({ url: blockBlob.url });
   } catch (err) {
     console.error('Brigade image upload error:', err);
-    return Response.json({ error: 'Upload failed' }, { status: 500 });
+    return Response.json({ error: 'Upload failed', detail: err instanceof Error ? err.message : String(err) }, { status: 500 });
   }
 }

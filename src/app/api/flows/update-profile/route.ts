@@ -7,6 +7,7 @@ export async function POST(req: NextRequest) {
   let body: unknown;
   try {
     body = await req.json();
+    console.log('[DEBUG update-profile] outgoing body:', JSON.stringify(body));
   } catch {
     return Response.json({ error: 'Invalid request body' }, { status: 400 });
   }
@@ -21,6 +22,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify(body),
     });
+    console.log('[DEBUG update-profile] flow response status:', flowRes.status);
   } catch (err) {
     console.error('update-profile flow error:', err);
     return Response.json({ error: 'Flow request failed' }, { status: 502 });
