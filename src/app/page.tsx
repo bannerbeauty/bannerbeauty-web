@@ -508,6 +508,48 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Video — Banner Blitz */}
+      <section style={{ background: '#FAF7F2', padding: '80px 24px' }}>
+        <div style={{ maxWidth: 800, margin: '0 auto', textAlign: 'center' }}>
+          <p style={{
+            fontFamily: 'Trebuchet MS, sans-serif',
+            fontSize: '1.125rem',
+            letterSpacing: '3px',
+            textTransform: 'uppercase',
+            color: '#C5A028',
+            margin: '0 0 12px 0',
+          }}>
+            See It In Action
+          </p>
+          <h2 style={{
+            fontFamily: 'Georgia, serif',
+            fontSize: 'clamp(2.8rem, 6vw, 4rem)',
+            fontWeight: 700,
+            color: '#1B2A4A',
+            margin: '0 0 32px 0',
+          }}>
+            What is a Banner Blitz?
+          </h2>
+          <div style={{
+            borderRadius: 8,
+            overflow: 'hidden',
+            aspectRatio: '16 / 9',
+            position: 'relative',
+          }}>
+            <iframe
+              width="100%"
+              height="100%"
+              src="https://www.youtube.com/embed/sLq1MrIsTN4"
+              title="What is a Banner Blitz?"
+              frameBorder="0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+            />
+          </div>
+        </div>
+      </section>
+
       {/* Featured Banner + Quotes — client-rendered */}
       <HomeClient featuredBanner={featuredBanner} quotes={quotes} locations={locations.map(l => ({ lat: l.bb_latitude, lng: l.bb_longitude }))} stateTotals={stateTotals} totalCount={count} dedication={dedication} />
     </>
