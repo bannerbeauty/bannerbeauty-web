@@ -77,6 +77,7 @@ export default async function BlitzDetailPage({
   let pendingBrigades: BlitzBrigadeItem[] = [];
   let recentBumps: BlitzBump[] = [];
   let userBrigades: UserBrigade[] = [];
+  let isBlitzAdmin = false;
 
   try {
     // Fetch blitz record
@@ -113,6 +114,15 @@ export default async function BlitzDetailPage({
       ownerProfileImageUrl: owner?.bb_profileimageurl ?? '',
       imageUrl: b.bb_imageurl ?? '',
     };
+
+    // Check if the logged-in Neighbor is a designated Blitz admin (owner is checked separately)
+    if (neighborId && neighborId !== blitz.ownerNeighborId) {
+      const blitzAdminRes = await dataverse.get<{ value: any[] }>(
+        `bb_blitzadmins?$filter=_bb_blitz_value eq '${id}' and _bb_neighbor_value eq '${neighborId}' and statecode eq 0` +
+        `&$select=bb_blitzadminid&$top=1`
+      );
+      isBlitzAdmin = (blitzAdminRes.value?.length ?? 0) > 0;
+    }
 
     // Fetch participating brigades
     const participatingRes = await dataverse.get<{ value: any[] }>(
@@ -243,6 +253,7 @@ export default async function BlitzDetailPage({
       recentBumps={recentBumps}
       userBrigades={userBrigades}
       neighborId={neighborId}
+      isBlitzAdmin={isBlitzAdmin}
       bannerOptionLabels={BANNER_OPTION_LABELS}
       sidebarData={sidebarData}
     />

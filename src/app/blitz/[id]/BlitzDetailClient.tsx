@@ -39,6 +39,7 @@ interface Props {
   recentBumps: BlitzBump[];
   userBrigades: UserBrigade[];
   neighborId: string | null;
+  isBlitzAdmin: boolean;
   bannerOptionLabels: Record<number, string>;
   sidebarData: SidebarData | null;
 }
@@ -50,6 +51,7 @@ export default function BlitzDetailClient({
   recentBumps,
   userBrigades,
   neighborId,
+  isBlitzAdmin,
   bannerOptionLabels,
   sidebarData,
 }: Props) {
@@ -174,8 +176,8 @@ export default function BlitzDetailClient({
             )}
           </div>
           {/* Action button */}
-          <div style={{ flexShrink: 0 }}>
-            {isOwner ? (
+          <div style={{ flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+            {isOwner && (
               <div style={{ display: 'flex', alignItems: 'center' }}>
                 <span style={{ padding: '8px 16px', background: 'rgba(197,160,40,0.15)', color: '#C5A028', borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', fontWeight: 700, border: '1px solid #C5A028' }}>
                   ★ Organizer
@@ -193,7 +195,27 @@ export default function BlitzDetailClient({
                   Edit
                 </Link>
               </div>
-            ) : eligibleBrigades.length > 0 && !requestSent ? (
+            )}
+            {!isOwner && isBlitzAdmin && (
+              <div style={{ display: 'flex', alignItems: 'center' }}>
+                <span style={{ padding: '8px 16px', background: 'rgba(197,160,40,0.15)', color: '#C5A028', borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', fontWeight: 700, border: '1px solid #C5A028' }}>
+                  ★ Admin
+                </span>
+                <Link
+                  href={`/blitz/${blitz.blitzId}/edit`}
+                  style={{
+                    display: 'inline-block', padding: '8px 16px',
+                    background: 'transparent', color: '#1B2A4A',
+                    borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif',
+                    fontSize: '0.82rem', fontWeight: 700, textDecoration: 'none',
+                    border: '1px solid #CCCCCC', marginLeft: 8,
+                  }}
+                >
+                  Edit
+                </Link>
+              </div>
+            )}
+            {eligibleBrigades.length > 0 && !requestSent && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                 <select
                   value={selectedBrigadeId}
@@ -211,11 +233,12 @@ export default function BlitzDetailClient({
                   {requesting ? 'Requesting...' : '★ Request to Join'}
                 </button>
               </div>
-            ) : requestSent ? (
+            )}
+            {requestSent && (
               <span style={{ padding: '8px 16px', background: 'rgba(255,255,255,0.05)', color: '#888888', borderRadius: 20, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.82rem', border: '1px solid #DDDDDD' }}>
                 ⏳ Request Pending
               </span>
-            ) : null}
+            )}
           </div>
         </div>
 
@@ -276,7 +299,7 @@ export default function BlitzDetailClient({
 
       {/* Tabs */}
       <div style={{ display: 'flex', borderBottom: '1px solid #EEEEEE', background: '#FFFFFF', position: 'sticky', top: 0, zIndex: 10 }}>
-        {(['bumps', 'brigades', ...(isOwner && pendingBrigades.length > 0 ? ['pending'] : [])] as const).map(tab => (
+        {(['bumps', 'brigades', ...((isOwner || isBlitzAdmin) && pendingBrigades.length > 0 ? ['pending'] : [])] as const).map(tab => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab as 'bumps' | 'brigades' | 'pending')}
@@ -341,8 +364,8 @@ export default function BlitzDetailClient({
           </div>
         )}
 
-        {/* Pending tab — owner only */}
-        {activeTab === 'pending' && isOwner && (
+        {/* Pending tab — owner or Blitz admin */}
+        {activeTab === 'pending' && (isOwner || isBlitzAdmin) && (
           <div>
             {pendingBrigades.map(brigade => (
               <div key={brigade.blitzbrigadeid} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 0', borderBottom: '1px solid #F5F5F5' }}>
