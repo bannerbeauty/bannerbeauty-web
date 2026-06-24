@@ -133,7 +133,7 @@ export default async function SubmitBannerPage() {
       `&$select=bb_lettertemplateid,bb_templatename,bb_previewtext,bb_bodyhtml&$orderby=bb_sortorder asc`
     ),
     dataverse.get<{ value: DvFlagProduct[] }>(
-      `bb_products?$filter=statecode eq 0 and bb_producttype eq 121120000` +
+      `bb_products?$filter=statecode eq 0 and (bb_producttype eq 121120000 or bb_producttype eq 121120002)` +
       `&$select=bb_productid,bb_productname,bb_price,bb_productnumber&$orderby=bb_productnumber asc`
     ),
     dataverse.get<{ value: DvLetterProduct[] }>(
