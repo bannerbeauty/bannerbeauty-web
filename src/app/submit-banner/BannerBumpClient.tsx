@@ -628,7 +628,7 @@ export default function BannerBumpClient({
               const needsBrigadeSelection = selectedBlitz && selectedBlitz.brigades.length > 1;
               return (
                 <div style={{ marginTop: 20 }}>
-                  <label style={labelStyle}>Are you Banner Bumping as part of a group activity? (optional)</label>
+                  <label style={labelStyle}>Are you Banner Bumping as part of a Banner Blitz? (optional)</label>
                   <select
                     value={selectedBlitzId}
                     onChange={e => {

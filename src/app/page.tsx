@@ -539,7 +539,7 @@ export default async function HomePage() {
             <iframe
               width="100%"
               height="100%"
-              src="https://www.youtube.com/embed/sLq1MrIsTN4"
+              src="https://www.youtube.com/embed/dPo8TzuE_9g"
               title="What is a Banner Blitz?"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

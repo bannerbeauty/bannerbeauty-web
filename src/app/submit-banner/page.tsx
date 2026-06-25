@@ -17,46 +17,56 @@ export interface ActiveBlitz {
 
 async function getNeighborActiveBlitzes(neighborId: string): Promise<ActiveBlitz[]> {
   try {
-    const [ownedRes, adminRes] = await Promise.all([
+    const [ownedRes, memberRes] = await Promise.all([
       dataverse.get<{ value: any[] }>(
         `bb_brigades?$filter=_bb_owner_value eq '${neighborId}' and statecode eq 0&$select=bb_brigadeid,bb_name`
       ),
       dataverse.get<{ value: any[] }>(
-        `bb_brigadeneighbors?$filter=_bb_neighbor_value eq '${neighborId}' and bb_isadmin eq true and statecode eq 0 and statuscode eq 121120001&$select=_bb_brigade_value`
+        `bb_brigadeneighbors?$filter=_bb_neighbor_value eq '${neighborId}' and statecode eq 0 and statuscode eq 121120001&$select=_bb_brigade_value`
       ),
     ]);
 
-    const brigadeIds = [
-      ...(ownedRes.value ?? []).map((b: any) => ({ id: b.bb_brigadeid, name: b.bb_name })),
-    ];
-
-    const adminBrigadeIds = (adminRes.value ?? []).map((bn: any) => bn._bb_brigade_value).filter(Boolean);
-    if (adminBrigadeIds.length > 0) {
-      const adminBrigadesRes = await dataverse.get<{ value: any[] }>(
-        `bb_brigades?$filter=${adminBrigadeIds.map((id: string) => `bb_brigadeid eq '${id}'`).join(' or ')}&$select=bb_brigadeid,bb_name`
-      );
-      brigadeIds.push(...(adminBrigadesRes.value ?? []).map((b: any) => ({ id: b.bb_brigadeid, name: b.bb_name })));
+    // De-dupe by brigade id — covers owner, admin, and plain member in one map
+    const brigadeMap = new Map<string, { id: string; name: string }>();
+    for (const b of ownedRes.value ?? []) {
+      brigadeMap.set(b.bb_brigadeid, { id: b.bb_brigadeid, name: b.bb_name });
     }
 
+    const memberBrigadeIds = [...new Set((memberRes.value ?? []).map((bn: any) => bn._bb_brigade_value).filter(Boolean))]
+      .filter((id: string) => !brigadeMap.has(id));
+    if (memberBrigadeIds.length > 0) {
+      const memberBrigadesRes = await dataverse.get<{ value: any[] }>(
+        `bb_brigades?$filter=${memberBrigadeIds.map((id: string) => `bb_brigadeid eq '${id}'`).join(' or ')}&$select=bb_brigadeid,bb_name`
+      );
+      for (const b of memberBrigadesRes.value ?? []) {
+        brigadeMap.set(b.bb_brigadeid, { id: b.bb_brigadeid, name: b.bb_name });
+      }
+    }
+
+    const brigadeIds = Array.from(brigadeMap.values());
     if (brigadeIds.length === 0) return [];
 
+    // Parenthesized OR group so the trailing AND conditions apply to every brigade id, not just the last one
     const blitzBrigadeRes = await dataverse.get<{ value: any[] }>(
-      `bb_blitzbrigades?$filter=${brigadeIds.map(b => `_bb_brigade_value eq '${b.id}'`).join(' or ')} and statuscode eq 121120002 and statecode eq 0&$select=_bb_blitz_value,_bb_brigade_value`
+      `bb_blitzbrigades?$filter=(${brigadeIds.map(b => `_bb_brigade_value eq '${b.id}'`).join(' or ')}) and statuscode eq 121120002 and statecode eq 0&$select=_bb_blitz_value,_bb_brigade_value`
     );
 
     const blitzIds = [...new Set((blitzBrigadeRes.value ?? []).map((bb: any) => bb._bb_blitz_value).filter(Boolean))];
     if (blitzIds.length === 0) return [];
 
+    // Same parenthesization fix here
     const blitzRes = await dataverse.get<{ value: any[] }>(
-      `bb_blitzs?$filter=${blitzIds.map(id => `bb_blitzid eq '${id}'`).join(' or ')} and statuscode eq 121120001 and statecode eq 0&$select=bb_blitzid,bb_name`
+      `bb_blitzs?$filter=(${blitzIds.map(id => `bb_blitzid eq '${id}'`).join(' or ')}) and statuscode eq 121120001 and statecode eq 0&$select=bb_blitzid,bb_name`
     );
 
     const blitzMap = new Map<string, ActiveBlitz>();
     for (const bl of blitzRes.value ?? []) {
       const matchingBBs = blitzBrigadeRes.value?.filter((bb: any) => bb._bb_blitz_value === bl.bb_blitzid) ?? [];
+      const seenBrigadeIds = new Set<string>();
       for (const bb of matchingBBs) {
         const brigade = brigadeIds.find(b => b.id === bb._bb_brigade_value);
-        if (!brigade) continue;
+        if (!brigade || seenBrigadeIds.has(brigade.id)) continue;
+        seenBrigadeIds.add(brigade.id);
         if (blitzMap.has(bl.bb_blitzid)) {
           blitzMap.get(bl.bb_blitzid)!.brigades.push({ brigadeId: brigade.id, brigadeName: brigade.name });
         } else {
