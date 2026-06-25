@@ -497,7 +497,7 @@ export default async function HomePage() {
             <iframe
               width="100%"
               height="100%"
-              src="https://www.youtube.com/embed/V5QjkW7ClrY"
+              src="https://www.youtube.com/embed/V5QjkW7ClrY?end=30"
               title="What is a Banner Bump?"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -539,7 +539,7 @@ export default async function HomePage() {
             <iframe
               width="100%"
               height="100%"
-              src="https://www.youtube.com/embed/nDHllE45Ou0"
+              src="https://www.youtube.com/embed/8DiAw5zAQG8?end=29"
               title="What is a Banner Blitz?"
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
