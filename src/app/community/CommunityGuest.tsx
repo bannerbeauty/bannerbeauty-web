@@ -52,7 +52,7 @@ export default function CommunityGuest() {
       setFeedItems(prev => {
         const combined = before ? [...prev, ...hydrated] : hydrated;
         const seen = new Set<string>();
-        return combined.filter(item => {
+        return combined.filter((item: typeof combined[0]) => {
           if (seen.has(item.id)) return false;
           seen.add(item.id);
           return true;
