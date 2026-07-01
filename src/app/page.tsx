@@ -340,7 +340,7 @@ export default async function HomePage() {
           </Link>
           <br />
           <Link
-            href="/signin?callbackUrl=/community"
+            href="/community"
             style={{
               display: 'inline-block',
               background: 'transparent',

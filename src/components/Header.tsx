@@ -7,11 +7,13 @@ import Image from 'next/image';
 
 const NAV_LINKS_LOGGED_OUT = [
   { label: 'Home', href: '/' },
+  { label: 'Community', href: '/community' },
   { label: 'Banner Bump', href: '/submit-banner' },
   { label: 'Store', href: '/store' },
 ];
 
 const NAV_LINKS_LOGGED_IN = [
+  { label: 'Home', href: '/' },
   { label: 'Community', href: '/community' },
   { label: 'Banner Bump', href: '/submit-banner' },
   { label: 'Store', href: '/store' },

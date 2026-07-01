@@ -48,7 +48,8 @@ const BANNER_OPTION_LABELS: Record<number, string> = {
 export default async function CommunityPage() {
   const session = await getSession();
   if (!session?.isLoggedIn) {
-    redirect('/signin');
+    const { default: CommunityGuest } = await import('./CommunityGuest');
+    return <CommunityGuest />;
   }
 
   const neighborId = session.neighborId;
