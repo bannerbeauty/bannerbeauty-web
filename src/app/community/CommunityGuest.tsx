@@ -99,14 +99,9 @@ export default function CommunityGuest() {
         <h1 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(1.4rem, 4vw, 2rem)', fontWeight: 700, color: '#FFFFFF', margin: '0 0 16px' }}>
           Join your neighbors in honoring America
         </h1>
-        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-          <Link href="/signup" style={{ display: 'inline-block', padding: '12px 28px', background: '#B22234', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Georgia, serif', fontSize: '0.95rem', fontWeight: 700, textDecoration: 'none' }}>
-            ★ Join Banner Beauty
-          </Link>
-          <Link href="/signin" style={{ display: 'inline-block', padding: '12px 28px', background: 'rgba(255,255,255,0.1)', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.9rem', textDecoration: 'none' }}>
-            Log In for Full Experience
-          </Link>
-        </div>
+        <Link href="/signin" style={{ display: 'inline-block', padding: '12px 28px', background: '#B22234', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Georgia, serif', fontSize: '0.95rem', fontWeight: 700, textDecoration: 'none' }}>
+          Log In for Full Experience
+        </Link>
       </div>
 
       {/* Feed */}
@@ -143,14 +138,9 @@ export default function CommunityGuest() {
             <p style={{ fontFamily: 'Georgia, serif', fontSize: '1.1rem', fontWeight: 700, color: '#FFFFFF', margin: '0 0 16px' }}>
               Ready to Banner Bump a neighbor?
             </p>
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
-              <Link href="/signup" style={{ display: 'inline-block', padding: '12px 28px', background: '#B22234', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Georgia, serif', fontSize: '0.95rem', fontWeight: 700, textDecoration: 'none' }}>
-                ★ Join Banner Beauty
-              </Link>
-              <Link href="/signin" style={{ display: 'inline-block', padding: '12px 28px', background: 'rgba(255,255,255,0.1)', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Trebuchet MS, sans-serif', fontSize: '0.9rem', textDecoration: 'none' }}>
-                Log In for Full Experience
-              </Link>
-            </div>
+            <Link href="/signin" style={{ display: 'inline-block', padding: '12px 28px', background: '#B22234', color: '#FFFFFF', borderRadius: 4, fontFamily: 'Georgia, serif', fontSize: '0.95rem', fontWeight: 700, textDecoration: 'none' }}>
+              Log In for Full Experience
+            </Link>
           </div>
         )}
 
